@@ -1,0 +1,30 @@
+﻿<UserControl x:Class="TeheManX_Editor.Forms.EnemyEditor"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:forms="clr-namespace:TeheManX_Editor.Forms"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="auto"/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        
+        <!--Layout Viewer-->
+        <Viewbox Width="auto">
+            <Canvas x:Name="canvas" Width="768" Height="512" ClipToBounds="True" PreviewMouseMove="canvas_PreviewMouseMove" PreviewMouseUp="canvas_PreviewMouseUp">
+                <Image x:Name="layoutImage" x:FieldModifier="public"  HorizontalAlignment="Left" VerticalAlignment="Top"/>
+            </Canvas>
+        </Viewbox>
+        <Label x:Name="camLbl" Grid.Row="0" IsHitTestVisible="False" Foreground="White" FontFamily="Consolas" HorizontalAlignment="Left" FontSize="20"></Label>
+
+        <!--Info-->
+        <StackPanel Grid.Column="1">
+            <Label Name="enemyX_Lbl" Foreground="White"></Label>
+            <Label Name="enemyY_Lbl" Foreground="White"></Label>
+        </StackPanel>
+
+    </Grid>
+</UserControl>

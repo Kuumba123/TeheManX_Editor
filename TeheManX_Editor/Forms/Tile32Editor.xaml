@@ -1,0 +1,174 @@
+﻿<UserControl x:Class="TeheManX_Editor.Forms.Tile32Editor"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:TeheManX_Editor.Forms"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid Background="#101010" UseLayoutRounding="True">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition />
+            <ColumnDefinition />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <ScrollViewer Grid.RowSpan="3" >
+            <!--32x32 List-->
+            <Grid x:Name="tileGrid">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <Image x:Name="tileImage" Grid.RowSpan="32" Grid.ColumnSpan="16" MouseDown="tileImage_MouseDown"/>
+                <Rectangle x:Name="tile32Cursor"   IsHitTestVisible="False" StrokeThickness="2.5" StrokeDashArray="2 2"  Stroke="#AFFF0000"></Rectangle>
+            </Grid>
+        </ScrollViewer>
+        <StackPanel Grid.Column="1" Orientation="Horizontal">
+            <Label Foreground="White" FontSize="18" FontFamily="Consolas" Padding="3,5,1,5">x16-Tiles</Label>
+            <Button Style="{StaticResource TileButton}" Click="Tile16Button_Click">0</Button>
+            <Button Style="{StaticResource TileButton}" Click="Tile16Button_Click">1</Button>
+            <Button Style="{StaticResource TileButton}" Click="Tile16Button_Click">2</Button>
+            <Button Style="{StaticResource TileButton}" Click="Tile16Button_Click">3</Button>
+            <Button Style="{StaticResource TileButton}" Click="Tile16Button_Click">4</Button>
+            <Button Style="{StaticResource TileButton}" Click="Tile16Button_Click">5</Button>
+            <Button Style="{StaticResource TileButton}" Click="Tile16Button_Click">6</Button>
+            <Button Style="{StaticResource TileButton}" Click="Tile16Button_Click">7</Button>
+            <Button Style="{StaticResource TileButton}" Click="Tile16Button_Click">8</Button>
+            <Button Style="{StaticResource TileButton}" Click="Tile16Button_Click">9</Button>
+        </StackPanel>
+        <Border Grid.Column="1" Grid.Row="1" BorderBrush="White" BorderThickness="2" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0">
+            <Grid x:Name="x16grid">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <Image  x:Name="x16Image" MaxWidth="768" Grid.RowSpan="16" Grid.ColumnSpan="16" MouseDown="x16Image_MouseDown"/>
+                <Rectangle x:Name="tile16Cursor"   IsHitTestVisible="False" StrokeThickness="2.5" StrokeDashArray="2 2"  Stroke="#AFFF0000"></Rectangle>
+            </Grid>
+        </Border>
+
+        <StackPanel Grid.Column="1" Grid.Row="2">
+            <StackPanel Orientation="Horizontal">
+                <Label Foreground="White" FontSize="18" FontFamily="Consolas" Padding="3,5,1,5">x32-Tiles</Label>
+                <Button Style="{StaticResource TileButton}" Click="Tile32Button_Click">0</Button>
+                <Button Style="{StaticResource TileButton}" Click="Tile32Button_Click">1</Button>
+                <Button Style="{StaticResource TileButton}" Click="Tile32Button_Click">2</Button>
+                <Button Style="{StaticResource TileButton}" Click="Tile32Button_Click">3</Button>
+                <Button Style="{StaticResource TileButton}" Click="Tile32Button_Click">4</Button>
+            </StackPanel>
+            <!--Tile Image for Selected 32x32 Tile & Grid Buttons-->
+            <WrapPanel Orientation="Horizontal">
+                <Border Grid.ColumnSpan="2" Grid.RowSpan="2" BorderBrush="White" BorderThickness="1" HorizontalAlignment="Left" Margin="3,1,1,2" >
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="32"/>
+                            <RowDefinition Height="32"/>
+                        </Grid.RowDefinitions>
+                        <Image Grid.ColumnSpan="2" Grid.RowSpan="2" x:Name="tileImageS" Width="64" MouseUp="tileImageS_MouseUp"/>
+                        <Rectangle x:Name="innerCursor" Width="32" Height="32" HorizontalAlignment="Left" VerticalAlignment="Top"  IsHitTestVisible="False" StrokeThickness="2.5" StrokeDashArray="2 2"  Stroke="#AFFF0000"></Rectangle>
+                    </Grid>
+                </Border>
+                <Button Margin="5" Width="125" Height="45"  Click="TileGridBtn_Click">Show 32X Grid</Button>
+                <Button Margin="5" Width="125" Height="45" Click="x16GridBtn_Click">Show 16X Grid</Button>
+            </WrapPanel>
+
+            <!--Tile Parameters-->
+            <StackPanel Orientation="Horizontal">
+                <Label FontSize="18" Foreground="White" FontFamily="Consolas" Padding="3">TILE:</Label>
+                <local:NumInt x:Name="tileInt" Width="70" FontSize="18" Value="0" Minimum="0" ValueChanged="tileInt_ValueChanged"></local:NumInt>
+
+                <Label FontSize="18" Foreground="White" FontFamily="Consolas" Padding="3">TL:</Label>
+                <local:NumInt x:Name="topLeftInt" Width="70" FontSize="18" Value="0" Minimum="0" ValueChanged="topLeftInt_ValueChanged"></local:NumInt>
+
+                <Label FontSize="18" Foreground="White" FontFamily="Consolas" Padding="3">TR:</Label>
+                <local:NumInt x:Name="topRightInt" Width="70" FontSize="18" Value="0" Minimum="0" ValueChanged="topRightInt_ValueChanged"></local:NumInt>
+
+                <Label FontSize="18" Foreground="White" FontFamily="Consolas" Padding="3">BL:</Label>
+                <local:NumInt x:Name="bottomLeftInt" Width="70" FontSize="18" Value="0" Minimum="0" ValueChanged="bottomLeftInt_ValueChanged"></local:NumInt>
+                
+                <Label FontSize="18" Foreground="White" FontFamily="Consolas" Padding="3">BR:</Label>
+                <local:NumInt x:Name="bottomRightInt" Width="70" FontSize="18" Value="0" Minimum="0" ValueChanged="bottomRightInt_ValueChanged"></local:NumInt>
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</UserControl>

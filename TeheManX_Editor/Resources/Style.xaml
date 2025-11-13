@@ -1,0 +1,79 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:local="clr-namespace:TeheManX_Editor.Forms"
+                    xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit">
+    <Style TargetType="Window">
+
+    </Style>
+
+    <!--Button Style for Tab Button Headers-->
+    <Style TargetType="Button" x:Key="TabButton">
+        <Setter Property="Background" Value="#101010"/>
+        <Setter Property="Foreground" Value="White"/>
+        <Setter Property="Margin" Value="-5,-3,-5,0"/>
+        <Setter Property="Padding" Value="4"/>
+        <Setter Property="Focusable" Value="False"/>
+        <Setter Property="FontSize" Value="16"/>
+    </Style>
+    <!--Tool Bar-->
+    <Style TargetType="DockPanel" x:Key="toolBar">
+        <Setter Property="Background" Value="#252625"/>
+        <Setter Property="Margin" Value="0,0,0,-3"/>
+    </Style>
+    <Style TargetType="Button" x:Key="ToolButton">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Foreground" Value="White"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Margin" Value="6,2,5,5"/>
+        <Setter Property="Width" Value="auto"/>
+        <Setter Property="Height" Value="24"/>
+        <Setter Property="FontSize" Value="12"/>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Foreground" Value="DarkBlue"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+    <!--Setting INT UP/DOWN Properties-->
+    <Style TargetType="local:NumInt">
+        <Setter Property="Background" Value="Black"/>
+        <Setter Property="Foreground" Value="White"/>
+        <Setter Property="FontFamily" Value="Consolas"/>
+        <Setter Property="ParsingNumberStyle" Value="HexNumber"/>
+        <Setter Property="FormatString" Value="X"/>
+        <Setter Property="Focusable" Value="False"/>
+        <Setter Property="MaxLength" Value="3"/>
+        <Setter Property="Value" Value="0"/>
+        <Setter Property="AutoMoveFocus" Value="False"/>
+        <Setter Property="AutoSelectBehavior" Value="Never"/>
+    </Style>
+    <Style TargetType="Image">
+        <Setter Property="RenderOptions.BitmapScalingMode" Value="NearestNeighbor"/>
+    </Style>
+    <!--....-->
+    <Style TargetType="Button" x:Key="TileButton">
+        <Setter Property="Background" Value="Black"/>
+        <Setter Property="Foreground" Value="White"/>
+        <Setter Property="Padding" Value="4"/>
+        <Setter Property="Focusable" Value="False"/>
+        <Setter Property="FontSize" Value="16"/>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Foreground" Value="Black"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+    <!--Button Style for Main Button-->
+    <Style TargetType="Button">
+        <Setter Property="Background" Value="#222222"/>
+        <Setter Property="Foreground" Value="White"/>
+        <Setter Property="Padding" Value="4"/>
+        <Setter Property="Focusable" Value="False"/>
+        <Setter Property="FontSize" Value="16"/>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Foreground" Value="DarkBlue"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+</ResourceDictionary>

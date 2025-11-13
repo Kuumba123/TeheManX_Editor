@@ -1,0 +1,88 @@
+﻿<Window x:Class="TeheManX_Editor.Forms.ToolsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:TeheManX_Editor.Forms"
+        mc:Ignorable="d"
+        Title="Tools Window" Height="450" Width="450" WindowStartupLocation="CenterScreen" ResizeMode="NoResize">
+    <Window.Resources>
+        <ResourceDictionary>
+            <Style TargetType="Label">
+                <Setter Property="Foreground" Value="White"/>
+                <Setter Property="FontSize" Value="20"/>
+            </Style>
+            <Style TargetType="TextBlock">
+                <Setter Property="Foreground" Value="White"/>
+                <Setter Property="FontSize" Value="20"/>
+            </Style>
+            <Style TargetType="Expander">
+                <Setter Property="Background" Value="#222222"/>
+                <Setter Property="Foreground" Value="White"/>
+            </Style>
+            <Style TargetType="Button">
+                <Setter Property="Background" Value="#111111"/>
+                <Setter Property="Foreground" Value="White"/>
+                <Setter Property="Padding" Value="4"/>
+                <Setter Property="Focusable" Value="False"/>
+                <Setter Property="FontSize" Value="16"/>
+                <Style.Triggers>
+                    <Trigger Property="IsMouseOver" Value="True">
+                        <Setter Property="Foreground" Value="DarkBlue"/>
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
+        </ResourceDictionary>
+    </Window.Resources>
+    <Grid Background="#060606">
+        <ScrollViewer>
+            <StackPanel>
+                <Expander>
+                    <Expander.Header>
+                        <TextBlock>MegaMan X Tools</TextBlock>
+                    </Expander.Header>
+                    <StackPanel>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+                            <Button Click="MMX1_DecompressClick">Decompress Tiles</Button>
+                            <Button Click="MMX1_CompressClick" Grid.Column="1">Compress Tiles</Button>
+                        </Grid>
+                    </StackPanel>
+                </Expander>
+                <Expander>
+                    <Expander.Header>
+                        <TextBlock>MegaMan X2 Tools</TextBlock>
+                    </Expander.Header>
+                    <StackPanel>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+                            <Button Click="MMX2_DecompressClick">Decompress Tiles</Button>
+                            <Button Click="MMX2_CompressClick" Grid.Column="1">Compress Tiles</Button>
+                        </Grid>
+                    </StackPanel>
+                </Expander>
+                <Expander>
+                    <Expander.Header>
+                        <TextBlock>MegaMan X3 Tools</TextBlock>
+                    </Expander.Header>
+                    <StackPanel>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+                            <Button Click="MMX2_DecompressClick">Decompress Tiles</Button>
+                            <Button Click="MMX2_CompressClick" Grid.Column="1">Compress Tiles</Button>
+                        </Grid>
+                    </StackPanel>
+                </Expander>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</Window>

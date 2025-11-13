@@ -1,0 +1,49 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>True</UseWindowsForms>
+    <ApplicationIcon>Resources\Icon.ico</ApplicationIcon>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Resources\MegaPogFrogYou 56.png" />
+    <None Remove="Resources\Twitch Logo 28 by 33.png" />
+    <None Remove="Resources\Twitter Logo 32 by 23.png" />
+    <None Remove="Resources\Youtube Logo 28 by 20.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Remove="Config\App.xaml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ApplicationDefinition Include="Config\App.xaml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Resources\Icon.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Resources\Twitch Logo 28 by 33.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Dragablz" Version="0.0.3.234" />
+    <PackageReference Include="Extended.Wpf.Toolkit" Version="5.0.0" />
+    <PackageReference Include="Ookii.Dialogs.Wpf" Version="5.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Resources\MegaPogFrogYou 56.png" />
+    <Resource Include="Resources\Twitter Logo 32 by 23.png" />
+    <Resource Include="Resources\Youtube Logo 28 by 20.png" />
+  </ItemGroup>
+
+</Project>

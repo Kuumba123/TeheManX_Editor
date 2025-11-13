@@ -1,0 +1,72 @@
+﻿<UserControl x:Class="TeheManX_Editor.Forms.LayoutEditor"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+             xmlns:local="clr-namespace:TeheManX_Editor.Forms"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid Background="#101010">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="auto"/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <!--Layout Viewer & Cam Info-->
+        <Grid x:Name="layoutGrid" Grid.RowSpan="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <Image x:Name="layoutImage" Grid.RowSpan="3" Grid.ColumnSpan="3" x:FieldModifier="public"  HorizontalAlignment="Left" VerticalAlignment="Top" MouseDown="layoutImage_MouseDown"></Image>
+        </Grid>
+        <Label x:Name="camLbl" IsHitTestVisible="False" Grid.Row="0" Foreground="White" FontFamily="Consolas" HorizontalAlignment="Left" FontSize="20"></Label>
+
+        <!--Selected Screen-->
+        <StackPanel Grid.Column="1" Background="#101010">
+            <StackPanel Orientation="Horizontal">
+                <Label Foreground="White" FontSize="18" FontFamily="Consolas" Padding="3,5,1,5">Backgroud Layer</Label>
+                <Button Style="{StaticResource TileButton}" Name="btn1" Click="LayerButton_Click">1</Button>
+                <Button Style="{StaticResource TileButton}" Name="btn2" Click="LayerButton_Click">2</Button>
+            </StackPanel>
+            <Border BorderBrush="White" BorderThickness="2" HorizontalAlignment="Left" Margin="0">
+                <Image x:Name="selectImage" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Top" MaxWidth="768" SnapsToDevicePixels="True"/>
+            </Border>
+            <WrapPanel Orientation="Horizontal">
+                <local:NumInt FontFamily="Consolas" Value="2" AutoMoveFocus="True" ParsingNumberStyle="HexNumber" FormatString="X" Width="69" Height="40" FontSize="33" Maximum="239" MinHeight="0" Focusable="False" ValueChanged="IntegerUpDown_ValueChanged" x:Name="screenInt" Minimum="0"/>
+
+                <StackPanel Orientation="Horizontal">
+                    <Button x:Name="gridBtn" Margin="8,5,2,5" Padding="8" Click="gridBtn_Click">Show Grid Lines</Button>
+                    <Button Margin="8,5,2,5" Padding="8" VerticalAlignment="Top" HorizontalAlignment="Left" Click="ViewScreens_Click">View All Screens</Button>
+                    <Button Width="30" Height="30" Padding="0" Margin="3" Click="SnapButton_Click">&#128247;</Button>
+                    <Button Width="30" Height="30" Padding="0" Margin="3" Click="Help_Click">?</Button>
+                </StackPanel>
+            </WrapPanel>
+        </StackPanel>
+        <Grid Width="150" HorizontalAlignment="Right" VerticalAlignment="Bottom" Grid.Column="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <Button Click="UpButton_Click" Grid.Column="1" FontSize="25" Width="40" Height="35" Margin="5">↑</Button>
+            <Button Click="DownButton_Click" Grid.Column="1" Grid.Row="1" FontSize="25" Width="40" Height="37" Margin="5">↓</Button>
+            <Button Click="LeftButton_Click" Grid.Column="0" Grid.RowSpan="2" FontSize="25" Width="40" Height="40" Margin="5">←</Button>
+            <Button Click="RightButton_Click" Grid.Column="2" Grid.RowSpan="2" FontSize="25" Width="40" Height="40" Margin="5">→</Button>
+        </Grid>
+    </Grid>
+</UserControl>
