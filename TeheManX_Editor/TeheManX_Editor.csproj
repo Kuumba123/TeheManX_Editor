@@ -9,6 +9,8 @@
     <UseWindowsForms>True</UseWindowsForms>
     <ApplicationIcon>Resources\Icon.ico</ApplicationIcon>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    <PlatformTarget>x86</PlatformTarget>
+    <AssemblyName>TeheMan X Editor</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
