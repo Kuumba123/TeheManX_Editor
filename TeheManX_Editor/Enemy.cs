@@ -8,6 +8,7 @@
         public byte Id;
         public byte SubId;
         public byte Type;
+        public byte Column; //just to make exporting easier
         #endregion Properties
 
         #region Constructors

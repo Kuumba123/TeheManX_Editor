@@ -49,6 +49,7 @@
         public static int[,] ScreenCount;
         public static int[,] Tile32Count;
         public static int[,] Tile16Count;
+        public static int[] EnemiesLength;
 
         public static byte[] VRAM_B = {
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -253,7 +254,7 @@
 {
                     {0x363 , 0x388 },
                     {0x2D7 , 0x290 },
-                    {0x9FB7 /*<- Defitnetly wrong count*/, 0x350 },
+                    {0x356 , 0x350 },
                     {0x365 , 0x35D },
                     {0x325 , 0x324 },
                     {0x2D4 , 0x2C5 },
@@ -288,6 +289,22 @@
                     {0x6F ,  0x68  },
                     {0x6F ,  0x68  },
                     {0xA8 ,  0x68  }
+            };
+            public static readonly int[] EnemiesLength = 
+            {
+                0x2C8,
+                0x211,
+                0x250,
+                0x4B3,
+                0x2EA,
+                0x32C,
+                0x2E2,
+                0x260,
+                0x2D2,
+                0x37F,
+                0x254,
+                0x2B2,
+                0x27
             };
         }
         public static class MegaManX2
@@ -425,7 +442,7 @@
                     {0x261,  0x2B5 },
                     {0x31A,  0x312 },
                     {0x2BE,  0x2B7 },
-                    {0xBFF,  0x10C },
+                    {0x113,  0x113 },
                     {0xC7 ,  0xC3  },
                     {0xCE ,  0x2B  },
                     {0x13B,  0x12F },
@@ -443,6 +460,22 @@
                     {0x28C,  0x26B },
                     {0x28C,  0x26B },
                     {0x28C,  0x26B }
+            };
+            public static readonly int[] EnemiesLength =
+            {
+                0x235,
+                0x4A7,
+                0x338,
+                0x489,
+                0x310,
+                0x382,
+                0x3B6,
+                0x3DA,
+                0x45C,
+                0x303,
+                0x212,
+                0x30F,
+                0xBD
             };
         }
         public static class MegaManX3
@@ -629,6 +662,24 @@
                     { 0x35D, 0x400  },
                     { 0x35D, 0x400  }
             };
+            public static readonly int[] EnemiesLength =
+{
+                0x2F1,
+                0x3B4,
+                0x3A7,
+                0x3D9,
+                0x3DA,
+                0x455,
+                0x3C9,
+                0x405,
+                0x33B,
+                0x22B,
+                0x3CB,
+                0x2BA,
+                0x274,
+                0xE6,
+                0x2AC
+            };
             internal class NA
             {
                 public const int LoadTileSetInfoOffset = 0x373C3;
@@ -671,6 +722,7 @@
                 ScreenCount = MegaManX.ScreenCount;
                 Tile32Count = MegaManX.Tile32Count;
                 Tile16Count = MegaManX.Tile16Count;
+                EnemiesLength = MegaManX.EnemiesLength;
 
                 if (gameVersion == GameVersion.NA)
                 {
@@ -709,6 +761,7 @@
                 ScreenCount = MegaManX2.ScreenCount;
                 Tile32Count = MegaManX2.Tile32Count;
                 Tile16Count = MegaManX2.Tile16Count;
+                EnemiesLength = MegaManX2.EnemiesLength;
 
                 if (gameVersion == GameVersion.NA)
                 {
@@ -751,6 +804,7 @@
                 ScreenCount = MegaManX3.ScreenCount;
                 Tile32Count = MegaManX3.Tile32Count;
                 Tile16Count = MegaManX3.Tile16Count;
+                EnemiesLength = MegaManX3.EnemiesLength;
 
                 if (gameVersion == GameVersion.NA)
                 {

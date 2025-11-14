@@ -278,7 +278,7 @@ namespace TeheManX_Editor.Forms
             }
             else if (key == "D")
             {
-                if ((window.enemyE.viewerX >> 8) < (32 - 2))
+                if ((window.enemyE.viewerX >> 8) < (32 - 3))
                 {
                     window.enemyE.viewerX += 0x100;
                     window.enemyE.DrawLayout();

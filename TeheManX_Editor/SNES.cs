@@ -16,7 +16,7 @@ namespace TeheManX_Editor
         #region Methods
         public static bool IsValidRom(byte [] rom)
         {
-            bool tempExpand = rom.Length >= 0x400000 && Encoding.ASCII.GetString(rom, 0x3FFFFA, 6) == "POGYOU";
+            bool tempExpand = rom.Length >= 0x400000 && Encoding.ASCII.GetString(rom, 0x3FFFF0, 6) == "POGYOU";
 
             if (Encoding.ASCII.GetString(rom, 0x7FC0, 10) == "MEGAMAN X ")
             {

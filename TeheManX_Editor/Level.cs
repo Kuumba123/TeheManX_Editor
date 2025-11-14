@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Windows;
 using System.Windows.Media;
 
@@ -23,7 +25,7 @@ namespace TeheManX_Editor
 #if false
             for (int i = 0; i < Const.LevelsCount; i++)
             {
-                for (int l = 0; l < 2; l++)
+                for (int l = 0; l < 1; l++)
                 {
                     ushort max32x = 0;
                     ushort max16x = 0;
@@ -50,6 +52,17 @@ namespace TeheManX_Editor
                         ushort id3 = BitConverter.ToUInt16(SNES.rom, offset + (t * 8) + 4);
                         ushort id4 = BitConverter.ToUInt16(SNES.rom, offset + (t * 8) + 6);
 
+                        //For Ignoring specific 32x32 tiles
+
+                        if (i == 9 && l == 0)
+                        {
+                            if (t == 0xD8 || t == 0x111)
+                            {
+                                continue;
+                            }
+                        }
+
+
                         if (id > max16x)
                             max16x = id;
                         else if (id2 > max16x)
@@ -59,13 +72,18 @@ namespace TeheManX_Editor
                         else if (id4 > max16x)
                             max16x = id4;
 
+                        if (id == 0x7CE)
+                        {
+                            System.Diagnostics.Debug.WriteLine("Hitted Very High ID");
+                        }
+
                         if (id == 0xFFFF || id2 == 0xFFFF || id3 == 0xFFFF || id4 == 0xFFFF)
                         {
                             System.Diagnostics.Debug.WriteLine("Max 16-bit int hitted");
                         }
                     }
                     if (l == 0)
-                        System.Diagnostics.Debug.WriteLine($"Stage - 0x{i:X2} BG - {l} Screen Count is 0x{screenCount:X} ");
+                        System.Diagnostics.Debug.WriteLine($"Stage - 0x{i:X2} BG - {l} Tile Count is 0x{max16x + 1:X} ");
                 }
             }
 #endif
@@ -368,25 +386,30 @@ namespace TeheManX_Editor
             int stage = 0;
             try
             {
-                int count = Const.LevelsCount;
-                if (Const.Id == Const.GameId.MegaManX)
-                    count = 0xD;
-
-                for (int i = 0; i < count; i++)
+                for (int i = 0; i < Const.PlayabledLevelsCount; i++)
                 {
                     stage = i;
                     Enemies[i].Clear();
                     //Get Address of Enemy Data
                     int addr = SNES.CpuToOffset(BitConverter.ToInt32(SNES.rom, Const.EnemyPointersOffset + (i * 2)) , Const.EnemyDataBank);
                     //Get Spawn Cam Byte
-                    byte b = SNES.rom[addr];
+                    byte column = SNES.rom[addr];
+                    if (column == 0xFF) // No Enemies in this stage
+                        continue;
                     addr++;
                     while (true)
                     {
                         var t = Enemies[i].Count;
                         Enemies[i].Add(new Enemy());
 
+                        if (Enemies[i].Count == 0xCC /* Max Amount of Enemies*/)
+                        {
+                            MessageBox.Show("Incorrect Enemy Data Format \nfor stage " + Convert.ToString(i, 16));
+                            Application.Current.Shutdown();
+                        }
+
                         //Assign Type
+                        Enemies[i][t].Column = column;
                         Enemies[i][t].Type = SNES.rom[addr];
                         //Assign Y
                         Enemies[i][t].Y = (short)(BitConverter.ToUInt16(SNES.rom, addr + 1) & 0x7FFF);
@@ -396,41 +419,92 @@ namespace TeheManX_Editor
                         //Assign X
                         Enemies[i][t].X = (short)(BitConverter.ToUInt16(SNES.rom, addr + 5) & 0x7FFF);
 
-                        //Check for Cam Spawn Byte
-                        if (SNES.rom[addr + 6] < 0x7F)
+                        // Check X high byte
+                        if ((SNES.rom[addr + 6] & 0x80) == 0)
                             addr += 7;
                         else
                         {
                             addr += 7;
-                            if (SNES.rom[addr] == b)
+                            if (SNES.rom[addr] == column)  // end of enemy data
                                 break;
-                            b = SNES.rom[addr];
+                            column = SNES.rom[addr];
                             addr++;
-                            if(Enemies[i].Count > 0xCC /* Max Amount of Enemies*/)
-                            {
-                                MessageBox.Show("Incorrect Enemy Data Format \nfor stage " + Convert.ToString(i, 16));
-                                Application.Current.Shutdown();
-                            }
                         }
                     }
                 }
             }catch(Exception e)
             {
-                MessageBox.Show("Stage " + Convert.ToString(stage, 16) + " Enemy Data Corrupted?\n" + e.Message, "ERROR");
+                MessageBox.Show($"Stage {stage:X}  Enemy Data Corrupted?\n" + e.Message, "ERROR");
                 Application.Current.Shutdown();
             }
         }
         public static bool SaveEnemyData()
         {
-            if (!SNES.expanded) //Normal Logic
+            for (int id = 0; id < Const.PlayabledLevelsCount; id++)
             {
-                return true;
-            }
-            else //Expanded Logic
-            {
+                List<Enemy> sorted = Enemies[id].OrderBy(e => e.Column).ToList();
 
+                MemoryStream ms = new MemoryStream(0x660);
+                BinaryWriter bw = new BinaryWriter(ms);
+
+                // If no enemies write FF and skip
+                if (sorted.Count == 0)
+                {
+                    SNES.rom[SNES.CpuToOffset(BitConverter.ToInt32(SNES.rom, Const.EnemyPointersOffset + (id * 2)),Const.EnemyDataBank)] = 0xFF;
+                    continue;
+                }
+
+                byte column = sorted[0].Column;
+                bw.Write(column); // Write initial column byte
+
+                for (int i = 0; i < sorted.Count; i++)
+                {
+                    bw.Write(sorted[i].Type);
+                    bw.Write(sorted[i].Y);
+                    bw.Write(sorted[i].Id);
+                    bw.Write(sorted[i].SubId);
+
+                    if (i == (sorted.Count - 1)) // Last Enemy
+                    {
+                        bw.Write((ushort)(sorted[i].X | 0x8000)); // Set high byte to mark end of data
+                        bw.Write(column); // Write final column byte
+                    }
+                    else
+                    {
+                        if (column != sorted[i + 1].Column)
+                        {
+                            bw.Write((ushort)(sorted[i].X | 0x8000)); // Set high byte to mark end of data
+                            column = sorted[i + 1].Column;
+                            bw.Write(column); // Write new column byte
+                        }
+                        else
+                            bw.Write(sorted[i].X);
+                    }
+                }
+
+                // Final size check
+                if (ms.Length > Const.EnemiesLength[id])
+                {
+                    MessageBox.Show(
+                        $"Enemy Data for Stage {id:X2} too large ({ms.Length:X}). Max {Const.EnemiesLength[id]:X}",
+                        "ERROR"
+                    );
+                    return false;
+                }
+
+                // Get offset from ROM
+                int offset = SNES.CpuToOffset(
+                    BitConverter.ToInt32(SNES.rom, Const.EnemyPointersOffset + (id * 2)),
+                    Const.EnemyDataBank
+                );
+
+                Array.Copy(ms.ToArray(), 0, SNES.rom, offset, ms.Length);
+
+                bw.Close();
+                ms.Close();
             }
-            return false;
+
+            return true;
         }
         public static void AssignPallete()
         {

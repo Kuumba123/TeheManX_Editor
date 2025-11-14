@@ -780,7 +780,7 @@ namespace TeheManX_Editor.Forms
         }
         private void screenInt16_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            if (e.NewValue == null)
+            if (e.NewValue == null || !mode16)
                 return;
             if (screenId == (int)e.NewValue || SNES.rom == null)
                 return;

@@ -26,12 +26,17 @@ namespace TeheManX_Editor.Forms
         bool down = false;
         Point point;
         #endregion Properties
+
+        #region Constructors
         public EnemyEditor()
         {
             InitializeComponent();
 
             layoutImage.Source = layoutBMP;
         }
+        #endregion Constructors
+
+        #region Methods
         public void DrawLayout()
         {
             layoutBMP.Lock();
@@ -75,18 +80,45 @@ namespace TeheManX_Editor.Forms
         {
             MainWindow.window.enemyE.control.Tag = null;
             //Disable
-
+            MainWindow.window.enemyE.idInt.IsEnabled = false;
+            MainWindow.window.enemyE.varInt.IsEnabled = false;
+            MainWindow.window.enemyE.typeInt.IsEnabled = false;
+            MainWindow.window.enemyE.xInt.IsEnabled = false;
+            MainWindow.window.enemyE.yInt.IsEnabled = false;
+            MainWindow.window.enemyE.columnInt.IsEnabled = false;
+            //MainWindow.window.enemyE.nameLbl.Content = "";
         }
-        private void UpdateEnemyCordLabel(int x, int y)
+        private void UpdateEnemyCordLabel(int x, int y, byte col)
+        {
+            MainWindow.window.enemyE.xInt.Value = x + viewerX + Const.EnemyOffset;
+            MainWindow.window.enemyE.yInt.Value = y + viewerY + Const.EnemyOffset;
+            MainWindow.window.enemyE.columnInt.Value = col;
+        }
+        private bool ValidEnemyAdd()
         {
 
+           if (Level.Id >= Const.PlayabledLevelsCount)
+            {
+                MessageBox.Show("Enemies cannot be added to this level.", "Error");
+                return false;
+            }
+            if (Level.Enemies[Level.Id].Count == 0xCC)
+            {
+                MessageBox.Show("The max amount of enemies you can put in a level is 0xCC.", "Error");
+                return false;
+            }
+            return true;
         }
+        #endregion Methods
+
+        #region Events
         private void Label_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
             MainWindow.window.enemyE.control.Tag = sender;
             byte type = ((Enemy)((EnemyLabel)control.Tag).Tag).Type;
             byte id = ((Enemy)((EnemyLabel)control.Tag).Tag).Id;
             byte var = ((Enemy)((EnemyLabel)control.Tag).Tag).SubId;
+            byte colmn = ((Enemy)((EnemyLabel)control.Tag).Tag).Column;
 
             if (e.ChangedButton == MouseButton.Left)
             {
@@ -96,17 +128,17 @@ namespace TeheManX_Editor.Forms
                 {
 
                     //Set Select Enemy
-                   /*MainWindow.window.enemyE.rangeInt.Value = range;
+                    MainWindow.window.enemyE.columnInt.Value = colmn;
                     MainWindow.window.enemyE.idInt.Value = id;
                     MainWindow.window.enemyE.varInt.Value = var;
-                    MainWindow.window.enemyE.typeInt.Value = type;*/
+                    MainWindow.window.enemyE.typeInt.Value = type;
                     //Enable
-                   /*MainWindow.window.enemyE.idInt.IsEnabled = true;
+                    MainWindow.window.enemyE.idInt.IsEnabled = true;
                     MainWindow.window.enemyE.varInt.IsEnabled = true;
                     MainWindow.window.enemyE.typeInt.IsEnabled = true;
                     MainWindow.window.enemyE.xInt.IsEnabled = true;
                     MainWindow.window.enemyE.yInt.IsEnabled = true;
-                    MainWindow.window.enemyE.rangeInt.IsEnabled = true;*/
+                    MainWindow.window.enemyE.columnInt.IsEnabled = true;
 
                     //UpdateEnemyName(type, id);
                 }
@@ -124,8 +156,7 @@ namespace TeheManX_Editor.Forms
         }
         private void canvas_PreviewMouseMove(object sender, MouseEventArgs e)
         {
-            if (obj == null)
-                return;
+            if (!down) return;
 
 
             //Move Enemy
@@ -140,11 +171,12 @@ namespace TeheManX_Editor.Forms
             if (y < 0 - Const.EnemyOffset)
                 y = 0 - Const.EnemyOffset;
 
+            Enemy en = (Enemy)((EnemyLabel)obj).Tag;
+            en.Column = (byte)(short)(((viewerX + x) / 32));
 
             Canvas.SetLeft(obj, x);
             Canvas.SetTop(obj, y);
-            UpdateEnemyCordLabel((int)x, (int)y);
-            var en = (Enemy)((EnemyLabel)obj).Tag;
+            UpdateEnemyCordLabel((int)x, (int)y, en.Column);
             en.X = (short)((short)(viewerX + x) + Const.EnemyOffset);
             en.Y = (short)((short)(viewerY + y) + Const.EnemyOffset);
 
@@ -155,5 +187,89 @@ namespace TeheManX_Editor.Forms
             obj = null;
             canvas.ReleaseMouseCapture();
         }
+        private void idInt_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        {
+            if (control.Tag == null || e.NewValue == null || e.OldValue == null)
+                return;
+            SNES.edit = true;
+            ((Enemy)((EnemyLabel)control.Tag).Tag).Id = (byte)(int)e.NewValue;
+            ((EnemyLabel)control.Tag).text.Content = Convert.ToString(((Enemy)((EnemyLabel)control.Tag).Tag).Id, 16).ToUpper();
+            //UpdateEnemyName(((Enemy)((EnemyLabel)control.Tag).Tag).type, ((Enemy)((EnemyLabel)control.Tag).Tag).id);
+        }
+        private void varInt_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        {
+            if (control.Tag == null || e.NewValue == null || e.OldValue == null)
+                return;
+            SNES.edit = true;
+            ((Enemy)((EnemyLabel)control.Tag).Tag).SubId = (byte)((int)e.NewValue & 0xFF);
+        }
+        private void typeInt_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        {
+            if (control.Tag == null || e.NewValue == null || e.OldValue == null)
+                return;
+            SNES.edit = true;
+            ((Enemy)((EnemyLabel)control.Tag).Tag).Type = (byte)((int)e.NewValue & 0xFF);
+            ((EnemyLabel)control.Tag).AssignTypeBorder(((Enemy)((EnemyLabel)control.Tag).Tag).Type);
+            //UpdateEnemyName(((Enemy)((EnemyLabel)control.Tag).Tag).type, ((Enemy)((EnemyLabel)control.Tag).Tag).id);
+        }
+        private void colInt_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        {
+            if (control.Tag == null || e.NewValue == null || e.OldValue == null)
+                return;
+            SNES.edit = true;
+            ((Enemy)((EnemyLabel)control.Tag).Tag).Column = (byte)((int)e.NewValue / 32);
+        }
+        private void xInt_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        {
+            if (control.Tag == null || e.NewValue == null || e.OldValue == null)
+                return;
+            SNES.edit = true;
+            ((Enemy)((EnemyLabel)control.Tag).Tag).X = (short)(int)e.NewValue;
+            Canvas.SetLeft((UIElement)control.Tag, ((int)e.NewValue) - viewerX - Const.EnemyOffset);
+        }
+        private void yInt_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        {
+            if (control.Tag == null || e.NewValue == null || e.OldValue == null)
+                return;
+            SNES.edit = true;
+            ((Enemy)((EnemyLabel)control.Tag).Tag).Y = (short)(int)e.NewValue;
+            Canvas.SetTop((UIElement)control.Tag, ((int)e.NewValue) - viewerY - Const.EnemyOffset);
+        }
+        private void AddEnemy_Click(object sender, RoutedEventArgs e)
+        {
+            if (!ValidEnemyAdd()) return;
+            var en = new Enemy();
+            en.X = (short)(viewerX + 0x100);
+            en.Y = (short)(viewerY + 0x100);
+            en.Id = 0xF; //Default is Met
+            en.Type = 0;
+            Level.Enemies[Level.Id].Add(en);
+            SNES.edit = true;
+            DrawEnemies();
+        }
+        private void RemoveEnemy_Click(object sender, RoutedEventArgs e)
+        {
+            if (control.Tag == null)
+                return;
+            SNES.edit = true;
+            Level.Enemies[Level.Id].Remove((Enemy)((EnemyLabel)control.Tag).Tag);
+            DrawEnemies();
+        }
+        private void ToolsBtn_Click(object sender, RoutedEventArgs e)
+        {
+            /*if (PSX.levels[Level.Id].GetIndex() > 25)
+            {
+                MessageBox.Show("There are not suppoused to be enemies in this level");
+                return;
+            }
+            ListWindow l = new ListWindow(3);
+            l.ShowDialog();*/
+        }
+        private void Help_Click(object sender, RoutedEventArgs e)
+        {
+            /*HelpWindow h = new HelpWindow(3);
+            h.ShowDialog();*/
+        }
+        #endregion Events
     }
 }
