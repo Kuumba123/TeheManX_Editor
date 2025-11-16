@@ -86,7 +86,7 @@ namespace TeheManX_Editor.Forms
                 DrawTiles16();
                 return;
             }
-            int tile32Offset = SNES.CpuToOffset(BitConverter.ToInt32(SNES.rom, Const.Tile32DataPointersOffset[Level.BG] + Level.Id * 3));
+            int tile32Offset = SNES.CpuToOffset(BinaryPrimitives.ReadInt32LittleEndian(SNES.rom.AsSpan(Const.Tile32DataPointersOffset[Level.BG] + Level.Id * 3)));
             tileBMP.Lock();
 
             for (int y = 0; y < 32; y++)
@@ -111,10 +111,10 @@ namespace TeheManX_Editor.Forms
                         }
                         continue;
                     }
-                    Level.Draw16xTile(BitConverter.ToUInt16(SNES.rom, tile32Offset + (tileId32 * 8)), x * 32, y * 32, tileBMP.BackBufferStride, tileBMP.BackBuffer);
-                    Level.Draw16xTile(BitConverter.ToUInt16(SNES.rom, tile32Offset + (tileId32 * 8) + 2), x * 32 + 16, y * 32, tileBMP.BackBufferStride, tileBMP.BackBuffer);
-                    Level.Draw16xTile(BitConverter.ToUInt16(SNES.rom, tile32Offset + (tileId32 * 8) + 4), x * 32, y * 32 + 16, tileBMP.BackBufferStride, tileBMP.BackBuffer);
-                    Level.Draw16xTile(BitConverter.ToUInt16(SNES.rom, tile32Offset + (tileId32 * 8) + 6), x * 32 + 16, y * 32 + 16, tileBMP.BackBufferStride, tileBMP.BackBuffer);
+                    Level.Draw16xTile(BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(tile32Offset + (tileId32 * 8))), x * 32, y * 32, tileBMP.BackBufferStride, tileBMP.BackBuffer);
+                    Level.Draw16xTile(BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(tile32Offset + (tileId32 * 8) + 2)), x * 32 + 16, y * 32, tileBMP.BackBufferStride, tileBMP.BackBuffer);
+                    Level.Draw16xTile(BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(tile32Offset + (tileId32 * 8) + 4)), x * 32, y * 32 + 16, tileBMP.BackBufferStride, tileBMP.BackBuffer);
+                    Level.Draw16xTile(BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(tile32Offset + (tileId32 * 8) + 6)), x * 32 + 16, y * 32 + 16, tileBMP.BackBufferStride, tileBMP.BackBuffer);
                 }
             }
             tileBMP.AddDirtyRect(new Int32Rect(0, 0, 256, 1024));
@@ -128,11 +128,11 @@ namespace TeheManX_Editor.Forms
                 return;
             }
             tileBMP_S.Lock();
-            int tile32Offset = SNES.CpuToOffset(BitConverter.ToInt32(SNES.rom, Const.Tile32DataPointersOffset[Level.BG] + Level.Id * 3));
-            Level.Draw16xTile(BitConverter.ToUInt16(SNES.rom, tile32Offset + (selectedTile * 8)), 0, 0, tileBMP_S.BackBufferStride, tileBMP_S.BackBuffer);
-            Level.Draw16xTile(BitConverter.ToUInt16(SNES.rom, tile32Offset + (selectedTile * 8) + 2), 16, 0, tileBMP_S.BackBufferStride, tileBMP_S.BackBuffer);
-            Level.Draw16xTile(BitConverter.ToUInt16(SNES.rom, tile32Offset + (selectedTile * 8) + 4), 0, 16, tileBMP_S.BackBufferStride, tileBMP_S.BackBuffer);
-            Level.Draw16xTile(BitConverter.ToUInt16(SNES.rom, tile32Offset + (selectedTile * 8) + 6), 16, 16, tileBMP_S.BackBufferStride, tileBMP_S.BackBuffer);
+            int tile32Offset = SNES.CpuToOffset(BinaryPrimitives.ReadInt32LittleEndian(SNES.rom.AsSpan(Const.Tile32DataPointersOffset[Level.BG] + Level.Id * 3)));
+            Level.Draw16xTile(BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(tile32Offset + (selectedTile * 8))), 0, 0, tileBMP_S.BackBufferStride, tileBMP_S.BackBuffer);
+            Level.Draw16xTile(BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(tile32Offset + (selectedTile * 8) + 2)), 16, 0, tileBMP_S.BackBufferStride, tileBMP_S.BackBuffer);
+            Level.Draw16xTile(BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(tile32Offset + (selectedTile * 8) + 4)), 0, 16, tileBMP_S.BackBufferStride, tileBMP_S.BackBuffer);
+            Level.Draw16xTile(BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(tile32Offset + (selectedTile * 8) + 6)), 16, 16, tileBMP_S.BackBufferStride, tileBMP_S.BackBuffer);
             tileBMP_S.AddDirtyRect(new Int32Rect(0, 0, 32, 32));
             tileBMP_S.Unlock();
         }
@@ -160,7 +160,7 @@ namespace TeheManX_Editor.Forms
             }
             else
             {
-                int offset = SNES.CpuToOffset(BitConverter.ToInt32(SNES.rom, Const.ScreenDataPointersOffset[Level.BG] + Level.Id * 3)) + screenId * 0x80;
+                int offset = SNES.CpuToOffset(BinaryPrimitives.ReadInt32LittleEndian(SNES.rom.AsSpan(Const.ScreenDataPointersOffset[Level.BG] + Level.Id * 3))) + screenId * 0x80;
                 Array.Clear(SNES.rom, offset, 0x80);
                 DrawScreen();
 
@@ -374,9 +374,9 @@ namespace TeheManX_Editor.Forms
                     int cY = SNES.GetSelectedTile(y, screenImage.ActualHeight, 8);
                     int cord = (cX * 2) + (cY * 16);
 
-                    int offset = SNES.CpuToOffset(BitConverter.ToInt32(SNES.rom, Const.ScreenDataPointersOffset[Level.BG] + Level.Id * 3)) + screenId * 0x80;
+                    int offset = SNES.CpuToOffset(BinaryPrimitives.ReadInt32LittleEndian(SNES.rom.AsSpan(Const.ScreenDataPointersOffset[Level.BG] + Level.Id * 3))) + screenId * 0x80;
 
-                    ushort tileId = BitConverter.ToUInt16(SNES.rom, offset + cord);
+                    ushort tileId = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + cord));
                     if (tileId == selectedTile)
                         return;
 
@@ -453,8 +453,8 @@ namespace TeheManX_Editor.Forms
                 screenData16 = GC.AllocateUninitializedArray<byte>(newSize, pinned: false);
 
 
-            int screenDataBaseOffset = SNES.CpuToOffset(BitConverter.ToInt32(SNES.rom, Const.ScreenDataPointersOffset[Level.BG] + Level.Id * 3));
-            int tile32BaseOffset = SNES.CpuToOffset(BitConverter.ToInt32(SNES.rom, Const.Tile32DataPointersOffset[Level.BG] + Level.Id * 3));
+            int screenDataBaseOffset = SNES.CpuToOffset(BinaryPrimitives.ReadInt32LittleEndian(SNES.rom.AsSpan(Const.ScreenDataPointersOffset[Level.BG] + Level.Id * 3)));
+            int tile32BaseOffset = SNES.CpuToOffset(BinaryPrimitives.ReadInt32LittleEndian(SNES.rom.AsSpan(Const.Tile32DataPointersOffset[Level.BG] + Level.Id * 3)));
 
             for (int screen = 0; screen < Const.ScreenCount[Level.Id, Level.BG]; screen++)
             {
@@ -462,7 +462,7 @@ namespace TeheManX_Editor.Forms
                 {
                     for (int x = 0; x < 8; x++)
                     {
-                        ushort tile32Id = BitConverter.ToUInt16(SNES.rom, screenDataBaseOffset + screen * 0x80 + x * 2 + y * 16);
+                        ushort tile32Id = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(screenDataBaseOffset + screen * 0x80 + x * 2 + y * 16));
 
                         int srcBaseOffset = tile32BaseOffset + tile32Id * 8;
                         int dstBaseOffset = screen * 0x200;
@@ -581,7 +581,7 @@ namespace TeheManX_Editor.Forms
 
                                 int srcCol = Grid.GetColumn(screenCursor16) + c;
                                 int srcRow = Grid.GetRow(screenCursor16) + r;
-                                ushort val = BitConverter.ToUInt16(screenData16, screenSelect16 * 0x200 + srcCol * 2 + srcRow * 32);
+                                ushort val = BinaryPrimitives.ReadUInt16LittleEndian(screenData16.AsSpan(screenSelect16 * 0x200 + srcCol * 2 + srcRow * 32));
                                 BinaryPrimitives.WriteUInt16LittleEndian(screenData16.AsSpan(dest), val);
                             }
                         }
@@ -661,7 +661,7 @@ namespace TeheManX_Editor.Forms
                     int cY = SNES.GetSelectedTile(y, screenImage16.ActualHeight, 16);
                     int cord = (cX * 2) + (cY * 32);
 
-                    if (BitConverter.ToUInt16(screenData16, screenId * 0x200 + cord) == (ushort)selectedTile16)
+                    if (BinaryPrimitives.ReadUInt16LittleEndian(screenData16.AsSpan(screenId * 0x200 + cord)) == (ushort)selectedTile16)
                         return;
 
                     BinaryPrimitives.WriteUInt16LittleEndian(screenData16.AsSpan(screenId * 0x200 + cord), (ushort)selectedTile16);
