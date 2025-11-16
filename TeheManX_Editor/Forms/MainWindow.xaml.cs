@@ -97,6 +97,7 @@ namespace TeheManX_Editor.Forms
             window.enemyE.DrawEnemies();
             UpdateViewrCam();
             UpdateEnemyViewerCam();
+            spawnE.SetSpawnSettings();
             UpdateWindowTitle();
         }
         public void UpdateWindowTitle()

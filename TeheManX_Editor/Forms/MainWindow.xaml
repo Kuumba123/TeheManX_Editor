@@ -64,6 +64,12 @@
                 </TabItem.Header>
                 <forms:EnemyEditor x:Name="enemyE"/>
             </TabItem>
+            <TabItem Name="spawnTab">
+                <TabItem.Header>
+                    <Button Style="{StaticResource TabButton}">Spawn</Button>
+                </TabItem.Header>
+                <forms:SpawnWindow x:Name="spawnE"/>
+            </TabItem>
         </dragablz:TabablzControl>
     </Grid>
 </Window>

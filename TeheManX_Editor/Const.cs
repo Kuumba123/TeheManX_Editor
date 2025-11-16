@@ -39,6 +39,10 @@
         public static int EnemyPointersOffset;
         public static int EnemyDataBank;
 
+        public static int MaxTotalCheckpoints;
+        public static int CheckpointOffset;
+        public static int[] MaxCheckpoints = new int[MaxLevels];
+
         public static int[] LayoutPointersOffset = new int[2]; //Layout Pointers Offset to compressed data
         public static int[] ScreenDataPointersOffset = new int[2];
         public static int[] Tile32DataPointersOffset = new int[2];
@@ -115,6 +119,8 @@
             public const int EnemyPointersOffset = 0x0282C2;
             public const int EnemyDataBank = 0x85;
 
+            public const int MaxTotalCheckpoints = 44;
+
             public static readonly int[] LayoutPointersOffset = { 0x30D24, 0x30F4F }; //Layout Pointers Offset to compressed data
             public static readonly int[] ScreenDataPointersOffset = { 0x30D93, 0x30FBE };
             public static readonly int[] Tile32DataPointersOffset = { 0x30E02, 0x3102D };
@@ -124,11 +130,13 @@
             {
                 public const int LoadTileSetInfoOffset = 0x3756F;
                 public const int CompressedTileInfoOffset = 0x376F7;
+                public const int CheckpointOffset = 0x32780;
             }
             internal class JP // Japanese Version
             {
                 public const int LoadTileSetInfoOffset = 0x37572;
                 public const int CompressedTileInfoOffset = 0x376FA;
+                public const int CheckpointOffset = 0x32783;
             }
             public static readonly byte[,] LayoutLength = new byte[0x25, 2]
 {
@@ -324,6 +332,8 @@
 
             public const int EnemyDataBank = 0x29;
 
+            public const int MaxTotalCheckpoints = 64;
+
             public static readonly int[] LayoutPointersOffset = { 0x030888, 0x30AB3 };
             public static readonly int[] ScreenDataPointersOffset = { 0x0308F7, 0x30B22 };
             public static readonly int[] Tile32DataPointersOffset = { 0x030966, 0x30B91 };
@@ -334,12 +344,14 @@
                 public const int LoadTileSetInfoOffset = 0x37831;
                 public const int CompressedTileInfoOffset = 0x37A01;
                 public const int EnemyPointersOffset = 0x14D3D1;
+                public const int CheckpointOffset = 0x324C5;
             }
             internal class JP // Japanese Version
             {
                 public const int LoadTileSetInfoOffset = 0x37832;
                 public const int CompressedTileInfoOffset = 0x37A02;
                 public const int EnemyPointersOffset = 0x14D3D9;
+                public const int CheckpointOffset = 0x324C6;
             }
             public static readonly byte[,] LayoutLength = new byte[0x1B, 2]
 {
@@ -495,6 +507,8 @@
 
             public const int EnemyPointersOffset = 0x1E4E4B;
             public const int EnemyDataBank = 0x3C;
+
+            public const int MaxTotalCheckpoints = 53;
 
             public static readonly int[] LayoutPointersOffset = { 0x309B3, 0x30BDE };
             public static readonly int[] ScreenDataPointersOffset = { 0x30A22, 0x30C4D };
@@ -684,11 +698,13 @@
             {
                 public const int LoadTileSetInfoOffset = 0x373C3;
                 public const int CompressedTileInfoOffset = 0x37732;
+                public const int CheckpointOffset = 0x328E4;
             }
             internal class JP
             {
                 public const int LoadTileSetInfoOffset = 0x373C4;
                 public const int CompressedTileInfoOffset = 0x37733;
+                public const int CheckpointOffset = 0x328E5;
             }
         }
         public static void AssignProperties(GameId gameId, GameVersion gameVersion, bool expanded)
@@ -698,8 +714,8 @@
             if (gameId == GameId.MegaManX)
             {
                 Id = GameId.MegaManX;
-                Const.LevelsCount = MegaManX.LevelsCount;
-                Const.PlayabledLevelsCount = MegaManX.PlayabledLevelsCount;
+                LevelsCount = MegaManX.LevelsCount;
+                PlayabledLevelsCount = MegaManX.PlayabledLevelsCount;
 
                 PaletteBank = MegaManX.PaletteBank;
                 PaletteColorBank = MegaManX.PaletteColorBank;
@@ -711,6 +727,8 @@
 
                 EnemyPointersOffset = MegaManX.EnemyPointersOffset;
                 EnemyDataBank = MegaManX.EnemyDataBank;
+
+                MaxTotalCheckpoints = MegaManX.MaxTotalCheckpoints;
 
                 LayoutPointersOffset = MegaManX.LayoutPointersOffset;
                 ScreenDataPointersOffset = MegaManX.ScreenDataPointersOffset;
@@ -728,18 +746,20 @@
                 {
                     LoadTileSetInfoOffset = MegaManX.NA.LoadTileSetInfoOffset;
                     CompressedTileInfoOffset = MegaManX.NA.CompressedTileInfoOffset;
+                    CheckpointOffset = MegaManX.NA.CheckpointOffset;
                 }
                 else
                 {
                     LoadTileSetInfoOffset = MegaManX.JP.LoadTileSetInfoOffset;
                     CompressedTileInfoOffset = MegaManX.JP.CompressedTileInfoOffset;
+                    CheckpointOffset = MegaManX.JP.CheckpointOffset;
                 }
             }
             else if (gameId == GameId.MegaManX2)
             {
                 Id = GameId.MegaManX2;
-                Const.LevelsCount = MegaManX2.LevelsCount;
-                Const.PlayabledLevelsCount = MegaManX2.PlayabledLevelsCount;
+                LevelsCount = MegaManX2.LevelsCount;
+                PlayabledLevelsCount = MegaManX2.PlayabledLevelsCount;
 
                 PaletteBank = MegaManX2.PaletteBank;
                 PaletteColorBank = MegaManX2.PaletteColorBank;
@@ -750,6 +770,8 @@
                 LoadTileSetStageBase = MegaManX2.LoadTileSetStageBase;
 
                 EnemyDataBank = MegaManX2.EnemyDataBank;
+
+                MaxTotalCheckpoints = MegaManX2.MaxTotalCheckpoints;
 
                 LayoutPointersOffset = MegaManX2.LayoutPointersOffset;
                 ScreenDataPointersOffset = MegaManX2.ScreenDataPointersOffset;
@@ -768,19 +790,21 @@
                     LoadTileSetInfoOffset = MegaManX2.NA.LoadTileSetInfoOffset;
                     CompressedTileInfoOffset = MegaManX2.NA.CompressedTileInfoOffset;
                     EnemyPointersOffset = MegaManX2.NA.EnemyPointersOffset;
+                    CheckpointOffset = MegaManX2.NA.CheckpointOffset;
                 }
                 else
                 {
                     LoadTileSetInfoOffset = MegaManX2.JP.LoadTileSetInfoOffset;
                     CompressedTileInfoOffset = MegaManX2.JP.CompressedTileInfoOffset;
                     EnemyPointersOffset = MegaManX2.JP.EnemyPointersOffset;
+                    CheckpointOffset = MegaManX2.JP.CheckpointOffset;
                 }
             }
             else if (gameId == GameId.MegaManX3)
             {
                 Id = GameId.MegaManX3;
-                Const.LevelsCount = MegaManX3.LevelsCount;
-                Const.PlayabledLevelsCount = MegaManX3.PlayabledLevelsCount;
+                LevelsCount = MegaManX3.LevelsCount;
+                PlayabledLevelsCount = MegaManX3.PlayabledLevelsCount;
 
                 PaletteBank = MegaManX3.PaletteBank;
                 PaletteColorBank = MegaManX3.PaletteColorBank;
@@ -793,6 +817,8 @@
 
                 EnemyPointersOffset = MegaManX3.EnemyPointersOffset;
                 EnemyDataBank = MegaManX3.EnemyDataBank;
+
+                MaxTotalCheckpoints = MegaManX3.MaxTotalCheckpoints;
 
                 LayoutPointersOffset = MegaManX3.LayoutPointersOffset;
                 ScreenDataPointersOffset = MegaManX3.ScreenDataPointersOffset;
@@ -810,11 +836,13 @@
                 {
                     LoadTileSetInfoOffset = MegaManX3.NA.LoadTileSetInfoOffset;
                     CompressedTileInfoOffset = MegaManX3.NA.CompressedTileInfoOffset;
+                    CheckpointOffset = MegaManX3.NA.CheckpointOffset;
                 }
                 else
                 {
                     LoadTileSetInfoOffset = MegaManX3.JP.LoadTileSetInfoOffset;
                     CompressedTileInfoOffset = MegaManX3.JP.CompressedTileInfoOffset;
+                    CheckpointOffset = MegaManX3.JP.CheckpointOffset;
                 }
             }
         }
