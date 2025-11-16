@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Buffers.Binary;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -21,72 +22,6 @@ namespace TeheManX_Editor
         #region Methods
         public static void LoadLevelData()
         {
-            /*NOTE: this code is too make defining the Constants much quicker so dont delete this*/
-#if false
-            for (int i = 0; i < Const.LevelsCount; i++)
-            {
-                for (int l = 0; l < 1; l++)
-                {
-                    ushort max32x = 0;
-                    ushort max16x = 0;
-
-                    byte screenCount = SNES.rom[SNES.CpuToOffset(BitConverter.ToInt32(SNES.rom, Const.LayoutPointersOffset[l] + i * 3)) + 2];
-
-                    int offset = SNES.CpuToOffset(BitConverter.ToInt32(SNES.rom, Const.ScreenDataPointersOffset[l] + i * 3));
-                    for (int t = 0; t < (screenCount * 64); t++)
-                    {
-                        ushort id = BitConverter.ToUInt16(SNES.rom, offset + (t * 2));
-                        if (id == 0xFFFF)
-                        {
-                            System.Diagnostics.Debug.WriteLine("Max 16-bit int hitted");
-                        }
-                        if (id > max32x)
-                            max32x = id;
-                    }
-
-                    offset = SNES.CpuToOffset(BitConverter.ToInt32(SNES.rom, Const.Tile32DataPointersOffset[l] + i * 3));
-                    for (int t = 0; t < (max32x + 1); t++)
-                    {
-                        ushort id = BitConverter.ToUInt16(SNES.rom, offset + (t * 8));
-                        ushort id2 = BitConverter.ToUInt16(SNES.rom, offset + (t * 8) + 2);
-                        ushort id3 = BitConverter.ToUInt16(SNES.rom, offset + (t * 8) + 4);
-                        ushort id4 = BitConverter.ToUInt16(SNES.rom, offset + (t * 8) + 6);
-
-                        //For Ignoring specific 32x32 tiles
-
-                        if (i == 9 && l == 0)
-                        {
-                            if (t == 0xD8 || t == 0x111)
-                            {
-                                continue;
-                            }
-                        }
-
-
-                        if (id > max16x)
-                            max16x = id;
-                        else if (id2 > max16x)
-                            max16x = id2;
-                        else if (id3 > max16x)
-                            max16x = id3;
-                        else if (id4 > max16x)
-                            max16x = id4;
-
-                        if (id == 0x7CE)
-                        {
-                            System.Diagnostics.Debug.WriteLine("Hitted Very High ID");
-                        }
-
-                        if (id == 0xFFFF || id2 == 0xFFFF || id3 == 0xFFFF || id4 == 0xFFFF)
-                        {
-                            System.Diagnostics.Debug.WriteLine("Max 16-bit int hitted");
-                        }
-                    }
-                    if (l == 0)
-                        System.Diagnostics.Debug.WriteLine($"Stage - 0x{i:X2} BG - {l} Tile Count is 0x{max16x + 1:X} ");
-                }
-            }
-#endif
             Id = 0;
             BG = 0;
             LoadLayouts();
@@ -94,14 +29,14 @@ namespace TeheManX_Editor
         }
         public static unsafe void Draw16xTile(int id, int x, int y, int stride, IntPtr dest)
         {
-            int offset = SNES.CpuToOffset(BitConverter.ToInt32(SNES.rom, Const.Tile16DataPointersOffset[BG] + Id * 3)) + id * 8;
+            int offset = SNES.CpuToOffset(BinaryPrimitives.ReadInt32LittleEndian(SNES.rom.AsSpan(Const.Tile16DataPointersOffset[BG] + Id * 3)) + id * 8);
             byte* buffer = (byte*)dest;
 
             Color backColor = Palette[0, 0];
 
             for (int i = 0; i < 4; i++)
             {
-                ushort val = BitConverter.ToUInt16(SNES.rom, offset + i * 2);
+                ushort val = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + i * 2));
                 int tileOffset = (val & 0x3FF) * 0x20; // 32 bytes per tile
                 int set = (val >> 10) & 7;             // Palette index
 
@@ -145,37 +80,37 @@ namespace TeheManX_Editor
         }
         public static unsafe void DrawScreen(int s, int stride, IntPtr ptr)
         {
-            int offset = SNES.CpuToOffset(BitConverter.ToInt32(SNES.rom, Const.ScreenDataPointersOffset[BG] + Id * 3)) + s * 0x80;
-            int tile32Offset = SNES.CpuToOffset(BitConverter.ToInt32(SNES.rom, Const.Tile32DataPointersOffset[BG] + Id * 3));
+            int offset = SNES.CpuToOffset(BinaryPrimitives.ReadInt32LittleEndian(SNES.rom.AsSpan(Const.ScreenDataPointersOffset[BG] + Id * 3))) + s * 0x80;
+            int tile32Offset = SNES.CpuToOffset(BinaryPrimitives.ReadInt32LittleEndian(SNES.rom.AsSpan(Const.Tile32DataPointersOffset[BG] + Id * 3)));
 
             for (int y = 0; y < 8; y++)
             {
                 for (int x = 0; x < 8; x++)
                 {
-                    ushort tileId32 = BitConverter.ToUInt16(SNES.rom, offset + (x * 2) + (y * 16));
+                    ushort tileId32 = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + (x * 2) + (y * 16)));
 
-                    Draw16xTile(BitConverter.ToUInt16(SNES.rom, tile32Offset + (tileId32 * 8)), x * 32, y * 32, stride, ptr);
-                    Draw16xTile(BitConverter.ToUInt16(SNES.rom, tile32Offset + (tileId32 * 8) + 2), x * 32 + 16, y * 32, stride, ptr);
-                    Draw16xTile(BitConverter.ToUInt16(SNES.rom, tile32Offset + (tileId32 * 8) + 4), x * 32, y * 32 + 16, stride, ptr);
-                    Draw16xTile(BitConverter.ToUInt16(SNES.rom, tile32Offset + (tileId32 * 8) + 6), x * 32 + 16, y * 32 + 16, stride, ptr);
+                    Draw16xTile(BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(tile32Offset + (tileId32 * 8))), x * 32, y * 32, stride, ptr);
+                    Draw16xTile(BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(tile32Offset + (tileId32 * 8) + 2)), x * 32 + 16, y * 32, stride, ptr);
+                    Draw16xTile(BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(tile32Offset + (tileId32 * 8) + 4)), x * 32, y * 32 + 16, stride, ptr);
+                    Draw16xTile(BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(tile32Offset + (tileId32 * 8) + 6)), x * 32 + 16, y * 32 + 16, stride, ptr);
                 }
             }
         }
         public static unsafe void DrawScreen(int s,int drawX,int drawY, int stride, IntPtr ptr)
         {
-            int offset = SNES.CpuToOffset(BitConverter.ToInt32(SNES.rom, Const.ScreenDataPointersOffset[BG] + Id * 3)) + s * 0x80;
-            int tile32Offset = SNES.CpuToOffset(BitConverter.ToInt32(SNES.rom, Const.Tile32DataPointersOffset[BG] + Id * 3));
+            int offset = SNES.CpuToOffset(BinaryPrimitives.ReadInt32LittleEndian(SNES.rom.AsSpan(Const.ScreenDataPointersOffset[BG] + Id * 3))) + s * 0x80;
+            int tile32Offset = SNES.CpuToOffset(BinaryPrimitives.ReadInt32LittleEndian(SNES.rom.AsSpan(Const.Tile32DataPointersOffset[BG] + Id * 3)));
 
             for (int y = 0; y < 8; y++)
             {
                 for (int x = 0; x < 8; x++)
                 {
-                    ushort tileId32 = BitConverter.ToUInt16(SNES.rom, offset + (x * 2) + (y * 16));
+                    ushort tileId32 = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + (x * 2) + (y * 16)));
 
-                    Draw16xTile(BitConverter.ToUInt16(SNES.rom, tile32Offset + (tileId32 * 8)), x * 32 + drawX, y * 32 + drawY, stride, ptr);
-                    Draw16xTile(BitConverter.ToUInt16(SNES.rom, tile32Offset + (tileId32 * 8) + 2), x * 32 + 16 + drawX, y * 32 + drawY, stride, ptr);
-                    Draw16xTile(BitConverter.ToUInt16(SNES.rom, tile32Offset + (tileId32 * 8) + 4), x * 32 + drawX, y * 32 + 16 + drawY, stride, ptr);
-                    Draw16xTile(BitConverter.ToUInt16(SNES.rom, tile32Offset + (tileId32 * 8) + 6), x * 32 + 16 + drawX, y * 32 + 16 + drawY, stride, ptr);
+                    Draw16xTile(BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(tile32Offset + (tileId32 * 8))), x * 32 + drawX, y * 32 + drawY, stride, ptr);
+                    Draw16xTile(BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(tile32Offset + (tileId32 * 8) + 2)), x * 32 + 16 + drawX, y * 32 + drawY, stride, ptr);
+                    Draw16xTile(BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(tile32Offset + (tileId32 * 8) + 4)), x * 32 + drawX, y * 32 + 16 + drawY, stride, ptr);
+                    Draw16xTile(BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(tile32Offset + (tileId32 * 8) + 6)), x * 32 + 16 + drawX, y * 32 + 16 + drawY, stride, ptr);
                 }
             }
         }
@@ -197,7 +132,7 @@ namespace TeheManX_Editor
             {
                 for (int i = 0; i < Const.LevelsCount; i++)
                 {
-                    int infoOffset = SNES.CpuToOffset(BitConverter.ToInt32(SNES.rom, Const.LayoutPointersOffset[l] + i * 3));
+                    int infoOffset = SNES.CpuToOffset(BinaryPrimitives.ReadInt32LittleEndian(SNES.rom.AsSpan(Const.LayoutPointersOffset[l] + i * 3)));
 
                     Array.Clear(temp, 0, temp.Length);
                     int destIndex = 0;
@@ -367,7 +302,7 @@ namespace TeheManX_Editor
                         return false;
                     }
                     //Save Layout to Rom
-                    int offset = SNES.CpuToOffset(BitConverter.ToInt32(SNES.rom, Const.LayoutPointersOffset[l] + i * 3));
+                    int offset = SNES.CpuToOffset(BinaryPrimitives.ReadInt32LittleEndian(SNES.rom.AsSpan(Const.LayoutPointersOffset[l] + i * 3)));
                     Array.Copy(compressedLayout, 0, SNES.rom, offset, compressedLayout.Length);
                 }
             }
@@ -391,7 +326,7 @@ namespace TeheManX_Editor
                     stage = i;
                     Enemies[i].Clear();
                     //Get Address of Enemy Data
-                    int addr = SNES.CpuToOffset(BitConverter.ToInt32(SNES.rom, Const.EnemyPointersOffset + (i * 2)) , Const.EnemyDataBank);
+                    int addr = SNES.CpuToOffset(BinaryPrimitives.ReadInt32LittleEndian(SNES.rom.AsSpan(Const.EnemyPointersOffset + (i * 2))) , Const.EnemyDataBank);
                     //Get Spawn Cam Byte
                     byte column = SNES.rom[addr];
                     if (column == 0xFF) // No Enemies in this stage
@@ -412,12 +347,12 @@ namespace TeheManX_Editor
                         Enemies[i][t].Column = column;
                         Enemies[i][t].Type = SNES.rom[addr];
                         //Assign Y
-                        Enemies[i][t].Y = (short)(BitConverter.ToUInt16(SNES.rom, addr + 1) & 0x7FFF);
+                        Enemies[i][t].Y = (short)(BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(addr + 1)) & 0x7FFF);
                         //Assign Id & Sub Id
                         Enemies[i][t].Id = SNES.rom[addr + 3];
                         Enemies[i][t].SubId = SNES.rom[addr + 4];
                         //Assign X
-                        Enemies[i][t].X = (short)(BitConverter.ToUInt16(SNES.rom, addr + 5) & 0x7FFF);
+                        Enemies[i][t].X = (short)(BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(addr + 5)) & 0x7FFF);
 
                         // Check X high byte
                         if ((SNES.rom[addr + 6] & 0x80) == 0)
@@ -450,7 +385,7 @@ namespace TeheManX_Editor
                 // If no enemies write FF and skip
                 if (sorted.Count == 0)
                 {
-                    SNES.rom[SNES.CpuToOffset(BitConverter.ToInt32(SNES.rom, Const.EnemyPointersOffset + (id * 2)),Const.EnemyDataBank)] = 0xFF;
+                    SNES.rom[SNES.CpuToOffset(BinaryPrimitives.ReadInt32LittleEndian(SNES.rom.AsSpan(Const.EnemyPointersOffset + (id * 2))),Const.EnemyDataBank)] = 0xFF;
                     continue;
                 }
 
@@ -494,7 +429,7 @@ namespace TeheManX_Editor
 
                 // Get offset from ROM
                 int offset = SNES.CpuToOffset(
-                    BitConverter.ToInt32(SNES.rom, Const.EnemyPointersOffset + (id * 2)),
+                    BinaryPrimitives.ReadInt32LittleEndian(SNES.rom.AsSpan(Const.EnemyPointersOffset + (id * 2))),
                     Const.EnemyDataBank
                 );
 
@@ -516,20 +451,20 @@ namespace TeheManX_Editor
                 else
                     id = Id;
 
-                int infoOffset = SNES.CpuToOffset(BitConverter.ToUInt16(SNES.rom, Const.PaletteInfoOffset + id * 2 + Const.PaletteStageBase), Const.PaletteBank);
+                int infoOffset = SNES.CpuToOffset(BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(Const.PaletteInfoOffset + id * 2 + Const.PaletteStageBase)), Const.PaletteBank);
 
                 while (SNES.rom[infoOffset] != 0)
                 {
                     int colorCount = SNES.rom[infoOffset]; //how many colors are going to be dumped
                     byte colorIndex = SNES.rom[infoOffset + 3]; //which color index to start dumping at
-                    int colorOffset = SNES.CpuToOffset(BitConverter.ToUInt16(SNES.rom, infoOffset + 1) + (Const.PaletteColorBank << 16)); //where the colors are located
+                    int colorOffset = SNES.CpuToOffset(BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(infoOffset + 1)) + (Const.PaletteColorBank << 16)); //where the colors are located
 
                     for (int c = 0; c < colorCount; c++)
                     {
                         if ((colorIndex + c) > 0x7F)
                             return;
 
-                        ushort color = BitConverter.ToUInt16(SNES.rom, colorOffset + c * 2);
+                        ushort color = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(colorOffset + c * 2));
                         byte R = (byte)(color % 32 * 8);
                         byte G = (byte)(color / 32 % 32 * 8);
                         byte B = (byte)(color / 1024 % 32 * 8);
@@ -566,7 +501,7 @@ namespace TeheManX_Editor
             else
                 id = Id;
 
-            int infoOffset = SNES.CpuToOffset(BitConverter.ToUInt16(SNES.rom, Const.LoadTileSetInfoOffset + id * 2 + Const.LoadTileSetStageBase), Const.LoadTileSetBank);
+            int infoOffset = SNES.CpuToOffset(BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(Const.LoadTileSetInfoOffset + id * 2 + Const.LoadTileSetStageBase)), Const.LoadTileSetBank);
 
             if (Const.Id == Const.GameId.MegaManX) // compression algorithem just for MMX
             {
@@ -581,10 +516,10 @@ namespace TeheManX_Editor
                 if (SNES.rom[infoOffset] != 0xFF)
                 {
                     int compressId = SNES.rom[infoOffset]; //which compressed tile Id to load
-                    int vramOffset = BitConverter.ToUInt16(SNES.rom, infoOffset + 3) & 0x7FFF; //where in vram to diump the tiles
-                    ushort size = BitConverter.ToUInt16(SNES.rom, compressId * 5 + Const.CompressedTileInfoOffset);
+                    int vramOffset = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(infoOffset + 3)) & 0x7FFF; //where in vram to diump the tiles
+                    ushort size = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(compressId * 5 + Const.CompressedTileInfoOffset));
                     size = (ushort)((size + 7) >> 3);
-                    int addr_R = SNES.CpuToOffset(BitConverter.ToInt32(SNES.rom, (compressId * 5) + Const.CompressedTileInfoOffset + 2));
+                    int addr_R = SNES.CpuToOffset(BinaryPrimitives.ReadInt32LittleEndian(SNES.rom.AsSpan((compressId * 5) + Const.CompressedTileInfoOffset + 2)));
                     try
                     {
                         while (size != 0)
@@ -623,10 +558,10 @@ namespace TeheManX_Editor
                 if (SNES.rom[infoOffset] != 0xFF)
                 {
                     int compressId = SNES.rom[infoOffset]; //which compressed tile Id to load
-                    int vramOffset = BitConverter.ToUInt16(SNES.rom, infoOffset + 3) & 0x7FFF; //where in vram to diump the tiles
+                    int vramOffset = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(infoOffset + 3)) & 0x7FFF; //where in vram to diump the tiles
 
-                    int addr_R = SNES.CpuToOffset(BitConverter.ToInt32(SNES.rom, compressId * 5 + Const.CompressedTileInfoOffset));
-                    int size = BitConverter.ToUInt16(SNES.rom, compressId * 5 + Const.CompressedTileInfoOffset + 3);
+                    int addr_R = SNES.CpuToOffset(BinaryPrimitives.ReadInt32LittleEndian(SNES.rom.AsSpan(compressId * 5 + Const.CompressedTileInfoOffset)));
+                    int size = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(compressId * 5 + Const.CompressedTileInfoOffset + 3));
                     int addr_W = 0x200;
 
                     try
