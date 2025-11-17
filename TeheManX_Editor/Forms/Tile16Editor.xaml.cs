@@ -62,6 +62,7 @@ namespace TeheManX_Editor.Forms
             DrawTile();
             UpdateTile16SelectionUI();
             UpdateTile8SelectionUI();
+            UpdateTileAttributeUI();
         }
         public unsafe void DrawVramTiles()
         {
