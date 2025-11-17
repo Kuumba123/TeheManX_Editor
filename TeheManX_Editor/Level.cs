@@ -321,7 +321,7 @@ namespace TeheManX_Editor
             int stage = 0;
             try
             {
-                for (int i = 0; i < Const.PlayabledLevelsCount; i++)
+                for (int i = 0; i < Const.PlayableLevelsCount; i++)
                 {
                     stage = i;
                     Enemies[i].Clear();
@@ -375,7 +375,7 @@ namespace TeheManX_Editor
         }
         public static bool SaveEnemyData()
         {
-            for (int id = 0; id < Const.PlayabledLevelsCount; id++)
+            for (int id = 0; id < Const.PlayableLevelsCount; id++)
             {
                 List<Enemy> sorted = Enemies[id].OrderBy(e => e.Column).ToList();
 
@@ -443,7 +443,7 @@ namespace TeheManX_Editor
         }
         public static void AssignPallete()
         {
-            if (Id < Const.PlayabledLevelsCount)
+            if (Id < Const.PlayableLevelsCount)
             {
                 int id;
                 if (Const.Id == Const.GameId.MegaManX3 && Id == 0xE)
@@ -492,7 +492,7 @@ namespace TeheManX_Editor
             Array.Copy(Const.VRAM_B, 0, Tiles, 0, 0x200);
             Array.Clear(Tiles, 0x200, Tiles.Length - 0x200);
 
-            if (Id >= Const.PlayabledLevelsCount)
+            if (Id >= Const.PlayableLevelsCount)
                 return;
 
             int id;

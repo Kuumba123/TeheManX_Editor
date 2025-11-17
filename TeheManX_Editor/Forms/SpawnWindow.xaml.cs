@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Buffers.Binary;
-using System.Linq;
+using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 
 namespace TeheManX_Editor.Forms
 {
@@ -21,7 +22,7 @@ namespace TeheManX_Editor.Forms
         #region Methods
         public void SetSpawnSettings()
         {
-            if (Level.Id >= Const.PlayabledLevelsCount)
+            if (Level.Id >= Const.PlayableLevelsCount)
             {
                 spawnInt.IsEnabled = false;
                 objectTileInt.IsEnabled = false;
@@ -47,7 +48,7 @@ namespace TeheManX_Editor.Forms
                 //calculate the max amount of checkpoints for the level
                 int maxCheckpoints = 0;
                 int checkpointSize = (Const.Id == Const.GameId.MegaManX) ? 0x1D : 0x1F;
-                if (Level.Id != (Const.PlayabledLevelsCount - 1))
+                if (Level.Id != (Const.PlayableLevelsCount - 1))
                 {
                     //get the start of the next level's checkpoint list
                     int nextOffset = BitConverter.ToUInt16(SNES.rom, Const.CheckpointOffset + (Level.Id + 1) * 2);
@@ -56,8 +57,8 @@ namespace TeheManX_Editor.Forms
                     if (Const.Id != Const.GameId.MegaManX)
                     {
                         //Note: MegaMan X2 does not keep the offsets in order
-                        ushort[] offsetList = new ushort[Const.PlayabledLevelsCount];
-                        for (int i = 0; i < Const.PlayabledLevelsCount; i++)
+                        ushort[] offsetList = new ushort[Const.PlayableLevelsCount];
+                        for (int i = 0; i < Const.PlayableLevelsCount; i++)
                             offsetList[i] = BitConverter.ToUInt16(SNES.rom, Const.CheckpointOffset + i * 2);
                         Array.Sort(offsetList);
                         nextOffset = offsetList[Array.IndexOf(offsetList,(ushort)currentOffset) + 1];
@@ -150,7 +151,7 @@ namespace TeheManX_Editor.Forms
         #region Events
         private void spawnInt_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            if (e.NewValue == null || SNES.rom == null || Level.Id >= Const.PlayabledLevelsCount)
+            if (e.NewValue == null || SNES.rom == null || Level.Id >= Const.PlayableLevelsCount)
                 return;
             int listOffset = BitConverter.ToUInt16(SNES.rom, Const.CheckpointOffset + Level.Id * 2) + Const.CheckpointOffset;
             int offset = BitConverter.ToUInt16(SNES.rom, listOffset + (int)e.NewValue * 2) + Const.CheckpointOffset;
@@ -158,7 +159,7 @@ namespace TeheManX_Editor.Forms
         }
         private void objectTileInt_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            if (e.NewValue == null || SNES.rom == null || Level.Id >= Const.PlayabledLevelsCount)
+            if (e.NewValue == null || SNES.rom == null || Level.Id >= Const.PlayableLevelsCount)
                 return;
             int listOffset = BitConverter.ToUInt16(SNES.rom, Const.CheckpointOffset + Level.Id * 2) + Const.CheckpointOffset;
             int offset = BitConverter.ToUInt16(SNES.rom, listOffset + (int)spawnInt.Value * 2) + Const.CheckpointOffset;
@@ -170,7 +171,7 @@ namespace TeheManX_Editor.Forms
         }
         private void backgroundTileInt_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            if (e.NewValue == null || SNES.rom == null || Level.Id >= Const.PlayabledLevelsCount)
+            if (e.NewValue == null || SNES.rom == null || Level.Id >= Const.PlayableLevelsCount)
                 return;
             int listOffset = BitConverter.ToUInt16(SNES.rom, Const.CheckpointOffset + Level.Id * 2) + Const.CheckpointOffset;
             int offset = BitConverter.ToUInt16(SNES.rom, listOffset + (int)spawnInt.Value * 2) + Const.CheckpointOffset;
@@ -182,7 +183,7 @@ namespace TeheManX_Editor.Forms
         }
         private void backgroundPalInt_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            if (e.NewValue == null || SNES.rom == null || Level.Id >= Const.PlayabledLevelsCount)
+            if (e.NewValue == null || SNES.rom == null || Level.Id >= Const.PlayableLevelsCount)
                 return;
             int listOffset = BitConverter.ToUInt16(SNES.rom, Const.CheckpointOffset + Level.Id * 2) + Const.CheckpointOffset;
             int offset = BitConverter.ToUInt16(SNES.rom, listOffset + (int)spawnInt.Value * 2) + Const.CheckpointOffset;
@@ -194,7 +195,7 @@ namespace TeheManX_Editor.Forms
         }
         private void unknownInt_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            if (e.NewValue == null || SNES.rom == null || Level.Id >= Const.PlayabledLevelsCount)
+            if (e.NewValue == null || SNES.rom == null || Level.Id >= Const.PlayableLevelsCount)
                 return;
             int listOffset = BitConverter.ToUInt16(SNES.rom, Const.CheckpointOffset + Level.Id * 2) + Const.CheckpointOffset;
             int offset = BitConverter.ToUInt16(SNES.rom, listOffset + (int)spawnInt.Value * 2) + Const.CheckpointOffset;
@@ -206,7 +207,7 @@ namespace TeheManX_Editor.Forms
         }
         private void megaIntX_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            if (e.NewValue == null || SNES.rom == null || Level.Id >= Const.PlayabledLevelsCount)
+            if (e.NewValue == null || SNES.rom == null || Level.Id >= Const.PlayableLevelsCount)
                 return;
             int listOffset = BitConverter.ToUInt16(SNES.rom, Const.CheckpointOffset + Level.Id * 2) + Const.CheckpointOffset;
             int offset = BitConverter.ToUInt16(SNES.rom, listOffset + (int)spawnInt.Value * 2) + Const.CheckpointOffset;
@@ -220,7 +221,7 @@ namespace TeheManX_Editor.Forms
         }
         private void megaIntY_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            if (e.NewValue == null || SNES.rom == null || Level.Id >= Const.PlayabledLevelsCount)
+            if (e.NewValue == null || SNES.rom == null || Level.Id >= Const.PlayableLevelsCount)
                 return;
             int listOffset = BitConverter.ToUInt16(SNES.rom, Const.CheckpointOffset + Level.Id * 2) + Const.CheckpointOffset;
             int offset = BitConverter.ToUInt16(SNES.rom, listOffset + (int)spawnInt.Value * 2) + Const.CheckpointOffset;
@@ -234,7 +235,7 @@ namespace TeheManX_Editor.Forms
         }
         private void camIntX_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            if (e.NewValue == null || SNES.rom == null || Level.Id >= Const.PlayabledLevelsCount)
+            if (e.NewValue == null || SNES.rom == null || Level.Id >= Const.PlayableLevelsCount)
                 return;
             int listOffset = BitConverter.ToUInt16(SNES.rom, Const.CheckpointOffset + Level.Id * 2) + Const.CheckpointOffset;
             int offset = BitConverter.ToUInt16(SNES.rom, listOffset + (int)spawnInt.Value * 2) + Const.CheckpointOffset;
@@ -248,7 +249,7 @@ namespace TeheManX_Editor.Forms
         }
         private void camIntY_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            if (e.NewValue == null || SNES.rom == null || Level.Id >= Const.PlayabledLevelsCount)
+            if (e.NewValue == null || SNES.rom == null || Level.Id >= Const.PlayableLevelsCount)
                 return;
             int listOffset = BitConverter.ToUInt16(SNES.rom, Const.CheckpointOffset + Level.Id * 2) + Const.CheckpointOffset;
             int offset = BitConverter.ToUInt16(SNES.rom, listOffset + (int)spawnInt.Value * 2) + Const.CheckpointOffset;
@@ -262,7 +263,7 @@ namespace TeheManX_Editor.Forms
         }
         private void bg2IntX_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            if (e.NewValue == null || SNES.rom == null || Level.Id >= Const.PlayabledLevelsCount)
+            if (e.NewValue == null || SNES.rom == null || Level.Id >= Const.PlayableLevelsCount)
                 return;
             int listOffset = BitConverter.ToUInt16(SNES.rom, Const.CheckpointOffset + Level.Id * 2) + Const.CheckpointOffset;
             int offset = BitConverter.ToUInt16(SNES.rom, listOffset + (int)spawnInt.Value * 2) + Const.CheckpointOffset;
@@ -276,7 +277,7 @@ namespace TeheManX_Editor.Forms
         }
         private void bg2IntY_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            if (e.NewValue == null || SNES.rom == null || Level.Id >= Const.PlayabledLevelsCount)
+            if (e.NewValue == null || SNES.rom == null || Level.Id >= Const.PlayableLevelsCount)
                 return;
             int listOffset = BitConverter.ToUInt16(SNES.rom, Const.CheckpointOffset + Level.Id * 2) + Const.CheckpointOffset;
             int offset = BitConverter.ToUInt16(SNES.rom, listOffset + (int)spawnInt.Value * 2) + Const.CheckpointOffset;
@@ -290,7 +291,7 @@ namespace TeheManX_Editor.Forms
         }
         private void camBorderIntL_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            if (e.NewValue == null || SNES.rom == null || Level.Id >= Const.PlayabledLevelsCount)
+            if (e.NewValue == null || SNES.rom == null || Level.Id >= Const.PlayableLevelsCount)
                 return;
             int listOffset = BitConverter.ToUInt16(SNES.rom, Const.CheckpointOffset + Level.Id * 2) + Const.CheckpointOffset;
             int offset = BitConverter.ToUInt16(SNES.rom, listOffset + (int)spawnInt.Value * 2) + Const.CheckpointOffset;
@@ -304,7 +305,7 @@ namespace TeheManX_Editor.Forms
         }
         private void camBorderIntR_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            if (e.NewValue == null || SNES.rom == null || Level.Id >= Const.PlayabledLevelsCount)
+            if (e.NewValue == null || SNES.rom == null || Level.Id >= Const.PlayableLevelsCount)
                 return;
             int listOffset = BitConverter.ToUInt16(SNES.rom, Const.CheckpointOffset + Level.Id * 2) + Const.CheckpointOffset;
             int offset = BitConverter.ToUInt16(SNES.rom, listOffset + (int)spawnInt.Value * 2) + Const.CheckpointOffset;
@@ -318,7 +319,7 @@ namespace TeheManX_Editor.Forms
         }
         private void camBorderIntT_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            if (e.NewValue == null || SNES.rom == null || Level.Id >= Const.PlayabledLevelsCount)
+            if (e.NewValue == null || SNES.rom == null || Level.Id >= Const.PlayableLevelsCount)
                 return;
             int listOffset = BitConverter.ToUInt16(SNES.rom, Const.CheckpointOffset + Level.Id * 2) + Const.CheckpointOffset;
             int offset = BitConverter.ToUInt16(SNES.rom, listOffset + (int)spawnInt.Value * 2) + Const.CheckpointOffset;
@@ -332,7 +333,7 @@ namespace TeheManX_Editor.Forms
         }
         private void camBorderIntB_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            if (e.NewValue == null || SNES.rom == null || Level.Id >= Const.PlayabledLevelsCount)
+            if (e.NewValue == null || SNES.rom == null || Level.Id >= Const.PlayableLevelsCount)
                 return;
             int listOffset = BitConverter.ToUInt16(SNES.rom, Const.CheckpointOffset + Level.Id * 2) + Const.CheckpointOffset;
             int offset = BitConverter.ToUInt16(SNES.rom, listOffset + (int)spawnInt.Value * 2) + Const.CheckpointOffset;
@@ -346,7 +347,7 @@ namespace TeheManX_Editor.Forms
         }
         private void bg2IntBaseX_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            if (e.NewValue == null || SNES.rom == null || Level.Id >= Const.PlayabledLevelsCount)
+            if (e.NewValue == null || SNES.rom == null || Level.Id >= Const.PlayableLevelsCount)
                 return;
             int listOffset = BitConverter.ToUInt16(SNES.rom, Const.CheckpointOffset + Level.Id * 2) + Const.CheckpointOffset;
             int offset = BitConverter.ToUInt16(SNES.rom, listOffset + (int)spawnInt.Value * 2) + Const.CheckpointOffset;
@@ -360,7 +361,7 @@ namespace TeheManX_Editor.Forms
         }
         private void bg2IntBaseY_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            if (e.NewValue == null || SNES.rom == null || Level.Id >= Const.PlayabledLevelsCount)
+            if (e.NewValue == null || SNES.rom == null || Level.Id >= Const.PlayableLevelsCount)
                 return;
             int listOffset = BitConverter.ToUInt16(SNES.rom, Const.CheckpointOffset + Level.Id * 2) + Const.CheckpointOffset;
             int offset = BitConverter.ToUInt16(SNES.rom, listOffset + (int)spawnInt.Value * 2) + Const.CheckpointOffset;
@@ -374,7 +375,7 @@ namespace TeheManX_Editor.Forms
         }
         private void unknown2Int_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            if (e.NewValue == null || SNES.rom == null || Level.Id >= Const.PlayabledLevelsCount)
+            if (e.NewValue == null || SNES.rom == null || Level.Id >= Const.PlayableLevelsCount)
                 return;
             int listOffset = BitConverter.ToUInt16(SNES.rom, Const.CheckpointOffset + Level.Id * 2) + Const.CheckpointOffset;
             int offset = BitConverter.ToUInt16(SNES.rom, listOffset + (int)spawnInt.Value * 2) + Const.CheckpointOffset;
@@ -386,7 +387,7 @@ namespace TeheManX_Editor.Forms
         }
         private void megaFlipInt_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            if (e.NewValue == null || SNES.rom == null || Level.Id >= Const.PlayabledLevelsCount)
+            if (e.NewValue == null || SNES.rom == null || Level.Id >= Const.PlayableLevelsCount)
                 return;
             int listOffset = BitConverter.ToUInt16(SNES.rom, Const.CheckpointOffset + Level.Id * 2) + Const.CheckpointOffset;
             int offset = BitConverter.ToUInt16(SNES.rom, listOffset + (int)spawnInt.Value * 2) + Const.CheckpointOffset;
@@ -404,7 +405,7 @@ namespace TeheManX_Editor.Forms
         }
         private void collisionInt_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            if (e.NewValue == null || SNES.rom == null || Level.Id >= Const.PlayabledLevelsCount)
+            if (e.NewValue == null || SNES.rom == null || Level.Id >= Const.PlayableLevelsCount)
                 return;
             int listOffset = BitConverter.ToUInt16(SNES.rom, Const.CheckpointOffset + Level.Id * 2) + Const.CheckpointOffset;
             int offset = BitConverter.ToUInt16(SNES.rom, listOffset + (int)spawnInt.Value * 2) + Const.CheckpointOffset;
@@ -420,9 +421,163 @@ namespace TeheManX_Editor.Forms
             SNES.rom[offset] = value;
             SNES.edit = true;
         }
-        private void GearBtn_Click(object sender, RoutedEventArgs e)
+        private void GearBtn_Click(object sender, RoutedEventArgs e) // Configure Max Checkpoints in the current stage
         {
+            if (Level.Id >= Const.PlayableLevelsCount)
+            {
+                MessageBox.Show("This level does not support checkpoints.", "ERROR");
+                return;
+            }
+            // 1st we are getting the amount of checkpoints in each level
+            byte[] checkpointsCount = new byte[Const.PlayableLevelsCount];
 
+
+            for (int s = 0; s < Const.PlayableLevelsCount; s++)
+            {
+                int maxCheckpoints = 0;
+                if (s != (Const.PlayableLevelsCount - 1))
+                {
+                    int nextOffset = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(Const.CheckpointOffset + (s + 1) * 2));
+                    int currentOffset = BitConverter.ToUInt16(SNES.rom, Const.CheckpointOffset + s * 2);
+
+                    if (true)
+                    {
+                        //Note: MegaMan X2 does not keep the offsets in order
+                        ushort[] offsetList = new ushort[Const.PlayableLevelsCount];
+                        for (int i = 0; i < Const.PlayableLevelsCount; i++)
+                            offsetList[i] = BitConverter.ToUInt16(SNES.rom, Const.CheckpointOffset + i * 2);
+                        Array.Sort(offsetList);
+                        nextOffset = offsetList[Array.IndexOf(offsetList, (ushort)currentOffset) + 1];
+                    }
+                    maxCheckpoints = (nextOffset - currentOffset) / 2;
+                }
+                else
+                {
+                    //use the first levels offsets to determine the last level's max checkpoints
+                    int firstOffset = BitConverter.ToUInt16(SNES.rom, Const.CheckpointOffset + 0 * 2) + Const.CheckpointOffset;
+                    int firstDataOffset = BitConverter.ToUInt16(SNES.rom, firstOffset);
+                    ushort lastOffset = BitConverter.ToUInt16(SNES.rom, s * 2 + Const.CheckpointOffset);
+                    maxCheckpoints = (firstDataOffset - lastOffset) / 2;
+                }
+                checkpointsCount[s] = (byte)maxCheckpoints;
+            }
+
+
+            // Create UI elements
+            Window window = new Window
+            {
+                Title = "Info",
+                SizeToContent = SizeToContent.WidthAndHeight,
+                ResizeMode = ResizeMode.NoResize,
+                WindowStartupLocation = WindowStartupLocation.CenterOwner,
+                Owner = Application.Current.MainWindow
+            };
+            TextBlock textBlock = new TextBlock() { Text = $"Max Total Check Points: {Const.MaxTotalCheckpoints}" , FontSize = 18, Foreground = Brushes.White , FontFamily = new FontFamily("Consolas")};
+            NumInt numInt = new NumInt() { Margin = new Thickness(5), Minimum = 1, Maximum = Const.MaxTotalCheckpoints, Value = spawnInt.Maximum + 1, Width = 100, FontFamily = new FontFamily("Consolas"), FontSize = 16 };
+            Grid.SetColumn(numInt, 1);
+            Grid.SetRow(numInt, 1);
+            Button confirmBtn = new Button() { Content = "OK", Width = 75, Height = 30, Margin = new Thickness(5) };
+            confirmBtn.Click += (se, ev) =>
+            {
+                if (numInt.Value == null)
+                    return;
+                int total = 0;
+                for (int i = 0; i < Const.PlayableLevelsCount; i++)
+                {
+                    if (i != Level.Id)
+                        total += checkpointsCount[i];
+                    else
+                        total += (int)numInt.Value;
+                }
+                if (total > Const.MaxTotalCheckpoints)
+                {
+                    MessageBox.Show($"The total amount of checkpoints across all levels cannot exceed {Const.MaxTotalCheckpoints}.\nCurrent Total: {total}", "ERROR");
+                    return;
+                }
+                //update the current level's max checkpoints
+                List<byte[]>[] checkpointData = new List<byte[]>[Const.PlayableLevelsCount];
+
+                // initialize each List<>
+                for (int i = 0; i < checkpointData.Length; i++)
+                    checkpointData[i] = new List<byte[]>();
+
+                int checkpointSize = (Const.Id == Const.GameId.MegaManX) ? 0x1D : 0x1F;
+
+                // now fill in the orignal checkpoint data
+                for (int s = 0; s < Const.PlayableLevelsCount; s++)
+                {
+                    int first = BitConverter.ToUInt16(SNES.rom, Const.CheckpointOffset + s * 2);
+                    int listOffset = BitConverter.ToUInt16(SNES.rom, Const.CheckpointOffset + s * 2) + Const.CheckpointOffset;
+
+                    for (int c = 0; c < checkpointsCount[s]; c++)
+                    {
+                        int offset = BitConverter.ToUInt16(SNES.rom, listOffset + c * 2) + Const.CheckpointOffset;
+                        byte[] checkpointBytes = new byte[checkpointSize];
+                        Array.Copy(SNES.rom, offset, checkpointBytes, 0, checkpointSize);
+                        checkpointData[s].Add(checkpointBytes);
+                    }
+                }
+
+                // now rebuild the checkpoint list
+                if (checkpointData[Level.Id].Count < (int)numInt.Value)
+                {
+                    while (checkpointData[Level.Id].Count < (int)numInt.Value)
+                        checkpointData[Level.Id].Add(new byte[checkpointSize]); //add a blank checkpoint
+                }
+                else if (checkpointData[Level.Id].Count > (int)numInt.Value)
+                {
+                    while (checkpointData[Level.Id].Count > (int)numInt.Value)
+                        checkpointData[Level.Id].RemoveAt(checkpointData[Level.Id].Count - 1); //remove last checkpoint
+                }
+
+                // Now test outputting the checkpoint data
+                int checkpointDataStartOffset = Const.CheckpointOffset + Const.PlayableLevelsCount * 2 + Const.MaxTotalCheckpoints * 2;
+                int checkpointPointersStartOffset = Const.CheckpointOffset + Const.PlayableLevelsCount * 2;
+
+
+                for (int s = 0; s < Const.PlayableLevelsCount; s++)
+                {
+                    for (int i = 0; i < checkpointData[s].Count; i++)
+                    {
+                        Array.Copy(checkpointData[s][i], 0, SNES.rom, checkpointDataStartOffset, checkpointSize);
+                        // Now write the pointer
+                        BinaryPrimitives.WriteUInt16LittleEndian(SNES.rom.AsSpan(checkpointPointersStartOffset), (ushort)(checkpointDataStartOffset - Const.CheckpointOffset));
+
+                        checkpointPointersStartOffset += 2;
+                        checkpointDataStartOffset += checkpointSize;
+                    }
+                }
+
+
+                // Now write the start of each level's checkpoint pointers
+                checkpointPointersStartOffset = Const.CheckpointOffset + Const.PlayableLevelsCount * 2;
+
+                for (int s = 0; s < Const.PlayableLevelsCount; s++)
+                {
+                    BinaryPrimitives.WriteUInt16LittleEndian(SNES.rom.AsSpan(Const.CheckpointOffset + s * 2), (ushort)(checkpointPointersStartOffset - Const.CheckpointOffset));
+                    checkpointPointersStartOffset += checkpointData[s].Count * 2;
+                }
+                SNES.edit = true;
+                spawnInt.Maximum = (int)numInt.Value - 1;
+                if (spawnInt.Value > spawnInt.Maximum)
+                    spawnInt.Value = spawnInt.Maximum;
+                MessageBox.Show("Checkpoint configuration updated successfully!");
+                window.Close();
+            };
+            Grid.SetRow(confirmBtn, 1);
+            Grid grid = new Grid();
+            grid.Background = Brushes.Black;
+            grid.ColumnDefinitions.Add(new ColumnDefinition());
+            grid.ColumnDefinitions.Add(new ColumnDefinition());
+            grid.RowDefinitions.Add(new RowDefinition());
+            grid.RowDefinitions.Add(new RowDefinition());
+            grid.Children.Add(textBlock);
+            grid.Children.Add(numInt);
+            grid.Children.Add(confirmBtn);
+
+
+            window.Content = grid;
+            window.ShowDialog();
         }
         #endregion Events
     }

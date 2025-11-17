@@ -55,7 +55,7 @@ namespace TeheManX_Editor.Forms
             foreach (var r in enemyLabels)
                 r.Visibility = Visibility.Collapsed;
 
-            if (Level.Id >= Const.PlayabledLevelsCount)
+            if (Level.Id >= Const.PlayableLevelsCount)
                 return;
 
             while (enemyLabels.Count < Level.Enemies[Level.Id].Count)
@@ -97,7 +97,7 @@ namespace TeheManX_Editor.Forms
         private bool ValidEnemyAdd()
         {
 
-           if (Level.Id >= Const.PlayabledLevelsCount)
+           if (Level.Id >= Const.PlayableLevelsCount)
             {
                 MessageBox.Show("Enemies cannot be added to this level.", "Error");
                 return false;

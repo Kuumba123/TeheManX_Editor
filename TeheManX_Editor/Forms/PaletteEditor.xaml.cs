@@ -123,7 +123,7 @@ namespace TeheManX_Editor.Forms
         {
             if (e.ChangedButton == MouseButton.Right) //Change Color
             {
-                if (Level.Id < Const.PlayabledLevelsCount)
+                if (Level.Id < Const.PlayableLevelsCount)
                 {
                     //Get Current Color
                     int c = Grid.GetColumn(sender as UIElement);

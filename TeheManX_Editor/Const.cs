@@ -22,7 +22,7 @@
         public static GameVersion Version = 0; //Game Version (0=US, 1=JP)
 
         public static int LevelsCount;
-        public static int PlayabledLevelsCount;
+        public static int PlayableLevelsCount;
 
         public static int PaletteBank;
         public static int PaletteColorBank;
@@ -103,7 +103,7 @@
         public static class MegaManX
         {
             public const int LevelsCount = 0x25;
-            public const int PlayabledLevelsCount = 0xD;
+            public const int PlayableLevelsCount = 0xD;
 
             public const int CompressedTilesAmount = 0xA9;
 
@@ -325,7 +325,7 @@
         public static class MegaManX2
         {
             public const int LevelsCount = 0x1B;
-            public const int PlayabledLevelsCount = 0xD;
+            public const int PlayableLevelsCount = 0xD;
 
             public const int CompressedTilesAmount = 0xA5;
 
@@ -506,7 +506,7 @@
         public static class MegaManX3
         {
             public const int LevelsCount = 0x25;
-            public const int PlayabledLevelsCount = 0xF;
+            public const int PlayableLevelsCount = 0xF;
 
             public const int CompressedTilesAmount = 0xDD;
 
@@ -733,7 +733,7 @@
             {
                 Id = GameId.MegaManX;
                 LevelsCount = MegaManX.LevelsCount;
-                PlayabledLevelsCount = MegaManX.PlayabledLevelsCount;
+                PlayableLevelsCount = MegaManX.PlayableLevelsCount;
 
                 PaletteBank = MegaManX.PaletteBank;
                 PaletteColorBank = MegaManX.PaletteColorBank;
@@ -777,7 +777,7 @@
             {
                 Id = GameId.MegaManX2;
                 LevelsCount = MegaManX2.LevelsCount;
-                PlayabledLevelsCount = MegaManX2.PlayabledLevelsCount;
+                PlayableLevelsCount = MegaManX2.PlayableLevelsCount;
 
                 PaletteBank = MegaManX2.PaletteBank;
                 PaletteColorBank = MegaManX2.PaletteColorBank;
@@ -822,7 +822,7 @@
             {
                 Id = GameId.MegaManX3;
                 LevelsCount = MegaManX3.LevelsCount;
-                PlayabledLevelsCount = MegaManX3.PlayabledLevelsCount;
+                PlayableLevelsCount = MegaManX3.PlayableLevelsCount;
 
                 PaletteBank = MegaManX3.PaletteBank;
                 PaletteColorBank = MegaManX3.PaletteColorBank;
