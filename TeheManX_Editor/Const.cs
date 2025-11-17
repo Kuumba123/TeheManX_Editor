@@ -13,14 +13,13 @@
         public enum GameVersion
         {
             NA,
-            JP,
-            PAL
+            JP
         }
         public const int MaxLevels = 0x30;
 
         /*Variable Constants*/
         public static GameId Id = 0;    //Game ID (0=MMX1, 1=MMX2, 2=MMX3)
-        public static GameVersion Version = 0; //Game Version (0=US, 1=JP, 2=EU)
+        public static GameVersion Version = 0; //Game Version (0=US, 1=JP)
 
         public static int LevelsCount;
         public static int PlayabledLevelsCount;
@@ -121,6 +120,10 @@
 
             public const int MaxTotalCheckpoints = 44;
 
+            public const int MaxTotalCameraSettings = 0x46; //ID Used in Storm Eagle Stage
+            public const int CameraSettingsBank = 0x86;
+            public const int CameraTriggersLength = 0x7EE; //size includes all the pointers
+
             public static readonly int[] LayoutPointersOffset = { 0x30D24, 0x30F4F }; //Layout Pointers Offset to compressed data
             public static readonly int[] ScreenDataPointersOffset = { 0x30D93, 0x30FBE };
             public static readonly int[] Tile32DataPointersOffset = { 0x30E02, 0x3102D };
@@ -131,12 +134,16 @@
                 public const int LoadTileSetInfoOffset = 0x3756F;
                 public const int CompressedTileInfoOffset = 0x376F7;
                 public const int CheckpointOffset = 0x32780;
+                public const int CameraTriggersOffset = 0x364E2;
+                public const int CameraSettingsOffset = 0x36CD0;
             }
             internal class JP // Japanese Version
             {
                 public const int LoadTileSetInfoOffset = 0x37572;
                 public const int CompressedTileInfoOffset = 0x376FA;
                 public const int CheckpointOffset = 0x32783;
+                public const int CameraTriggersOffset = 0x364E5;
+                public const int CameraSettingsOffset = 0x36CD3;
             }
             public static readonly byte[,] LayoutLength = new byte[0x25, 2]
 {
@@ -334,6 +341,12 @@
 
             public const int MaxTotalCheckpoints = 64;
 
+            public const int MaxTotalCameraSettings = 0x7E;
+            public const int CameraTriggersLength = 0xEFB; //size includes all the pointers
+            public const int CameraSettingsBank = 0x2;
+            public const int CameraTriggersOffset = 0x16BE9;
+            public const int CameraSettingsOffset = 0x17AE4;
+
             public static readonly int[] LayoutPointersOffset = { 0x030888, 0x30AB3 };
             public static readonly int[] ScreenDataPointersOffset = { 0x0308F7, 0x30B22 };
             public static readonly int[] Tile32DataPointersOffset = { 0x030966, 0x30B91 };
@@ -509,6 +522,11 @@
             public const int EnemyDataBank = 0x3C;
 
             public const int MaxTotalCheckpoints = 53;
+            public const int MaxTotalCameraSettings = 0x90;
+            public const int CameraTriggersLength = 0x1489; //size includes all the pointers
+            public const int CameraSettingsBank = 0x3;
+            public const int CameraTriggersOffset = 0x1DE43;
+            public const int CameraSettingsOffset = 0x1F2CC;
 
             public static readonly int[] LayoutPointersOffset = { 0x309B3, 0x30BDE };
             public static readonly int[] ScreenDataPointersOffset = { 0x30A22, 0x30C4D };
