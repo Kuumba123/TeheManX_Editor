@@ -185,6 +185,7 @@ namespace TeheManX_Editor.Forms
         private void canvas_PreviewMouseUp(object sender, MouseButtonEventArgs e)
         {
             obj = null;
+            down = false;
             canvas.ReleaseMouseCapture();
         }
         private void idInt_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
