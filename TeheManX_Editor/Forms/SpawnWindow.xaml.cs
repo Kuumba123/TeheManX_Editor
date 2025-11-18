@@ -117,34 +117,34 @@ namespace TeheManX_Editor.Forms
         }
         private void SetIntValues(int offset)
         {
-            objectTileInt.Value = SNES.rom[offset + 0];
-            backgroundTileInt.Value = SNES.rom[offset + 1];
-            backgroundPalInt.Value = SNES.rom[offset + 2];
+            MainWindow.window.spawnE.objectTileInt.Value = SNES.rom[offset + 0];
+            MainWindow.window.spawnE.backgroundTileInt.Value = SNES.rom[offset + 1];
+            MainWindow.window.spawnE.backgroundPalInt.Value = SNES.rom[offset + 2];
             if (Const.Id != Const.GameId.MegaManX)
             {
-                unknownInt.Value = SNES.rom[offset + 3];
-                unknown2Int.Value = SNES.rom[offset + 0x1C];
-                megaFlipInt.Value = SNES.rom[offset  + 0x1E];
-                collisionInt.Value = SNES.rom[offset + 0x1D];
+                MainWindow.window.spawnE.unknownInt.Value = SNES.rom[offset + 3];
+                MainWindow.window.spawnE.unknown2Int.Value = SNES.rom[offset + 0x1C];
+                MainWindow.window.spawnE.megaFlipInt.Value = SNES.rom[offset  + 0x1E];
+                MainWindow.window.spawnE.collisionInt.Value = SNES.rom[offset + 0x1D];
                 offset++;
             }
             else
             {
-                megaFlipInt.Value = SNES.rom[offset + 27];
-                collisionInt.Value = SNES.rom[offset + 28];
+                MainWindow.window.spawnE.megaFlipInt.Value = SNES.rom[offset + 27];
+                MainWindow.window.spawnE.collisionInt.Value = SNES.rom[offset + 28];
             }
-            megaIntX.Value = BitConverter.ToUInt16(SNES.rom, offset + 3);
-            megaIntY.Value = BitConverter.ToUInt16(SNES.rom, offset + 5);
-            camIntX.Value = BitConverter.ToUInt16(SNES.rom, offset + 7);
-            camIntY.Value = BitConverter.ToUInt16(SNES.rom, offset + 9);
-            bg2IntX.Value = BitConverter.ToUInt16(SNES.rom, offset + 11);
-            bg2IntY.Value = BitConverter.ToUInt16(SNES.rom, offset + 13);
-            camBorderIntL.Value = BitConverter.ToUInt16(SNES.rom, offset + 15);
-            camBorderIntR.Value = BitConverter.ToUInt16(SNES.rom, offset + 17);
-            camBorderIntT.Value = BitConverter.ToUInt16(SNES.rom, offset + 19);
-            camBorderIntB.Value = BitConverter.ToUInt16(SNES.rom, offset + 21);
-            bg2IntBaseX.Value = BitConverter.ToUInt16(SNES.rom, offset + 23);
-            bg2IntBaseY.Value = BitConverter.ToUInt16(SNES.rom, offset + 25);
+            MainWindow.window.spawnE.megaIntX.Value = BitConverter.ToUInt16(SNES.rom, offset + 3);
+            MainWindow.window.spawnE.megaIntY.Value = BitConverter.ToUInt16(SNES.rom, offset + 5);
+            MainWindow.window.spawnE.camIntX.Value = BitConverter.ToUInt16(SNES.rom, offset + 7);
+            MainWindow.window.spawnE.camIntY.Value = BitConverter.ToUInt16(SNES.rom, offset + 9);
+            MainWindow.window.spawnE.bg2IntX.Value = BitConverter.ToUInt16(SNES.rom, offset + 11);
+            MainWindow.window.spawnE.bg2IntY.Value = BitConverter.ToUInt16(SNES.rom, offset + 13);
+            MainWindow.window.spawnE.camBorderIntL.Value = BitConverter.ToUInt16(SNES.rom, offset + 15);
+            MainWindow.window.spawnE.camBorderIntR.Value = BitConverter.ToUInt16(SNES.rom, offset + 17);
+            MainWindow.window.spawnE.camBorderIntT.Value = BitConverter.ToUInt16(SNES.rom, offset + 19);
+            MainWindow.window.spawnE.camBorderIntB.Value = BitConverter.ToUInt16(SNES.rom, offset + 21);
+            MainWindow.window.spawnE.bg2IntBaseX.Value = BitConverter.ToUInt16(SNES.rom, offset + 23);
+            MainWindow.window.spawnE.bg2IntBaseY.Value = BitConverter.ToUInt16(SNES.rom, offset + 25);
         }
         #endregion Methods
 
