@@ -70,6 +70,18 @@
                 </TabItem.Header>
                 <forms:SpawnWindow x:Name="spawnE"/>
             </TabItem>
+            <TabItem Name="camTab">
+                <TabItem.Header>
+                    <Button Style="{StaticResource TabButton}">Camera</Button>
+                </TabItem.Header>
+                <forms:CameraEditor x:Name="camE"/>
+            </TabItem>
+            <TabItem Name="tileTab">
+                <TabItem.Header>
+                    <Button Style="{StaticResource TabButton}">VRAM Tiles</Button>
+                </TabItem.Header>
+                <forms:TileEditor x:Name="tileD"/>
+            </TabItem>
         </dragablz:TabablzControl>
     </Grid>
 </Window>

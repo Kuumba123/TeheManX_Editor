@@ -42,6 +42,8 @@
         public static int CheckpointOffset;
         public static int[] MaxCheckpoints = new int[MaxLevels];
 
+        public static int BackgroundTileInfoOffset;
+
         public static int[] LayoutPointersOffset = new int[2]; //Layout Pointers Offset to compressed data
         public static int[] ScreenDataPointersOffset = new int[2];
         public static int[] Tile32DataPointersOffset = new int[2];
@@ -136,6 +138,7 @@
                 public const int CheckpointOffset = 0x32780;
                 public const int CameraTriggersOffset = 0x364E2;
                 public const int CameraSettingsOffset = 0x36CD0;
+                public const int BackgroundTileInfoOffset = 0x321D5;
             }
             internal class JP // Japanese Version
             {
@@ -144,6 +147,7 @@
                 public const int CheckpointOffset = 0x32783;
                 public const int CameraTriggersOffset = 0x364E5;
                 public const int CameraSettingsOffset = 0x36CD3;
+                public const int BackgroundTileInfoOffset = 0x321D8;
             }
             public static readonly byte[,] LayoutLength = new byte[0x25, 2]
 {
@@ -358,6 +362,7 @@
                 public const int CompressedTileInfoOffset = 0x37A01;
                 public const int EnemyPointersOffset = 0x14D3D1;
                 public const int CheckpointOffset = 0x324C5;
+                public const int BackgroundTileInfoOffset = 0x31D6A;
             }
             internal class JP // Japanese Version
             {
@@ -365,6 +370,7 @@
                 public const int CompressedTileInfoOffset = 0x37A02;
                 public const int EnemyPointersOffset = 0x14D3D9;
                 public const int CheckpointOffset = 0x324C6;
+                public const int BackgroundTileInfoOffset = 0x31D6B;
             }
             public static readonly byte[,] LayoutLength = new byte[0x1B, 2]
 {
@@ -522,11 +528,14 @@
             public const int EnemyDataBank = 0x3C;
 
             public const int MaxTotalCheckpoints = 53;
+
             public const int MaxTotalCameraSettings = 0x90;
             public const int CameraTriggersLength = 0x1489; //size includes all the pointers
             public const int CameraSettingsBank = 0x3;
             public const int CameraTriggersOffset = 0x1DE43;
             public const int CameraSettingsOffset = 0x1F2CC;
+
+            public const int BackgroundTileInfoOffset = 0x40623;
 
             public static readonly int[] LayoutPointersOffset = { 0x309B3, 0x30BDE };
             public static readonly int[] ScreenDataPointersOffset = { 0x30A22, 0x30C4D };
@@ -765,12 +774,14 @@
                     LoadTileSetInfoOffset = MegaManX.NA.LoadTileSetInfoOffset;
                     CompressedTileInfoOffset = MegaManX.NA.CompressedTileInfoOffset;
                     CheckpointOffset = MegaManX.NA.CheckpointOffset;
+                    BackgroundTileInfoOffset = MegaManX.NA.BackgroundTileInfoOffset;
                 }
                 else
                 {
                     LoadTileSetInfoOffset = MegaManX.JP.LoadTileSetInfoOffset;
                     CompressedTileInfoOffset = MegaManX.JP.CompressedTileInfoOffset;
                     CheckpointOffset = MegaManX.JP.CheckpointOffset;
+                    BackgroundTileInfoOffset = MegaManX.JP.BackgroundTileInfoOffset;
                 }
             }
             else if (gameId == GameId.MegaManX2)
@@ -809,6 +820,7 @@
                     CompressedTileInfoOffset = MegaManX2.NA.CompressedTileInfoOffset;
                     EnemyPointersOffset = MegaManX2.NA.EnemyPointersOffset;
                     CheckpointOffset = MegaManX2.NA.CheckpointOffset;
+                    BackgroundTileInfoOffset = MegaManX2.NA.BackgroundTileInfoOffset;
                 }
                 else
                 {
@@ -816,6 +828,7 @@
                     CompressedTileInfoOffset = MegaManX2.JP.CompressedTileInfoOffset;
                     EnemyPointersOffset = MegaManX2.JP.EnemyPointersOffset;
                     CheckpointOffset = MegaManX2.JP.CheckpointOffset;
+                    BackgroundTileInfoOffset = MegaManX2.JP.BackgroundTileInfoOffset;
                 }
             }
             else if (gameId == GameId.MegaManX3)
@@ -837,6 +850,8 @@
                 EnemyDataBank = MegaManX3.EnemyDataBank;
 
                 MaxTotalCheckpoints = MegaManX3.MaxTotalCheckpoints;
+
+                BackgroundTileInfoOffset = MegaManX3.BackgroundTileInfoOffset;
 
                 LayoutPointersOffset = MegaManX3.LayoutPointersOffset;
                 ScreenDataPointersOffset = MegaManX3.ScreenDataPointersOffset;

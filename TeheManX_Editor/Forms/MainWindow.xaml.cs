@@ -129,6 +129,7 @@ namespace TeheManX_Editor.Forms
                 else
                     Level.Id = Const.LevelsCount - 1;
                 //Re-Update
+                Level.TileSet = 0;
                 Level.AssignPallete();
                 Level.DecompressLevelTiles();
                 Update();
@@ -145,6 +146,7 @@ namespace TeheManX_Editor.Forms
                 else
                     Level.Id = 0;
                 //Re-Update
+                Level.TileSet = 0;
                 Level.AssignPallete();
                 Level.DecompressLevelTiles();
                 Update();
