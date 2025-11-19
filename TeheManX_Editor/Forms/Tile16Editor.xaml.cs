@@ -56,6 +56,8 @@ namespace TeheManX_Editor.Forms
             MainWindow.window.tile16E.tileInt.Maximum = max16;
             if (selectedTile > max16)
                 MainWindow.window.tile16E.tileInt.Value = max16;
+            int offset = SNES.CpuToOffset(BitConverter.ToInt32(SNES.rom, Const.TileCollisionDataPointersOffset + Level.Id * 3));
+            collisionInt.Value = SNES.rom[offset + selectedTile];
 
             Draw16xTiles();
             DrawVramTiles();
@@ -199,6 +201,9 @@ namespace TeheManX_Editor.Forms
 
             selectedTile = id;
             tileInt.Value = selectedTile;
+            int offset = SNES.CpuToOffset(BitConverter.ToInt32(SNES.rom, Const.TileCollisionDataPointersOffset + Level.Id * 3));
+            collisionInt.Value = SNES.rom[offset + selectedTile];
+
             DrawTile();
             UpdateTile16SelectionUI();
             UpdateTile8SelectionUI();
@@ -312,9 +317,26 @@ namespace TeheManX_Editor.Forms
                 return;
 
             selectedTile = (int)e.NewValue;
+            int offset = SNES.CpuToOffset(BitConverter.ToInt32(SNES.rom, Const.TileCollisionDataPointersOffset + Level.Id * 3));
+            collisionInt.Value = SNES.rom[offset + selectedTile];
             UpdateTile16SelectionUI();
             UpdateTile8SelectionUI();
             DrawTile();
+        }
+        private void collisionInt_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        {
+            if (e.NewValue == null || SNES.rom == null)
+                return;
+
+            int offset = SNES.CpuToOffset(BitConverter.ToInt32(SNES.rom, Const.TileCollisionDataPointersOffset + Level.Id * 3));
+            offset += selectedTile;
+
+            byte val = SNES.rom[offset];
+            if (val == (byte)(int)e.NewValue)
+                return;
+
+            SNES.rom[offset] = (byte)(int)e.NewValue;
+            SNES.edit = true;
         }
         private void vramInt_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {

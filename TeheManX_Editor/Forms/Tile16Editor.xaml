@@ -12,7 +12,7 @@
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="8*"/>
+            <RowDefinition Height="7*"/>
             <RowDefinition Height="auto"></RowDefinition>
             <RowDefinition />
         </Grid.RowDefinitions>
@@ -69,7 +69,7 @@
             </Grid.RowDefinitions>
 
             <StackPanel Grid.Row="0" Orientation="Horizontal">
-                <Label Foreground="White" FontSize="18" FontFamily="Consolas" Padding="3,5,1,5">Palette</Label>
+                <TextBlock Foreground="White" FontSize="18" FontFamily="Consolas" Padding="3,5,1,5">Palette</TextBlock>
                 <Button Style="{StaticResource TileButton}" Click="Clut_Click">0</Button>
                 <Button Style="{StaticResource TileButton}" Click="Clut_Click">1</Button>
                 <Button Style="{StaticResource TileButton}" Click="Clut_Click">2</Button>
@@ -92,7 +92,7 @@
         </Grid>
         <StackPanel Grid.Column="1" Grid.Row="1">
             <StackPanel Orientation="Horizontal">
-                <Label Foreground="White" FontSize="18" FontFamily="Consolas" Padding="3,5,1,5">x16-Tiles</Label>
+                <TextBlock Foreground="White" FontSize="18" FontFamily="Consolas" Padding="3,5,1,5">x16-Tiles</TextBlock>
                 <Button Style="{StaticResource TileButton}" Click="Page_Click">0</Button>
                 <Button Style="{StaticResource TileButton}" Click="Page_Click">1</Button>
                 <Button Style="{StaticResource TileButton}" Click="Page_Click">2</Button>
@@ -129,17 +129,22 @@
         <!--Tile Parameters-->
         <WrapPanel Orientation="Horizontal" Grid.Column="1" Grid.Row="2">
             <StackPanel Orientation="Horizontal">
-                <Label FontSize="18" Foreground="White" FontFamily="Consolas" Padding="3">TILE:</Label>
+                <TextBlock FontSize="18" Foreground="White" FontFamily="Consolas" Padding="3">TILE:</TextBlock>
                 <local:NumInt x:Name="tileInt" Width="70" FontSize="18" Value="0" Minimum="0" ValueChanged="tileInt_ValueChanged"></local:NumInt>
             </StackPanel>
 
             <StackPanel Orientation="Horizontal">
-                <Label FontSize="18" Foreground="White" FontFamily="Consolas" Padding="3">Vram:</Label>
+                <TextBlock FontSize="18" Foreground="White" FontFamily="Consolas" Padding="3">Collision:</TextBlock>
+                <local:NumInt x:Name="collisionInt" Width="45" FontSize="18" Value="0" Minimum="0" Maximum="#FF" ValueChanged="collisionInt_ValueChanged"></local:NumInt>
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal">
+                <TextBlock FontSize="18" Foreground="White" FontFamily="Consolas" Padding="3">Vram:</TextBlock>
                 <local:NumInt x:Name="vramInt" Width="70" FontSize="18" Value="0" Minimum="0" Maximum="#1FF" ValueChanged="vramInt_ValueChanged"></local:NumInt>
             </StackPanel>
 
             <StackPanel Orientation="Horizontal">
-                <Label FontSize="18" Foreground="White" FontFamily="Consolas" Padding="3">Pal:</Label>
+                <TextBlock FontSize="18" Foreground="White" FontFamily="Consolas" Padding="3">Pal:</TextBlock>
                 <local:NumInt x:Name="palInt" Width="40" FontSize="18" Value="0" Minimum="0" Maximum="7" ValueChanged="palInt_ValueChanged"></local:NumInt>
             </StackPanel>
 
