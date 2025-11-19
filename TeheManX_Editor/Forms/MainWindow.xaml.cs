@@ -71,7 +71,7 @@ namespace TeheManX_Editor.Forms
                     Level.LoadLevelData();
                     //Setup Editor
                     Level.AssignPallete();
-                    Level.DecompressLevelTiles();
+                    Level.LoadLevelTiles();
                     Update();
                     hub.Visibility = Visibility.Visible;
                 }
@@ -131,7 +131,7 @@ namespace TeheManX_Editor.Forms
                 //Re-Update
                 Level.TileSet = 0;
                 Level.AssignPallete();
-                Level.DecompressLevelTiles();
+                Level.LoadLevelTiles();
                 Update();
             }
             else if (key == "F2")
@@ -148,7 +148,7 @@ namespace TeheManX_Editor.Forms
                 //Re-Update
                 Level.TileSet = 0;
                 Level.AssignPallete();
-                Level.DecompressLevelTiles();
+                Level.LoadLevelTiles();
                 Update();
             }
         }
@@ -358,7 +358,7 @@ namespace TeheManX_Editor.Forms
                     //Setup Editor
                     Level.Id = 0;
                     Level.AssignPallete();
-                    Level.DecompressLevelTiles();
+                    Level.LoadLevelTiles();
                     Update();
                     hub.Visibility = Visibility.Visible;
                 }

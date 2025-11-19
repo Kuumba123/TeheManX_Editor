@@ -489,14 +489,81 @@ namespace TeheManX_Editor
                 }
             }
         }
-        public static void DecompressLevelTiles() //also loads dynamic background tiles and pallete data for those tiles
+        public static void LoadLevelTiles()
         {
             Array.Copy(Const.VRAM_B, 0, Tiles, 0, 0x200);
             Array.Clear(Tiles, 0x200, Tiles.Length - 0x200);
-
             if (Id >= Const.PlayableLevelsCount)
                 return;
+            DecompressLevelTiles();
+            LoadDynamicBackgroundTiles();
+        }
+        public static void LoadDynamicBackgroundTiles()
+        {
+            //Load Dynamic Background Tiles
+            int stageOffset = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(Const.BackgroundTileInfoOffset + Id * 2)) + Const.BackgroundTileInfoOffset;
+            int offset = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(stageOffset + TileSet * 2)) + Const.BackgroundTileInfoOffset;
 
+            ushort transferSize = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset));
+
+            while (transferSize != 0)
+            {
+                ushort vramAddress = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + 2));
+                int srcOffset = SNES.CpuToOffset(BinaryPrimitives.ReadInt32LittleEndian(SNES.rom.AsSpan(offset + 4)));
+
+                try
+                {
+                    int dest = (vramAddress * 2) - 0x2000;
+                    Array.Copy(SNES.rom, srcOffset, Tiles, dest, transferSize);
+
+                }
+                catch (Exception)
+                {
+                    MessageBox.Show($"Error happened when loading Tile Graphics from ROM offset 0x{srcOffset:X}\nCorrupted ROM ?", "ERROR");
+                    Application.Current.Shutdown();
+                }
+                //Now for the Pallete Data
+                int palInfoOffset = 0;
+                ushort palId = 0;
+                try
+                {
+                    palId = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + 7));
+                    palInfoOffset = SNES.CpuToOffset(BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(Const.PaletteInfoOffset + palId)), Const.PaletteBank);
+
+                    while (SNES.rom[palInfoOffset] != 0)
+                    {
+                        int colorCount = SNES.rom[palInfoOffset]; //how many colors are going to be dumped
+                        byte colorIndex = SNES.rom[palInfoOffset + 3]; //which color index to start dumping at
+                        int colorOffset = SNES.CpuToOffset(BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(palInfoOffset + 1)) + (Const.PaletteColorBank << 16)); //where the colors are located
+
+                        for (int c = 0; c < colorCount; c++)
+                        {
+                            if ((colorIndex + c) > 0x7F)
+                                return;
+
+                            ushort color = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(colorOffset + c * 2));
+                            byte R = (byte)(color % 32 * 8);
+                            byte G = (byte)(color / 32 % 32 * 8);
+                            byte B = (byte)(color / 1024 % 32 * 8);
+
+                            Palette[((colorIndex + c) >> 4) & 0xF, (colorIndex + c) & 0xF] = Color.FromRgb(R, G, B);
+                        }
+                        palInfoOffset += 4;
+                    }
+                }
+                catch (Exception)
+                {
+                    MessageBox.Show($"Error happened when loading Tile Graphics from ROM offset 0x{palInfoOffset:X} via Id 0x{palId:X}\nCorrupted ROM ?", "ERROR");
+                    Application.Current.Shutdown();
+                }
+
+                //Next Transfer
+                offset += 9;
+                transferSize = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset));
+            }
+        }
+        public static void DecompressLevelTiles() //also loads dynamic background tiles and pallete data for those tiles
+        {
             int id;
             if (Const.Id == Const.GameId.MegaManX3 && Id == 0xE)
                 id = 0xB; //special case for MMX3 rekt version of dophler 2
@@ -612,68 +679,6 @@ namespace TeheManX_Editor
                         Application.Current.Shutdown();
                     }
                 }
-            }
-
-            //Load Dynamic Background Tiles
-            int stageOffset = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(Const.BackgroundTileInfoOffset + Id * 2)) + Const.BackgroundTileInfoOffset;
-            int offset = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(stageOffset + TileSet * 2)) + Const.BackgroundTileInfoOffset;
-
-            ushort transferSize = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset));
-
-            while (transferSize != 0)
-            {
-                ushort vramAddress = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + 2));
-                int srcOffset = SNES.CpuToOffset(BinaryPrimitives.ReadInt32LittleEndian(SNES.rom.AsSpan(offset + 4)));
-
-                try
-                {
-                    int dest = (vramAddress * 2) - 0x2000;
-                    Array.Copy(SNES.rom, srcOffset, Tiles, dest, transferSize);
-
-                }
-                catch (Exception)
-                {
-                    MessageBox.Show($"Error happened when loading Tile Graphics from ROM offset 0x{srcOffset:X}\nCorrupted ROM ?", "ERROR");
-                    Application.Current.Shutdown();
-                }
-                //Now for the Pallete Data
-                int palInfoOffset = 0;
-                ushort palId = 0;
-                try
-                {
-                    palId = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + 7));
-                    palInfoOffset = SNES.CpuToOffset(BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(Const.PaletteInfoOffset + palId)), Const.PaletteBank);
-
-                    while (SNES.rom[palInfoOffset] != 0)
-                    {
-                        int colorCount = SNES.rom[palInfoOffset]; //how many colors are going to be dumped
-                        byte colorIndex = SNES.rom[palInfoOffset + 3]; //which color index to start dumping at
-                        int colorOffset = SNES.CpuToOffset(BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(palInfoOffset + 1)) + (Const.PaletteColorBank << 16)); //where the colors are located
-
-                        for (int c = 0; c < colorCount; c++)
-                        {
-                            if ((colorIndex + c) > 0x7F)
-                                return;
-
-                            ushort color = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(colorOffset + c * 2));
-                            byte R = (byte)(color % 32 * 8);
-                            byte G = (byte)(color / 32 % 32 * 8);
-                            byte B = (byte)(color / 1024 % 32 * 8);
-
-                            Palette[((colorIndex + c) >> 4) & 0xF, (colorIndex + c) & 0xF] = Color.FromRgb(R, G, B);
-                        }
-                        palInfoOffset += 4;
-                    }
-                }
-                catch (Exception)
-                {
-                    MessageBox.Show($"Error happened when loading Tile Graphics from ROM offset 0x{palInfoOffset:X} via Id 0x{palId:X}\nCorrupted ROM ?", "ERROR");
-                    Application.Current.Shutdown();
-                }
-
-                //Next Transfer
-                offset += 9;
-                transferSize = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset));
             }
         }
     }
