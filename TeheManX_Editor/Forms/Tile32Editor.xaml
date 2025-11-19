@@ -68,7 +68,7 @@
             </Grid>
         </ScrollViewer>
         <StackPanel Grid.Column="1" Orientation="Horizontal">
-            <Label Foreground="White" FontSize="18" FontFamily="Consolas" Padding="3,5,1,5">x16-Tiles</Label>
+            <TextBlock Foreground="White" FontSize="18" FontFamily="Consolas" Padding="3,5,1,5">x16-Tiles</TextBlock>
             <Button Style="{StaticResource TileButton}" Click="Tile16Button_Click">0</Button>
             <Button Style="{StaticResource TileButton}" Click="Tile16Button_Click">1</Button>
             <Button Style="{StaticResource TileButton}" Click="Tile16Button_Click">2</Button>
@@ -125,7 +125,7 @@
 
         <StackPanel Grid.Column="1" Grid.Row="2">
             <StackPanel Orientation="Horizontal">
-                <Label Foreground="White" FontSize="18" FontFamily="Consolas" Padding="3,5,1,5">x32-Tiles</Label>
+                <TextBlock Foreground="White" FontSize="18" FontFamily="Consolas" Padding="3,5,1,5">x32-Tiles</TextBlock>
                 <Button Style="{StaticResource TileButton}" Click="Tile32Button_Click">0</Button>
                 <Button Style="{StaticResource TileButton}" Click="Tile32Button_Click">1</Button>
                 <Button Style="{StaticResource TileButton}" Click="Tile32Button_Click">2</Button>
@@ -154,19 +154,19 @@
 
             <!--Tile Parameters-->
             <StackPanel Orientation="Horizontal">
-                <Label FontSize="18" Foreground="White" FontFamily="Consolas" Padding="3">TILE:</Label>
+                <TextBlock FontSize="18" Foreground="White" FontFamily="Consolas" Padding="3">TILE:</TextBlock>
                 <local:NumInt x:Name="tileInt" Width="70" FontSize="18" Value="0" Minimum="0" ValueChanged="tileInt_ValueChanged"></local:NumInt>
 
-                <Label FontSize="18" Foreground="White" FontFamily="Consolas" Padding="3">TL:</Label>
+                <TextBlock FontSize="18" Foreground="White" FontFamily="Consolas" Padding="3">TL:</TextBlock>
                 <local:NumInt x:Name="topLeftInt" Width="70" FontSize="18" Value="0" Minimum="0" ValueChanged="topLeftInt_ValueChanged"></local:NumInt>
 
-                <Label FontSize="18" Foreground="White" FontFamily="Consolas" Padding="3">TR:</Label>
+                <TextBlock FontSize="18" Foreground="White" FontFamily="Consolas" Padding="3">TR:</TextBlock>
                 <local:NumInt x:Name="topRightInt" Width="70" FontSize="18" Value="0" Minimum="0" ValueChanged="topRightInt_ValueChanged"></local:NumInt>
 
-                <Label FontSize="18" Foreground="White" FontFamily="Consolas" Padding="3">BL:</Label>
+                <TextBlock FontSize="18" Foreground="White" FontFamily="Consolas" Padding="3">BL:</TextBlock>
                 <local:NumInt x:Name="bottomLeftInt" Width="70" FontSize="18" Value="0" Minimum="0" ValueChanged="bottomLeftInt_ValueChanged"></local:NumInt>
                 
-                <Label FontSize="18" Foreground="White" FontFamily="Consolas" Padding="3">BR:</Label>
+                <TextBlock FontSize="18" Foreground="White" FontFamily="Consolas" Padding="3">BR:</TextBlock>
                 <local:NumInt x:Name="bottomRightInt" Width="70" FontSize="18" Value="0" Minimum="0" ValueChanged="bottomRightInt_ValueChanged"></local:NumInt>
             </StackPanel>
         </StackPanel>

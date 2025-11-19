@@ -30,12 +30,12 @@
             </Grid.RowDefinitions>
             <Image x:Name="layoutImage" Grid.RowSpan="3" Grid.ColumnSpan="3" x:FieldModifier="public"  HorizontalAlignment="Left" VerticalAlignment="Top" MouseDown="layoutImage_MouseDown"></Image>
         </Grid>
-        <Label x:Name="camLbl" IsHitTestVisible="False" Grid.Row="0" Foreground="White" FontFamily="Consolas" HorizontalAlignment="Left" FontSize="20"></Label>
+        <TextBlock x:Name="camLbl" IsHitTestVisible="False" Grid.Row="0" Foreground="White" FontFamily="Consolas" HorizontalAlignment="Left" FontSize="20"></TextBlock>
 
         <!--Selected Screen-->
         <StackPanel Grid.Column="1" Background="#101010">
             <StackPanel Orientation="Horizontal">
-                <Label Foreground="White" FontSize="18" FontFamily="Consolas" Padding="3,5,1,5">Backgroud Layer</Label>
+                <TextBlock Foreground="White" FontSize="18" FontFamily="Consolas" Padding="3,5,1,5">Backgroud Layer</TextBlock>
                 <Button Style="{StaticResource TileButton}" Name="btn1" Click="LayerButton_Click">1</Button>
                 <Button Style="{StaticResource TileButton}" Name="btn2" Click="LayerButton_Click">2</Button>
             </StackPanel>

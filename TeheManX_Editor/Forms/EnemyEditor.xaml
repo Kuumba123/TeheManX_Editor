@@ -14,12 +14,12 @@
         </Grid.ColumnDefinitions>
         
         <!--Layout Viewer-->
-        <Viewbox Width="auto">
+        <Viewbox Width="auto" HorizontalAlignment="Left">
             <Canvas x:Name="canvas" Width="768" Height="512" ClipToBounds="True" PreviewMouseMove="canvas_PreviewMouseMove" PreviewMouseUp="canvas_PreviewMouseUp">
-                <Image x:Name="layoutImage" x:FieldModifier="public"  HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                <Image x:Name="layoutImage" x:FieldModifier="public"/>
             </Canvas>
         </Viewbox>
-        <Label x:Name="camLbl" Grid.Row="0" IsHitTestVisible="False" Foreground="White" FontFamily="Consolas" HorizontalAlignment="Left" FontSize="20"></Label>
+        <TextBlock x:Name="camLbl" Grid.Row="0" IsHitTestVisible="False" Foreground="White" FontFamily="Consolas" HorizontalAlignment="Left" FontSize="20"></TextBlock>
 
         <Grid Focusable="False" Grid.Column="1" Background="Black">
             <Grid.RowDefinitions>
@@ -48,22 +48,22 @@
                 <StackPanel Orientation="Vertical">
                     <StackPanel Orientation="Horizontal">
                         <!--ID-->
-                        <Label Width="70" FontSize="18" Foreground="White" FontFamily="Consolas">ID:</Label>
+                        <TextBlock Width="70" FontSize="18" Foreground="White" FontFamily="Consolas">ID:</TextBlock>
                         <local:NumInt x:Name="idInt" Width="60" ButtonSpinnerWidth="20" FontSize="20" Value="0" Maximum="#FF" Minimum="0" MaxLength="3" ValueChanged="idInt_ValueChanged" IsUndoEnabled="False" IsEnabled="False"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
                         <!--Var-->
-                        <Label Width="70" FontSize="18" Foreground="White" FontFamily="Consolas">Var:</Label>
+                        <TextBlock Width="70" FontSize="18" Foreground="White" FontFamily="Consolas">Var:</TextBlock>
                         <local:NumInt x:Name="varInt" Width="60" ButtonSpinnerWidth="20" FontSize="22" Value="0" Maximum="#FF" Minimum="0" MaxLength="3" IsEnabled="False" ValueChanged="varInt_ValueChanged"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
                         <!--Type-->
-                        <Label Width="70" FontSize="18" Foreground="White" FontFamily="Consolas">Type:</Label>
+                        <TextBlock Width="70" FontSize="18" Foreground="White" FontFamily="Consolas">Type:</TextBlock>
                         <local:NumInt x:Name="typeInt" Width="60" ButtonSpinnerWidth="20" FontSize="22" Value="0" Maximum="#5" Minimum="0" MaxLength="3" IsEnabled="False" ValueChanged="typeInt_ValueChanged"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
                         <!--Column-->
-                        <Label Width="70" FontSize="16" Foreground="White" FontFamily="Consolas">Column:</Label>
+                        <TextBlock Width="70" FontSize="18" Foreground="White" FontFamily="Consolas">Column:</TextBlock>
                         <local:NumInt x:Name="columnInt" Width="60" ButtonSpinnerWidth="20" FontSize="22" Value="0" Maximum="#5" Minimum="0" MaxLength="3" IsEnabled="False" ValueChanged="colInt_ValueChanged"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
@@ -76,12 +76,12 @@
                 <StackPanel Grid.Column="1" VerticalAlignment="Bottom">
                     <!--X-->
                     <StackPanel Orientation="Horizontal">
-                        <Label FontSize="33" Foreground="White" FontFamily="Consolas" Padding="3,3,0,3">X:</Label>
+                        <TextBlock FontSize="33" Foreground="White" FontFamily="Consolas" Padding="3,3,0,3">X:</TextBlock>
                         <local:NumInt x:Name="xInt" ButtonSpinnerWidth="20" Width="100" Height="40" FontSize="33" Value="0" Maximum="#1FFF" Minimum="0" MaxLength="3" IsEnabled="False" ValueChanged="xInt_ValueChanged"/>
                     </StackPanel>
                     <!--Y-->
                     <StackPanel Orientation="Horizontal">
-                        <Label FontSize="33" Foreground="White" FontFamily="Consolas" Padding="3,3,0,3">Y:</Label>
+                        <TextBlock FontSize="33" Foreground="White" FontFamily="Consolas" Padding="3,3,0,3">Y:</TextBlock>
                         <local:NumInt x:Name="yInt" ButtonSpinnerWidth="20" Width="100" Height="40" FontSize="33" Value="0" Maximum="#1FFF" Minimum="0" MaxLength="3" IsEnabled="False" ValueChanged="yInt_ValueChanged"/>
                     </StackPanel>
                 </StackPanel>

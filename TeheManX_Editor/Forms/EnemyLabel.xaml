@@ -5,10 +5,10 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:TeheManX_Editor.Forms"
              mc:Ignorable="d" 
-             d:DesignHeight="17" MinHeight="17" d:DesignWidth="20" MinWidth="20">
+             d:DesignHeight="17" d:DesignWidth="20">
     <Grid>
         <Border BorderBrush="Red" x:Name="border" x:FieldModifier="public" BorderThickness="1" Canvas.Left="128" Canvas.Top="128">
-            <Label x:Name="text" x:FieldModifier="public" Padding="0" Background="Black" Foreground="White" FontFamily="Consolas" FontSize="15" HorizontalContentAlignment="Center" VerticalContentAlignment="Center">30</Label>
+            <TextBlock x:Name="text" x:FieldModifier="public" Padding="0" Background="Black" Foreground="White" FontFamily="Consolas" FontSize="15">30</TextBlock>
         </Border>
     </Grid>
 </UserControl>
