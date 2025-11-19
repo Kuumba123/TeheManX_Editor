@@ -535,8 +535,6 @@
             public const int CameraTriggersOffset = 0x1DE43;
             public const int CameraSettingsOffset = 0x1F2CC;
 
-            public const int BackgroundTileInfoOffset = 0x40623;
-
             public static readonly int[] LayoutPointersOffset = { 0x309B3, 0x30BDE };
             public static readonly int[] ScreenDataPointersOffset = { 0x30A22, 0x30C4D };
             public static readonly int[] Tile32DataPointersOffset = { 0x30A91, 0x30CBC };
@@ -726,12 +724,14 @@
                 public const int LoadTileSetInfoOffset = 0x373C3;
                 public const int CompressedTileInfoOffset = 0x37732;
                 public const int CheckpointOffset = 0x328E4;
+                public const int BackgroundTileInfoOffset = 0x32085;
             }
             internal class JP
             {
                 public const int LoadTileSetInfoOffset = 0x373C4;
                 public const int CompressedTileInfoOffset = 0x37733;
                 public const int CheckpointOffset = 0x328E5;
+                public const int BackgroundTileInfoOffset = 0x32086;
             }
         }
         public static void AssignProperties(GameId gameId, GameVersion gameVersion, bool expanded)
@@ -851,8 +851,6 @@
 
                 MaxTotalCheckpoints = MegaManX3.MaxTotalCheckpoints;
 
-                BackgroundTileInfoOffset = MegaManX3.BackgroundTileInfoOffset;
-
                 LayoutPointersOffset = MegaManX3.LayoutPointersOffset;
                 ScreenDataPointersOffset = MegaManX3.ScreenDataPointersOffset;
                 Tile32DataPointersOffset = MegaManX3.Tile32DataPointersOffset;
@@ -870,12 +868,14 @@
                     LoadTileSetInfoOffset = MegaManX3.NA.LoadTileSetInfoOffset;
                     CompressedTileInfoOffset = MegaManX3.NA.CompressedTileInfoOffset;
                     CheckpointOffset = MegaManX3.NA.CheckpointOffset;
+                    BackgroundTileInfoOffset = MegaManX3.NA.BackgroundTileInfoOffset;
                 }
                 else
                 {
                     LoadTileSetInfoOffset = MegaManX3.JP.LoadTileSetInfoOffset;
                     CompressedTileInfoOffset = MegaManX3.JP.CompressedTileInfoOffset;
                     CheckpointOffset = MegaManX3.JP.CheckpointOffset;
+                    BackgroundTileInfoOffset = MegaManX3.JP.BackgroundTileInfoOffset;
                 }
             }
         }
