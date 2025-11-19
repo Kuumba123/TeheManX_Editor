@@ -14,9 +14,9 @@ namespace TeheManX_Editor.Forms
     public partial class Tile32Editor : UserControl
     {
         #region Properties
-        WriteableBitmap x16BMP = new WriteableBitmap(256, 256, 96, 96, PixelFormats.Rgb24, null);
-        WriteableBitmap tileBMP = new WriteableBitmap(256, 1024, 96, 96, PixelFormats.Rgb24, null);
-        WriteableBitmap tileBMP_S = new WriteableBitmap(32, 32, 96, 96, PixelFormats.Rgb24, null);
+        WriteableBitmap x16BMP = new WriteableBitmap(256, 256, 96, 96, PixelFormats.Bgra32, null);
+        WriteableBitmap tileBMP = new WriteableBitmap(256, 1024, 96, 96, PixelFormats.Bgra32, null);
+        WriteableBitmap tileBMP_S = new WriteableBitmap(32, 32, 96, 96, PixelFormats.Bgra32, null);
         Button past;
         Button past2; //X16
         public int page = 0;    //x32
@@ -81,9 +81,10 @@ namespace TeheManX_Editor.Forms
                             {
                                 for (int c = 0; c < 32; c++)
                                 {
-                                    buffer[(x * 32 + c) * 3 + (y * 32 + r) * tileBMP.BackBufferStride + 0] = 0;
-                                    buffer[(x * 32 + c) * 3 + (y * 32 + r) * tileBMP.BackBufferStride + 1] = 0;
-                                    buffer[(x * 32 + c) * 3 + (y * 32 + r) * tileBMP.BackBufferStride + 2] = 0;
+                                    buffer[(x * 32 + c) * 4 + (y * 32 + r) * tileBMP.BackBufferStride + 0] = 0;
+                                    buffer[(x * 32 + c) * 4 + (y * 32 + r) * tileBMP.BackBufferStride + 1] = 0;
+                                    buffer[(x * 32 + c) * 4 + (y * 32 + r) * tileBMP.BackBufferStride + 2] = 0;
+                                    buffer[(x * 32 + c) * 4 + (y * 32 + r) * tileBMP.BackBufferStride + 3] = 0xFF;
                                 }
                             }
                         }
@@ -115,15 +116,16 @@ namespace TeheManX_Editor.Forms
                             {
                                 for (int c = 0; c < 16; c++)
                                 {
-                                    buffer[(x * 16 + c) * 3 + (y * 16 + r) * x16BMP.BackBufferStride + 0] = 0;
-                                    buffer[(x * 16 + c) * 3 + (y * 16 + r) * x16BMP.BackBufferStride + 1] = 0;
-                                    buffer[(x * 16 + c) * 3 + (y * 16 + r) * x16BMP.BackBufferStride + 2] = 0;
+                                    buffer[(x * 16 + c) * 4 + (y * 16 + r) * x16BMP.BackBufferStride + 0] = 0;
+                                    buffer[(x * 16 + c) * 4 + (y * 16 + r) * x16BMP.BackBufferStride + 1] = 0;
+                                    buffer[(x * 16 + c) * 4 + (y * 16 + r) * x16BMP.BackBufferStride + 2] = 0;
+                                    buffer[(x * 16 + c) * 4 + (y * 16 + r) * x16BMP.BackBufferStride + 3] = 0xFF;
                                 }
                             }
                         }
                         continue;
                     }
-                    Level.Draw16xTile(id, x * 16, y * 16, 768, x16BMP.BackBuffer);
+                    Level.Draw16xTile(id, x * 16, y * 16, x16BMP.BackBufferStride, x16BMP.BackBuffer);
                 }
             }
             x16BMP.AddDirtyRect(new Int32Rect(0, 0, 256, 256));

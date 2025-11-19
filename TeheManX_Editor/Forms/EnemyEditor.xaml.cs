@@ -18,7 +18,7 @@ namespace TeheManX_Editor.Forms
         #endregion Fields
 
         #region Properties
-        internal WriteableBitmap layoutBMP = new WriteableBitmap(768, 512, 96, 96, PixelFormats.Rgb24, null);
+        internal WriteableBitmap layoutBMP = new WriteableBitmap(768, 512, 96, 96, PixelFormats.Bgra32, null);
         public int viewerX = 0x400;
         public int viewerY = 0;
         UIElement obj;

@@ -15,7 +15,7 @@ namespace TeheManX_Editor.Forms
     public partial class PaletteEditor : UserControl
     {
         #region Properties
-        WriteableBitmap vramTiles = new WriteableBitmap(128, 512, 96, 96, PixelFormats.Rgb24, null);
+        WriteableBitmap vramTiles = new WriteableBitmap(128, 512, 96, 96, PixelFormats.Bgra32, null);
         Rectangle selectSetRect = new Rectangle() { IsHitTestVisible = false, StrokeThickness = 2.5, StrokeDashArray = new DoubleCollection() { 2.2 }, CacheMode = null, Stroke = Brushes.PapayaWhip };
         public int palId = 0;
         #endregion Properties
@@ -94,9 +94,11 @@ namespace TeheManX_Editor.Forms
 
                             byte index = (byte)(p0 | (p1 << 1) | (p2 << 2) | (p3 << 3));
 
-                            buffer[(x * 8 + col) * 3 + (y * 8 + row) * vramTiles.BackBufferStride + 0] = Level.Palette[set, index].R;
-                            buffer[(x * 8 + col) * 3 + (y * 8 + row) * vramTiles.BackBufferStride + 1] = Level.Palette[set, index].G;
-                            buffer[(x * 8 + col) * 3 + (y * 8 + row) * vramTiles.BackBufferStride + 2] = Level.Palette[set, index].B;
+                            Color color = Level.Palette[set, index];
+
+                            uint pixel = color.B | ((uint)color.G << 8) | ((uint)color.R << 16) | 0xFF000000;
+
+                            *(uint*)(buffer + (x * 8 + col) * 4 + (y * 8 + row) * vramTiles.BackBufferStride) = pixel;
                         }
                     }
                 }

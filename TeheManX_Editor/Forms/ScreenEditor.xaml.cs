@@ -15,9 +15,9 @@ namespace TeheManX_Editor.Forms
     public partial class ScreenEditor : UserControl
     {
         #region Properties
-        WriteableBitmap screenBMP = new WriteableBitmap(256, 256, 96, 96, PixelFormats.Rgb24, null); //for both modes
-        WriteableBitmap tileBMP = new WriteableBitmap(256, 1024, 96, 96, PixelFormats.Rgb24, null);
-        WriteableBitmap tileBMP_S = new WriteableBitmap(32, 32, 96, 96, PixelFormats.Rgb24, null);
+        WriteableBitmap screenBMP = new WriteableBitmap(256, 256, 96, 96, PixelFormats.Bgra32, null); //for both modes
+        WriteableBitmap tileBMP = new WriteableBitmap(256, 1024, 96, 96, PixelFormats.Bgra32, null);
+        WriteableBitmap tileBMP_S = new WriteableBitmap(32, 32, 96, 96, PixelFormats.Bgra32, null);
         Button past;
         bool screenDown = false; //used in both modes
         public int page = 0;
@@ -29,8 +29,8 @@ namespace TeheManX_Editor.Forms
         byte[] screenData16 = null; //holds the screen data for 16x16 mode
         HashSet<ulong> tiles32 = new HashSet<ulong>(); //the 32x32 tiles that are based off the data in screenData16
         int pastTiles32Count = -1;
-        WriteableBitmap tileBMP16 = new WriteableBitmap(256, 256, 96, 96, PixelFormats.Rgb24, null);
-        WriteableBitmap tileBMP_S16 = new WriteableBitmap(16, 16, 96, 96, PixelFormats.Rgb24, null);
+        WriteableBitmap tileBMP16 = new WriteableBitmap(256, 256, 96, 96, PixelFormats.Bgra32, null);
+        WriteableBitmap tileBMP_S16 = new WriteableBitmap(16, 16, 96, 96, PixelFormats.Bgra32, null);
         Button past16;
         public int page16 = 0;
         public int screenSelect16 = -1;
@@ -103,9 +103,10 @@ namespace TeheManX_Editor.Forms
                             {
                                 for (int c = 0; c < 32; c++)
                                 {
-                                    buffer[(x * 32 + c) * 3 + (y * 32 + r) * tileBMP.BackBufferStride + 0] = 0;
-                                    buffer[(x * 32 + c) * 3 + (y * 32 + r) * tileBMP.BackBufferStride + 1] = 0;
-                                    buffer[(x * 32 + c) * 3 + (y * 32 + r) * tileBMP.BackBufferStride + 2] = 0;
+                                    buffer[(x * 32 + c) * 4 + (y * 32 + r) * tileBMP.BackBufferStride + 0] = 0;
+                                    buffer[(x * 32 + c) * 4 + (y * 32 + r) * tileBMP.BackBufferStride + 1] = 0;
+                                    buffer[(x * 32 + c) * 4 + (y * 32 + r) * tileBMP.BackBufferStride + 2] = 0;
+                                    buffer[(x * 32 + c) * 4 + (y * 32 + r) * tileBMP.BackBufferStride + 3] = 0xFF;
                                 }
                             }
                         }
@@ -204,15 +205,16 @@ namespace TeheManX_Editor.Forms
                             {
                                 for (int c = 0; c < 16; c++)
                                 {
-                                    buffer[(x * 16 + c) * 3 + (y * 16 + r) * tileBMP16.BackBufferStride + 0] = 0;
-                                    buffer[(x * 16 + c) * 3 + (y * 16 + r) * tileBMP16.BackBufferStride + 1] = 0;
-                                    buffer[(x * 16 + c) * 3 + (y * 16 + r) * tileBMP16.BackBufferStride + 2] = 0;
+                                    buffer[(x * 16 + c) * 4 + (y * 16 + r) * tileBMP16.BackBufferStride + 0] = 0;
+                                    buffer[(x * 16 + c) * 4 + (y * 16 + r) * tileBMP16.BackBufferStride + 1] = 0;
+                                    buffer[(x * 16 + c) * 4 + (y * 16 + r) * tileBMP16.BackBufferStride + 2] = 0;
+                                    buffer[(x * 16 + c) * 4 + (y * 16 + r) * tileBMP16.BackBufferStride + 3] = 0xFF;
                                 }
                             }
                         }
                         continue;
                     }
-                    Level.Draw16xTile(id, x * 16, y * 16, 768, tileBMP16.BackBuffer);
+                    Level.Draw16xTile(id, x * 16, y * 16, tileBMP16.BackBufferStride, tileBMP16.BackBuffer);
                 }
             }
             tileBMP16.AddDirtyRect(new Int32Rect(0, 0, 256, 256));

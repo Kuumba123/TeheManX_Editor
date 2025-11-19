@@ -14,9 +14,9 @@ namespace TeheManX_Editor.Forms
     public partial class Tile16Editor : UserControl
     {
         #region Properties
-        WriteableBitmap x16BMP = new WriteableBitmap(256, 256, 96, 96, PixelFormats.Rgb24, null);
-        WriteableBitmap vramTiles = new WriteableBitmap(128, 512, 96, 96, PixelFormats.Rgb24, null);
-        WriteableBitmap tileBMP_S = new WriteableBitmap(16, 16, 96, 96, PixelFormats.Rgb24, null);
+        WriteableBitmap x16BMP = new WriteableBitmap(256, 256, 96, 96, PixelFormats.Bgra32, null);
+        WriteableBitmap vramTiles = new WriteableBitmap(128, 512, 96, 96, PixelFormats.Bgra32, null);
+        WriteableBitmap tileBMP_S = new WriteableBitmap(16, 16, 96, 96, PixelFormats.Bgra32, null);
         public int page = 0;
         public int palId = 0;
         public int selectedTile = 0;
@@ -98,9 +98,13 @@ namespace TeheManX_Editor.Forms
 
                             byte index = (byte)(p0 | (p1 << 1) | (p2 << 2) | (p3 << 3));
 
-                            buffer[(x * 8 + col) * 3 + (y * 8 + row) * vramTiles.BackBufferStride + 0] = Level.Palette[set, index].R;
-                            buffer[(x * 8 + col) * 3 + (y * 8 + row) * vramTiles.BackBufferStride + 1] = Level.Palette[set, index].G;
-                            buffer[(x * 8 + col) * 3 + (y * 8 + row) * vramTiles.BackBufferStride + 2] = Level.Palette[set, index].B;
+                            // compute pixel position once and write 32-bit BGRA in a single store
+                            int px = x * 8 + col;
+                            int py = y * 8 + row;
+                            int baseIdx = px * 4 + py * vramTiles.BackBufferStride;
+                            Color colStruct = Level.Palette[set, index];
+                            uint bgra = (0xFFu << 24) | ((uint)colStruct.R << 16) | ((uint)colStruct.G << 8) | (uint)colStruct.B;
+                            *(uint*)(buffer + baseIdx) = bgra;
                         }
                     }
                 }
@@ -121,19 +125,18 @@ namespace TeheManX_Editor.Forms
                         unsafe
                         {
                             byte* buffer = (byte*)x16BMP.BackBuffer;
+                            uint val = 0xFF000000;
                             for (int r = 0; r < 16; r++)
                             {
                                 for (int c = 0; c < 16; c++)
                                 {
-                                    buffer[(x * 16 + c) * 3 + (y * 16 + r) * x16BMP.BackBufferStride + 0] = 0;
-                                    buffer[(x * 16 + c) * 3 + (y * 16 + r) * x16BMP.BackBufferStride + 1] = 0;
-                                    buffer[(x * 16 + c) * 3 + (y * 16 + r) * x16BMP.BackBufferStride + 2] = 0;
+                                    *(uint*)(buffer + (x * 16 + c) * 4 + (y * 16 + r) * x16BMP.BackBufferStride) = val;
                                 }
                             }
                         }
                         continue;
                     }
-                    Level.Draw16xTile(id, x * 16, y * 16, 768, x16BMP.BackBuffer);
+                    Level.Draw16xTile(id, x * 16, y * 16, x16BMP.BackBufferStride, x16BMP.BackBuffer);
                 }
             }
             x16BMP.AddDirtyRect(new Int32Rect(0, 0, 256, 256));

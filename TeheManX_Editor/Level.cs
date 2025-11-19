@@ -46,7 +46,7 @@ namespace TeheManX_Editor
                 bool flipV = (val & 0x8000) != 0;
 
                 // Top-left of this 8x8 subtile in destination
-                int destBase = (x + ((i & 1) * 8)) * 3 + (y + ((i >> 1) * 8)) * stride;
+                int destBase = (x + ((i & 1) * 8)) * 4 + (y + ((i >> 1) * 8)) * stride;
 
                 for (int row = 0; row < 8; row++)
                 {
@@ -69,13 +69,13 @@ namespace TeheManX_Editor
                         // Apply horizontal flipping when calculating destination X
                         int destX = flipH ? (7 ^ col) : col;
 
-                        int destIndex = destBase + (destY * stride) + (destX * 3);
+                        int destIndex = destBase + (destY * stride) + (destX * 4);
 
                         Color color = index == 0 ? backColor : Palette[set, index];
 
-                        buffer[destIndex + 0] = color.R;
-                        buffer[destIndex + 1] = color.G;
-                        buffer[destIndex + 2] = color.B;
+                        uint pixel = color.B | ((uint)color.G << 8) | ((uint)color.R << 16) | 0xFF000000;
+
+                        *(uint*)(buffer + destIndex) = pixel;
                     }
                 }
             }
