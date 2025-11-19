@@ -101,7 +101,11 @@ namespace TeheManX_Editor.Forms
             {
                 if (Keyboard.IsKeyDown(Key.LeftShift))
                 {
-                    MainWindow.window.screenE.screenInt.Value = Level.Layout[Level.Id,Level.BG, i];
+                    int screen = Level.Layout[Level.Id, Level.BG, i];
+                    if (!MainWindow.window.screenE.mode16)
+                        MainWindow.window.screenE.screenInt.Value = screen;
+                    else
+                        MainWindow.window.screenE.screenInt16.Value = screen;
                     return;
                 }
                 selectedScreen = Level.Layout[Level.Id,Level.BG, i];
