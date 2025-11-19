@@ -80,7 +80,7 @@
                 <TabItem.Header>
                     <Button Style="{StaticResource TabButton}">VRAM Tiles</Button>
                 </TabItem.Header>
-                <forms:TileEditor x:Name="tileD"/>
+                <forms:TileEditor x:Name="tileE"/>
             </TabItem>
         </dragablz:TabablzControl>
     </Grid>
