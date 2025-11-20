@@ -63,10 +63,13 @@ namespace TeheManX_Editor
             cpu &= 0xFFFF;
             return cpu - 0x8000 + ((bank & 0x7F) * 0x8000);
         }
-        public static int OffsetToCpu(int cpu)
+        public static int OffsetToCpu(int offset)
         {
-            return 0;
+            offset &= 0xFFFFFF;
+            int bank = (offset / 0x8000) & 0x7F;
+            int addr = offset % 0x8000;
+            return (bank << 16) | (addr + 0x8000);
         }
-        #endregion Methods
+    #endregion Methods
     }
 }
