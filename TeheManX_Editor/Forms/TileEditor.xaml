@@ -6,20 +6,71 @@
              xmlns:local="clr-namespace:TeheManX_Editor.Forms"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <Style TargetType="TextBlock">
+            <Setter Property="FontFamily" Value="Consolas" />
+            <Setter Property="FontSize" Value="22" />
+            <Setter Property="Foreground" Value="White"/>
+        </Style>
+        <Style TargetType="Separator">
+            <Setter Property="Margin" Value="0"/>
+        </Style>
+        <Style TargetType="TextBox">
+            <Setter Property="FontFamily" Value="Consolas"/>
+            <Setter Property="FontSize" Value="24"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Background" Value="Black"/>
+        </Style>
+        <Style TargetType="local:NumInt">
+            <Setter Property="FontSize" Value="24"/>
+            <Setter Property="Width" Value="100"/>
+            <Setter Property="AllowTextInput" Value="True"/>
+            <Setter Property="Background" Value="Black"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontFamily" Value="Consolas"/>
+            <Setter Property="ParsingNumberStyle" Value="HexNumber"/>
+            <Setter Property="FormatString" Value="X"/>
+            <Setter Property="AutoSelectBehavior" Value="Never"/>
+        </Style>
+    </UserControl.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="auto"/>
-
         </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+        </Grid.RowDefinitions>
         <StackPanel>
             <TextBlock FontSize="18" Foreground="White" FontFamily="Consolas" HorizontalAlignment="Center">Background</TextBlock>
             <Border BorderBrush="White" BorderThickness="2">
                 <StackPanel>
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock FontSize="24" Foreground="White" FontFamily="Consolas">Tile Set:</TextBlock>
-                        <local:NumInt x:Name="tileSetInt" FontSize="24" Minimum="0" Maximum="#FF"></local:NumInt>
+                        <TextBlock Width="160">Tile Setting:</TextBlock>
+                        <local:NumInt x:Name="bgTileSetInt" Width="85" Minimum="0" Maximum="#FF" ValueChanged="bgTileSetInt_ValueChanged" Value="#0"></local:NumInt>
                     </StackPanel>
+                    <Separator></Separator>
+                    <TextBlock HorizontalAlignment="Center" FontSize="18">Properties</TextBlock>
+                    <Separator></Separator>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Width="160">VRAM Length:</TextBlock>
+                        <local:NumInt x:Name="bgLengthInt" Width="85" Minimum="0" Maximum="#FFFF" ValueChanged="bgLengthInt_ValueChanged" Value="#0"></local:NumInt>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Width="160">Vram Address:</TextBlock>
+                        <local:NumInt x:Name="bgAddressInt" Width="85" Minimum="0" Maximum="#FFFF" ValueChanged="bgAddressInt_ValueChanged" Value="#0"></local:NumInt>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock x:Name="bgSrcText" Width="160">CPU Address:</TextBlock>
+                        <TextBox x:Name="bgSrcBox" Width="85" TextChanged="bgSrcBox_TextChanged"></TextBox>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Width="160">Palette ID:</TextBlock>
+                        <local:NumInt x:Name="bgPalInt" Width="85" Minimum="0" Maximum="#FFFF" ValueChanged="bgPalInt_ValueChanged" Value="#0"></local:NumInt>
+                    </StackPanel>
+                    <Separator></Separator>
+                    <CheckBox x:Name="romOffsetCheck" FontSize="18" Foreground="White" FontFamily="Consolas" Checked="romOffsetCheck_Changed" Unchecked="romOffsetCheck_Changed">Use Rom Offset</CheckBox>
+                    <Separator></Separator>
                     <CheckBox x:Name="freshCheck" FontSize="18" Foreground="White" FontFamily="Consolas">Fresh Redraw</CheckBox>
+                    <Separator></Separator>
                     <StackPanel Orientation="Horizontal">
                         <TextBlock FontSize="18" Foreground="White" FontFamily="Consolas">Redraw Level:</TextBlock>
                         <Button Click="RedrawBtn_Click" Width="25" Height="25" Padding="0" Margin="8,1,0,0" VerticalContentAlignment="Top" VerticalAlignment="Top">🔄</Button>
