@@ -384,11 +384,12 @@ namespace TeheManX_Editor
                 MemoryStream ms = new MemoryStream(0x660);
                 BinaryWriter bw = new BinaryWriter(ms);
 
-                // If no enemies write FF and skip
+                // Stupid bug in enemy dumping code requires at least 1 enemy
                 if (sorted.Count == 0)
                 {
-                    SNES.rom[SNES.CpuToOffset(BinaryPrimitives.ReadInt32LittleEndian(SNES.rom.AsSpan(Const.EnemyPointersOffset + (id * 2))),Const.EnemyDataBank)] = 0xFF;
-                    continue;
+                    MessageBox.Show(
+                        $"Enemy Data for Stage {id:X2} needs atleast 1 enemy because of a bug in the game's enemy dumping code.","ERROR");
+                    return false;
                 }
 
                 byte column = sorted[0].Column;
