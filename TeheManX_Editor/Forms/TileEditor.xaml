@@ -38,7 +38,10 @@
             <ColumnDefinition Width="auto"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition/>
         </Grid.RowDefinitions>
+        
         <StackPanel>
             <TextBlock FontSize="18" Foreground="White" FontFamily="Consolas" HorizontalAlignment="Center">Background</TextBlock>
             <Border BorderBrush="White" BorderThickness="2">
@@ -77,6 +80,11 @@
                     </StackPanel>
                 </StackPanel>
             </Border>
+        </StackPanel>
+
+        <StackPanel Grid.Row="1">
+            <Button Width="30" Height="30" Margin="5" Click="GearBtn_Click">⚙️</Button>
+            <Button Width="30" Height="30" Click="LoadBtn_Click">↺</Button>
         </StackPanel>
     </Grid>
 </UserControl>

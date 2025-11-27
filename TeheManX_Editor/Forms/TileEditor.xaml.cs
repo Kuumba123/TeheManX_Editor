@@ -261,6 +261,15 @@ namespace TeheManX_Editor.Forms
             }
             _suppressBgSrcBoxTextChanged = false;
         }
+        private void GearBtn_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+        private void LoadBtn_Click(object sender, RoutedEventArgs e)
+        {
+            LoadWindow loadWindow = new LoadWindow();
+            loadWindow.ShowDialog();
+        }
         #endregion Events
     }
 }
