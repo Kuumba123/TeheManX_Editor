@@ -519,9 +519,11 @@ namespace TeheManX_Editor.Forms
                     if (hubIndex == 0)
                     {
                         this.hub.SelectedIndex = GetActualIndex(this.hub.Items.Count - 1);
+                        window.Focus();
                         return;
                     }
                     this.hub.SelectedIndex = GetActualIndex(hubIndex - 1);
+                    window.Focus();
                 }
                 else if (key == "Right" && SNES.rom != null && this.hub.Items.Count > 1)
                 {
@@ -529,9 +531,11 @@ namespace TeheManX_Editor.Forms
                     if (hubIndex == this.hub.Items.Count - 1)
                     {
                         this.hub.SelectedIndex = GetActualIndex(0);
+                        window.Focus();
                         return;
                     }
                     this.hub.SelectedIndex = GetActualIndex(hubIndex + 1);
+                    window.Focus();
                 }
                 return;
             }
