@@ -84,7 +84,7 @@ namespace TeheManX_Editor.Forms
             int srcAddr = BinaryPrimitives.ReadInt32LittleEndian(SNES.rom.AsSpan(offset + 4)) & 0xFFFFFF;
             int palId = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + 7));
 
-            if (romOffsetCheck.IsChecked == true)
+            if (MainWindow.window.tileE.romOffsetCheck.IsChecked == true)
                 srcAddr = SNES.CpuToOffset(srcAddr);
 
             MainWindow.window.tileE.bgLengthInt.Value = length;
@@ -193,7 +193,7 @@ namespace TeheManX_Editor.Forms
             try
             {
                 srcAddr = int.Parse(bgSrcBox.Text, System.Globalization.NumberStyles.HexNumber) & 0xFFFFFF;
-                if (romOffsetCheck.IsChecked == true)
+                if (MainWindow.window.tileE.romOffsetCheck.IsChecked == true)
                     srcAddr = SNES.OffsetToCpu(srcAddr);
             }
             catch (Exception)
@@ -235,7 +235,7 @@ namespace TeheManX_Editor.Forms
             int listOffset = BitConverter.ToUInt16(SNES.rom, Const.BackgroundTileInfoOffset + Level.Id * 2) + Const.BackgroundTileInfoOffset;
             int offset = BitConverter.ToUInt16(SNES.rom, listOffset + (int)MainWindow.window.tileE.bgTileSetInt.Value * 2) + Const.BackgroundTileInfoOffset;
 
-            if (romOffsetCheck.IsChecked == true)
+            if (MainWindow.window.tileE.romOffsetCheck.IsChecked == true)
                 bgSrcText.Text = "ROM Offset:";
             else
                 bgSrcText.Text = "CPU Address:";
@@ -247,12 +247,12 @@ namespace TeheManX_Editor.Forms
             try
             {
                 valNew = int.Parse(bgSrcBox.Text, System.Globalization.NumberStyles.HexNumber) & 0xFFFFFF;
-                if (romOffsetCheck.IsChecked == true)
+                if (MainWindow.window.tileE.romOffsetCheck.IsChecked == true)
                     valNew = SNES.CpuToOffset(valNew);
                 else
                     valNew = SNES.OffsetToCpu(valNew);
 
-                if (Const.Id == Const.GameId.MegaManX && romOffsetCheck.IsChecked == false) valNew |= 0x800000;
+                if (Const.Id == Const.GameId.MegaManX && MainWindow.window.tileE.romOffsetCheck.IsChecked == false) valNew |= 0x800000;
                 bgSrcBox.Text = valNew.ToString("X6");
             }
             catch (Exception)
