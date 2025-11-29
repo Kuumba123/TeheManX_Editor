@@ -19,7 +19,7 @@
                 <Image x:Name="layoutImage" x:FieldModifier="public"/>
             </Canvas>
         </Viewbox>
-        <TextBlock x:Name="camLbl" Grid.Row="0" IsHitTestVisible="False" Foreground="White" FontFamily="Consolas" HorizontalAlignment="Left" FontSize="20"></TextBlock>
+        <TextBlock x:Name="camLbl" Grid.Row="0" IsHitTestVisible="False" Foreground="White" FontFamily="Consolas" Margin="5,0,0,0" HorizontalAlignment="Left" FontSize="20"></TextBlock>
 
         <Grid Focusable="False" Grid.Column="1" Background="Black">
             <Grid.RowDefinitions>

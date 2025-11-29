@@ -69,7 +69,7 @@ namespace TeheManX_Editor.Forms
             for (int i = 0; i < Level.Enemies[Level.Id].Count; i++) //Update Each Enemy
             {
                 enemyLabels[i].Tag = Level.Enemies[Level.Id][i];
-                enemyLabels[i].text.Text = Level.Enemies[Level.Id][i].Id.ToString("X2");
+                enemyLabels[i].text.Text = Level.Enemies[Level.Id][i].Id.ToString("X");
                 enemyLabels[i].AssignTypeBorder(Level.Enemies[Level.Id][i].Type);
                 Canvas.SetLeft(enemyLabels[i], Level.Enemies[Level.Id][i].X - viewerX - Const.EnemyOffset);
                 Canvas.SetTop(enemyLabels[i], Level.Enemies[Level.Id][i].Y - viewerY - Const.EnemyOffset);
@@ -194,7 +194,7 @@ namespace TeheManX_Editor.Forms
                 return;
             SNES.edit = true;
             ((Enemy)((EnemyLabel)control.Tag).Tag).Id = (byte)(int)e.NewValue;
-            ((EnemyLabel)control.Tag).text.Text = ((Enemy)((EnemyLabel)control.Tag).Tag).Id.ToString("X2");
+            ((EnemyLabel)control.Tag).text.Text = ((Enemy)((EnemyLabel)control.Tag).Tag).Id.ToString("X");
             //UpdateEnemyName(((Enemy)((EnemyLabel)control.Tag).Tag).type, ((Enemy)((EnemyLabel)control.Tag).Tag).id);
         }
         private void varInt_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
