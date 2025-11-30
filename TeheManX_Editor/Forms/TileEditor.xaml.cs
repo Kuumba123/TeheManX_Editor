@@ -105,14 +105,17 @@ namespace TeheManX_Editor.Forms
             int listOffset = BitConverter.ToUInt16(SNES.rom, Const.BackgroundTileInfoOffset + Level.Id * 2) + Const.BackgroundTileInfoOffset;
             int offset = BitConverter.ToUInt16(SNES.rom, listOffset + (int)MainWindow.window.tileE.bgTileSetInt.Value * 2) + Const.BackgroundTileInfoOffset;
 
-            if (BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset)) == 0) return;
+            Level.TileSet = (int)MainWindow.window.tileE.bgTileSetInt.Value;
 
-                Level.TileSet = (int)MainWindow.window.tileE.bgTileSetInt.Value;
-
-            if (freshCheck.IsChecked == true)
-                Level.LoadLevelTiles();
+            if (BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset)) != 0)
+            {
+                if (freshCheck.IsChecked == true)
+                    Level.LoadLevelTiles();
+                else
+                    Level.LoadDynamicBackgroundTiles();
+            }
             else
-                Level.LoadDynamicBackgroundTiles();
+                Level.LoadLevelTiles();
 
             MainWindow.window.layoutE.DrawLayout();
             MainWindow.window.layoutE.DrawScreen();
