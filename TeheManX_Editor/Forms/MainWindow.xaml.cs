@@ -19,6 +19,7 @@ namespace TeheManX_Editor.Forms
         internal static MainWindow window;
         internal static Settings settings = Settings.SetDefaultSettings();
         internal static Process emu;
+        public static List<Undo> undos = new List<Undo>();
         #endregion Fields
 
         #region Properties
@@ -130,6 +131,7 @@ namespace TeheManX_Editor.Forms
                 else
                     Level.Id = Const.LevelsCount - 1;
                 //Re-Update
+                undos.Clear();
                 Level.TileSet = 0;
                 Level.AssignPallete();
                 Level.LoadLevelTiles();
@@ -147,6 +149,7 @@ namespace TeheManX_Editor.Forms
                 else
                     Level.Id = 0;
                 //Re-Update
+                undos.Clear();
                 Level.TileSet = 0;
                 Level.AssignPallete();
                 Level.LoadLevelTiles();
@@ -357,12 +360,22 @@ namespace TeheManX_Editor.Forms
                     SNES.savePath = fd.FileName;
                     Level.LoadLevelData();
                     //Setup Editor
+                    undos.Clear();
                     Level.Id = 0;
                     Level.AssignPallete();
                     Level.LoadLevelTiles();
                     Update();
                     hub.Visibility = Visibility.Visible;
                 }
+            }
+        }
+        private void ProcessUndo()
+        {
+            if (undos.Count != 0)
+            {
+                Undo undo = undos[undos.Count - 1];
+                Undo.ApplyUndo(undo);
+                undos.RemoveAt(undos.Count - 1);
             }
         }
         private bool SaveGame()
@@ -511,7 +524,7 @@ namespace TeheManX_Editor.Forms
                 }
                 else if (key == "Z" && SNES.rom != null)
                 {
-
+                    ProcessUndo();
                 }
                 else if (key == "Left" && SNES.rom != null && this.hub.Items.Count > 1)
                 {
@@ -638,7 +651,7 @@ namespace TeheManX_Editor.Forms
                 return;
             if (settings.EmuPath == "")
             {
-                MessageBox.Show("You must set the emulator path in the settings before using the test button");
+                MessageBox.Show("You must set the emulator/script path in the settings before using the test button");
                 return;
             }
             if (settings.SaveOnTest)
@@ -687,6 +700,18 @@ namespace TeheManX_Editor.Forms
         {
             SettingsWindow settings = new SettingsWindow();
             settings.ShowDialog();
+        }
+        private void stagesBtn_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+        private void helpBtn_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+        private void undoBtn_Click(object sender, RoutedEventArgs e)
+        {
+            ProcessUndo();
         }
         #endregion Events
     }

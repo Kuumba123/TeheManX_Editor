@@ -26,7 +26,7 @@ namespace TeheManX_Editor.Forms
 
         /*16x16 Mode Properties*/
         public bool mode16 = false; //is 16x16 mode active
-        byte[] screenData16 = null; //holds the screen data for 16x16 mode
+        public byte[] screenData16 = null; //holds the screen data for 16x16 mode
         HashSet<ulong> tiles32 = new HashSet<ulong>(); //the 32x32 tiles that are based off the data in screenData16
         int pastTiles32Count = -1;
         WriteableBitmap tileBMP16 = new WriteableBitmap(256, 256, 96, 96, PixelFormats.Bgra32, null);
@@ -174,7 +174,7 @@ namespace TeheManX_Editor.Forms
         /*
         *  Mode 16x16 GUI Methods
         */
-        private void DrawScreen16()
+        public void DrawScreen16()
         {
             screenBMP.Lock();
             for (int y = 0; y < 16; y++)
@@ -349,7 +349,12 @@ namespace TeheManX_Editor.Forms
                 if (tileId == selectedTile)
                     return;
 
+                if (MainWindow.undos.Count == Const.MaxUndo)
+                    MainWindow.undos.RemoveAt(0);
+                MainWindow.undos.Add(Undo.CreateScreenUndo((byte)screenId, (byte)cX, (byte)cY));
+
                 BinaryPrimitives.WriteUInt16LittleEndian(SNES.rom.AsSpan(offset + screenId * 0x80 + cX * 2 + cY * 16), (ushort)selectedTile);
+
                 SNES.edit = true;
                 DrawScreen();
 
@@ -381,6 +386,10 @@ namespace TeheManX_Editor.Forms
                     ushort tileId = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + cord));
                     if (tileId == selectedTile)
                         return;
+
+                    if (MainWindow.undos.Count == Const.MaxUndo)
+                        MainWindow.undos.RemoveAt(0);
+                    MainWindow.undos.Add(Undo.CreateScreenUndo((byte)screenId, (byte)cX, (byte)cY));
 
                     BinaryPrimitives.WriteUInt16LittleEndian(SNES.rom.AsSpan(offset + cord), (ushort)selectedTile);
                     SNES.edit = true;
@@ -478,6 +487,13 @@ namespace TeheManX_Editor.Forms
                 }
             }
 
+            //Clear Screen Undos of 32x32 Mode
+            for (int i = (MainWindow.undos.Count - 1); i != -1; i--)
+            {
+                if (MainWindow.undos[i].type == TeheManX_Editor.Undo.UndoType.Screen)
+                    MainWindow.undos.RemoveAt(i);
+            }
+
             tiles32.Clear();
             Update32x32TileList(true);
             Update32x32TileCountText();
@@ -571,6 +587,9 @@ namespace TeheManX_Editor.Forms
                 {
                     if (Grid.GetColumnSpan(screenCursor16) != 1 || Grid.GetRowSpan(screenCursor16) != 1) //Paste From other Screen
                     {
+                        if (MainWindow.undos.Count == Const.MaxUndo)
+                            MainWindow.undos.RemoveAt(0);
+                        MainWindow.undos.Add(Undo.CreateGroupScreenUndo16((byte)screenId, (byte)cX, (byte)cY, (byte)Grid.GetColumnSpan(screenCursor16), (byte)Grid.GetRowSpan(screenCursor16)));
                         for (int r = 0; r < Grid.GetRowSpan(screenCursor16); r++)
                         {
                             for (int c = 0; c < Grid.GetColumnSpan(screenCursor16); c++)
@@ -608,6 +627,10 @@ namespace TeheManX_Editor.Forms
                     int rowSrc = Grid.GetRow(cursor16);
                     int colSrc = Grid.GetColumn(cursor16);
 
+                    if (MainWindow.undos.Count == Const.MaxUndo)
+                        MainWindow.undos.RemoveAt(0);
+                    MainWindow.undos.Add(Undo.CreateGroupScreenUndo16((byte)screenId, (byte)cX, (byte)cY, (byte)Grid.GetColumnSpan(cursor16), (byte)Grid.GetRowSpan(cursor16)));
+
                     for (int r = 0; r < Grid.GetRowSpan(cursor16); r++)
                     {
                         for (int c = 0; c < Grid.GetColumnSpan(cursor16); c++)
@@ -635,6 +658,9 @@ namespace TeheManX_Editor.Forms
                     return;
                 }
                 //Normal Paste
+                if (MainWindow.undos.Count == Const.MaxUndo)
+                    MainWindow.undos.RemoveAt(0);
+                MainWindow.undos.Add(Undo.CreateScreenUndo16((byte)screenId, (byte)cX, (byte)cY));
                 BinaryPrimitives.WriteUInt16LittleEndian(screenData16.AsSpan(cord + screenId * 0x200), (ushort)selectedTile16);
                 SNES.edit = true;
                 Update32x32TileList();
@@ -666,6 +692,9 @@ namespace TeheManX_Editor.Forms
                     if (BinaryPrimitives.ReadUInt16LittleEndian(screenData16.AsSpan(screenId * 0x200 + cord)) == (ushort)selectedTile16)
                         return;
 
+                    if (MainWindow.undos.Count == Const.MaxUndo)
+                        MainWindow.undos.RemoveAt(0);
+                    MainWindow.undos.Add(Undo.CreateScreenUndo16((byte)screenId, (byte)cX, (byte)cY));
                     BinaryPrimitives.WriteUInt16LittleEndian(screenData16.AsSpan(screenId * 0x200 + cord), (ushort)selectedTile16);
                     SNES.edit = true;
                     Update32x32TileList();
@@ -863,6 +892,13 @@ namespace TeheManX_Editor.Forms
                 {
                     int offset = tile.Value * 8 + tile32DestBase;
                     BinaryPrimitives.WriteUInt64LittleEndian(SNES.rom.AsSpan(offset), tile.Key);
+                }
+
+                //Clear Screen Undos of 16x16 Mode & Undos of 32x32 Tile Edits
+                for (int i = (MainWindow.undos.Count - 1); i != -1; i--)
+                {
+                    if (MainWindow.undos[i].type == TeheManX_Editor.Undo.UndoType.Screen || MainWindow.undos[i].type == TeheManX_Editor.Undo.UndoType.X32)
+                        MainWindow.undos.RemoveAt(i);
                 }
 
                 //Done

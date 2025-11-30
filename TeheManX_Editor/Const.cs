@@ -4,6 +4,7 @@
     {
         public const string EditorVersion = "1.0";
         public const int EnemyOffset = 8; //For Enemy Labels
+        public const int MaxUndo = 512;
         public enum GameId
         {
             MegaManX,

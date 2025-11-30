@@ -22,7 +22,7 @@ namespace TeheManX_Editor.Forms
         public List<Label> screenLabels = new List<Label>();
         public Button pastLayer;
         #endregion Properties
-        
+
         #region Constructors
         public LayoutEditor()
         {
@@ -114,6 +114,11 @@ namespace TeheManX_Editor.Forms
             }
             else
             {
+                //Save Undo & Edit
+                if (MainWindow.undos.Count == Const.MaxUndo)
+                    MainWindow.undos.RemoveAt(0);
+                MainWindow.undos.Add(Undo.CreateLayoutUndo(i));
+
                 Level.Layout[Level.Id,Level.BG,i] = (byte)(selectedScreen & 0xFF);
                 SNES.edit = true;
                 DrawLayout();
