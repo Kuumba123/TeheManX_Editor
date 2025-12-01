@@ -68,6 +68,7 @@ namespace TeheManX_Editor
             {
                 MainWindow.window.layoutE.DrawLayout();
                 MainWindow.window.enemyE.DrawLayout();
+                MainWindow.layoutWindow.UpdateLayoutGrid();
             }
         }
         internal static Undo CreateScreenUndo(byte screen, byte x, byte y)
