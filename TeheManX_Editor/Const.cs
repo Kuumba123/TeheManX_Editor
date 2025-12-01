@@ -18,6 +18,13 @@
         }
         public const int MaxLevels = 0x30;
 
+        /*Expansion Constants*/
+        public static readonly int[] ExpandMaxScreens = { 0x43, 0x21 };     //for MMX1 only
+        public static readonly int[] ExpandMaxScreens2 = { 0x3F, 0x21 };    //for MMX2 & MMX3
+        public static readonly int[] ExpandMaxTiles32 = { 0x500, 0x300 };
+        public static int ExpandMaxTiles16 = 0x600; //shared between both layers
+        public static int ExpandLayoutLength = 0x400; //for both layers
+
         /*Variable Constants*/
         public static GameId Id = 0;    //Game ID (0=MMX1, 1=MMX2, 2=MMX3)
         public static GameVersion Version = 0; //Game Version (0=US, 1=JP)
@@ -132,6 +139,8 @@
             public static readonly int[] Tile32DataPointersOffset = { 0x30E02, 0x3102D };
             public static readonly int[] Tile16DataPointersOffset = { 0x30E71, 0x3109C };
             public static int TileCollisionDataPointersOffset = 0x30EE0;
+
+            public const int BankCount = 48;
             internal class NA // North America Version
             {
                 public const int LoadTileSetInfoOffset = 0x3756F;
@@ -357,6 +366,8 @@
             public static readonly int[] Tile32DataPointersOffset = { 0x030966, 0x30B91 };
             public static readonly int[] Tile16DataPointersOffset = { 0x0309D5, 0x30C00 };
             public static int TileCollisionDataPointersOffset = 0x030A44;
+
+            public const int BankCount = 48;
             internal class NA // North America Version
             {
                 public const int LoadTileSetInfoOffset = 0x37831;
@@ -541,6 +552,8 @@
             public static readonly int[] Tile32DataPointersOffset = { 0x30A91, 0x30CBC };
             public static readonly int[] Tile16DataPointersOffset = { 0x30B00, 0x30D2B };
             public static int TileCollisionDataPointersOffset = 0x30B6F;
+
+            public const int BankCount = 64;
 
             public static readonly byte[,] LayoutLength = new byte[0x25, 2]
 {
