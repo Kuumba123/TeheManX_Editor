@@ -7,6 +7,7 @@ using System.Text.Json;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using Xceed.Wpf.AvalonDock.Layout;
 
 namespace TeheManX_Editor.Forms
 {
@@ -703,7 +704,41 @@ namespace TeheManX_Editor.Forms
         }
         private void stagesBtn_Click(object sender, RoutedEventArgs e)
         {
+            if (SNES.rom == null)
+                return;
 
+            // Create a new context menu
+            ContextMenu menu = new ContextMenu();
+
+            // Create Menu Items
+            for (int i = 0; i < Const.LevelsCount; i++)
+            {
+                MenuItem item = new MenuItem() { Header = $"STAGE {i:X2}" };
+                item.Uid = i.ToString();
+                item.Click += (s, args) =>
+                {
+                    if (window.screenE.mode16)
+                    {
+                        MessageBox.Show("You must exit 16x16 Mode before you can switch stages!");
+                        return;
+                    }
+                    Level.Id = int.Parse(((MenuItem)s).Uid);
+                    //Re-Update
+                    undos.Clear();
+                    Level.TileSet = 0;
+                    Level.AssignPallete();
+                    Level.LoadLevelTiles();
+                    Update();
+                };
+                menu.Items.Add(item);
+            }
+
+            // Attach the menu to the button
+            stagesBtn.ContextMenu = menu;
+
+            // Show the menu immediately
+            menu.PlacementTarget = stagesBtn;
+            menu.IsOpen = true;
         }
         private void helpBtn_Click(object sender, RoutedEventArgs e)
         {
