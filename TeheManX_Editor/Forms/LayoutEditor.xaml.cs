@@ -114,6 +114,9 @@ namespace TeheManX_Editor.Forms
             }
             else
             {
+                if (Level.Layout[Level.Id, Level.BG, i] == (byte)(selectedScreen & 0xFF))
+                    return;
+
                 //Save Undo & Edit
                 if (MainWindow.undos.Count == Const.MaxUndo)
                     MainWindow.undos.RemoveAt(0);
@@ -123,6 +126,8 @@ namespace TeheManX_Editor.Forms
                 SNES.edit = true;
                 DrawLayout();
                 MainWindow.window.enemyE.DrawLayout();
+                if (LayoutWindow.isOpen)
+                    MainWindow.layoutWindow.UpdateLayoutGrid();
             }
         }
         private void IntegerUpDown_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
@@ -163,15 +168,15 @@ namespace TeheManX_Editor.Forms
             MainWindow.window.tile32E.AssignLimits();
             MainWindow.window.tile16E.AssignLimits();
             MainWindow.window.enemyE.DrawLayout();
-            //if (MainWindow.layoutWindow != null)
-            //    MainWindow.layoutWindow.DrawScreens();
+            if (LayoutWindow.isOpen)
+                MainWindow.layoutWindow.UpdateLayoutGrid();
         }
         private void ViewScreens_Click(object sender, RoutedEventArgs e)
         {
-            /*if (ListWindow.screenViewOpen)
+            if (LayoutWindow.isOpen)
                 return;
-            MainWindow.layoutWindow = new ListWindow(0);
-            MainWindow.layoutWindow.Show();*/
+            MainWindow.layoutWindow = new LayoutWindow();
+            MainWindow.layoutWindow.Show();
         }
         private void Help_Click(object sender, RoutedEventArgs e)
         {

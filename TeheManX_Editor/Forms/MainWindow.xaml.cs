@@ -18,6 +18,7 @@ namespace TeheManX_Editor.Forms
     {
         #region Fields
         internal static MainWindow window;
+        internal static LayoutWindow layoutWindow = new LayoutWindow();
         internal static Settings settings = Settings.SetDefaultSettings();
         internal static Process emu;
         public static List<Undo> undos = new List<Undo>();
@@ -104,6 +105,9 @@ namespace TeheManX_Editor.Forms
             spawnE.SetSpawnSettings();
             tileE.AssignLimits();
             UpdateWindowTitle();
+
+            if (LayoutWindow.isOpen)
+                layoutWindow.UpdateLayoutGrid();
         }
         public void UpdateWindowTitle()
         {
@@ -163,6 +167,28 @@ namespace TeheManX_Editor.Forms
         {
             if (key == "Delete")
             {
+                var result = MessageBox.Show("Are you sure you want to delete all of Layer " + (Level.BG + 1) + "?\nThis cant be un-done", "", MessageBoxButton.YesNo);
+
+                if (result == MessageBoxResult.Yes)
+                {
+                    if (undos.Count != 0)
+                    {
+                        for (int i = (undos.Count - 1); i == -1; i++)
+                        {
+                            if (undos[i].type == Undo.UndoType.Layout)
+                                undos.RemoveAt(i);
+                        }
+                    }
+                    for (int i = 0; i < 0x400; i++)
+                    {
+                        Level.Layout[Level.Id, Level.BG, i] = 0;
+                    }
+                    SNES.edit = true;
+                    window.layoutE.DrawLayout();
+                    window.enemyE.DrawLayout();
+                    if (LayoutWindow.isOpen)
+                        layoutWindow.UpdateLayoutGrid();
+                }
                 return;
             }
             if (!notFocus)  //check if NumInt is focused
@@ -213,18 +239,14 @@ namespace TeheManX_Editor.Forms
                 if (Level.BG != 0)
                 {
                     Level.BG = 0;
-                    //window.enemyE.Draw();
-                    /*if (ListWindow.screenViewOpen)
-                    {
-                        layoutWindow.DrawScreens();
-                        layoutWindow.Title = "All Screens in Layer " + (Level.BG + 1);
-                    }*/
                     window.layoutE.UpdateBtn();
                     window.layoutE.AssignLimits();
                     window.screenE.AssignLimits();
                     window.tile32E.AssignLimits();
                     window.tile16E.AssignLimits();
                     window.enemyE.DrawLayout();
+                    if (LayoutWindow.isOpen)
+                        layoutWindow.UpdateLayoutGrid();
                 }
             }
             else if (key == "D2")
@@ -237,18 +259,14 @@ namespace TeheManX_Editor.Forms
                 if (Level.BG != 1)
                 {
                     Level.BG = 1;
-                    //window.enemyE.Draw();
-                    /*if (ListWindow.screenViewOpen)
-                    {
-                        layoutWindow.DrawScreens();
-                        layoutWindow.Title = "All Screens in Layer " + (Level.BG + 1);
-                    }*/
                     window.layoutE.UpdateBtn();
                     window.layoutE.AssignLimits();
                     window.screenE.AssignLimits();
                     window.tile32E.AssignLimits();
                     window.tile16E.AssignLimits();
                     window.enemyE.DrawLayout();
+                    if (LayoutWindow.isOpen)
+                        layoutWindow.UpdateLayoutGrid();
                 }
             }
         }
@@ -837,6 +855,9 @@ namespace TeheManX_Editor.Forms
                     Level.AssignPallete();
                     Level.LoadLevelTiles();
                     Update();
+
+                    if (LayoutWindow.isOpen)
+                        layoutWindow.UpdateLayoutGrid();
                 };
                 menu.Items.Add(item);
             }

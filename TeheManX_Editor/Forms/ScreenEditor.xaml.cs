@@ -488,10 +488,13 @@ namespace TeheManX_Editor.Forms
             }
 
             //Clear Screen Undos of 32x32 Mode
-            for (int i = (MainWindow.undos.Count - 1); i != -1; i--)
+            if (MainWindow.undos.Count != 0)
             {
-                if (MainWindow.undos[i].type == TeheManX_Editor.Undo.UndoType.Screen)
-                    MainWindow.undos.RemoveAt(i);
+                for (int i = (MainWindow.undos.Count - 1); i != -1; i--)
+                {
+                    if (MainWindow.undos[i].type == TeheManX_Editor.Undo.UndoType.Screen)
+                        MainWindow.undos.RemoveAt(i);
+                }
             }
 
             tiles32.Clear();
@@ -895,10 +898,13 @@ namespace TeheManX_Editor.Forms
                 }
 
                 //Clear Screen Undos of 16x16 Mode & Undos of 32x32 Tile Edits
-                for (int i = (MainWindow.undos.Count - 1); i != -1; i--)
+                if (MainWindow.undos.Count != 0)
                 {
-                    if (MainWindow.undos[i].type == TeheManX_Editor.Undo.UndoType.Screen || MainWindow.undos[i].type == TeheManX_Editor.Undo.UndoType.X32)
-                        MainWindow.undos.RemoveAt(i);
+                    for (int i = (MainWindow.undos.Count - 1); i != -1; i--)
+                    {
+                        if (MainWindow.undos[i].type == TeheManX_Editor.Undo.UndoType.Screen || MainWindow.undos[i].type == TeheManX_Editor.Undo.UndoType.X32)
+                            MainWindow.undos.RemoveAt(i);
+                    }
                 }
 
                 //Done
