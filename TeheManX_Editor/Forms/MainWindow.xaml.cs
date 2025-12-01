@@ -256,9 +256,27 @@ namespace TeheManX_Editor.Forms
             if (key == "Delete")
                 window.screenE.DeleteScreen();
         }
-        private void PaletteKeyCheck(string key, bool notFocus)
+        private void PaletteKeyCheck(string key)
         {
+            bool update = false;
+            if (key == "Up")
+            {
+                window.paletteE.palId--;
+                update = true;
+            }
+            else if(key == "Down")
+            {
+                window.paletteE.palId++;
+                update = true;
+            }
 
+            if (update)
+            {
+                window.paletteE.palId &= 7;
+                window.paletteE.UpdatePaletteText();
+                window.paletteE.DrawVramTiles();
+                window.paletteE.UpdateCursor();
+            }
         }
         private void EnemyKeyCheck(string key, bool notFocus)
         {
@@ -573,9 +591,9 @@ namespace TeheManX_Editor.Forms
                         ScreenKeyCheck(key);
                         break;
                     }
-                case "clutTab":
+                case "paletteTab":
                     {
-                        //ClutKeyCheck(key);
+                        PaletteKeyCheck(key);
                         break;
                     }
                 case "enemyTab":

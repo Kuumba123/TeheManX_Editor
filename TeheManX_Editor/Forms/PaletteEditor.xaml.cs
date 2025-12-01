@@ -118,6 +118,14 @@ namespace TeheManX_Editor.Forms
             }
             selectSetRect.Fill = Brushes.Transparent;
         }
+        public void UpdatePaletteText()
+        {
+            MainWindow.window.paletteE.palTxt.Text = $"Palette: {palId}";
+        }
+        public void UpdateCursor()
+        {
+            Grid.SetRow(selectSetRect, palId);
+        }
         #endregion Methods
 
         #region Events
@@ -200,8 +208,9 @@ namespace TeheManX_Editor.Forms
             else
             {
                 palId = Grid.GetRow(sender as UIElement);
+                UpdatePaletteText();
                 DrawVramTiles();
-                Grid.SetRow(selectSetRect, palId);
+                UpdateCursor();
             }
         }
         #endregion Events
