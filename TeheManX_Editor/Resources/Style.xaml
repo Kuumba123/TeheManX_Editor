@@ -42,7 +42,7 @@
         <Setter Property="ParsingNumberStyle" Value="HexNumber"/>
         <Setter Property="FormatString" Value="X"/>
         <Setter Property="Focusable" Value="False"/>
-        <Setter Property="MaxLength" Value="3"/>
+        <Setter Property="MaxLength" Value="8"/>
         <Setter Property="Value" Value="0"/>
         <Setter Property="AutoMoveFocus" Value="False"/>
         <Setter Property="AutoSelectBehavior" Value="Never"/>

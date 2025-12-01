@@ -20,6 +20,8 @@ namespace TeheManX_Editor.Forms
             InitializeComponent();
             emuPathBox.Text = MainWindow.settings.EmuPath;
             saveOnTestCheck.IsChecked = MainWindow.settings.SaveOnTest;
+            displayInt.Value = MainWindow.settings.ReferanceWidth;
+            dontUpdateCheck.IsChecked = MainWindow.settings.DontUpdate;
             enable = true;
         }
         #endregion Constructors
@@ -54,6 +56,18 @@ namespace TeheManX_Editor.Forms
             MainWindow.settings.SaveOnTest = false;
             edited = true;
         }
+        private void displayInt_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        {
+            if (!enable || e.NewValue == null || e.OldValue == null) return;
+            MainWindow.settings.ReferanceWidth = (int)e.NewValue;
+            edited = true;
+        }
+        private void dontUpdateCheck_Change(object sender, RoutedEventArgs e)
+        {
+            if (!enable) return;
+            MainWindow.settings.DontUpdate = (bool)dontUpdateCheck.IsChecked;
+            edited = true;
+        }
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             if (edited)
@@ -70,5 +84,6 @@ namespace TeheManX_Editor.Forms
             }
         }
         #endregion Events
+
     }
 }

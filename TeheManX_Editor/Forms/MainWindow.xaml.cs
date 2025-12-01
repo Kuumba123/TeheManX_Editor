@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Text.Json;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using Xceed.Wpf.AvalonDock.Layout;
 
 namespace TeheManX_Editor.Forms
 {
@@ -47,6 +47,8 @@ namespace TeheManX_Editor.Forms
                         Application.Current.Shutdown();
                     }
                 }
+                DefineSizing();
+
                 string[] args = Environment.GetCommandLineArgs();
 
                 if (args.Length == 2) //Open Game Files using args
@@ -425,12 +427,100 @@ namespace TeheManX_Editor.Forms
             }
             return true;
         }
+        private void SaveLayout()
+        {
+
+        }
+        private void LoadLayout()
+        {
+
+        }
+        private void LockWindows()
+        {
+            foreach (var childWind in Application.Current.Windows)
+            {
+                if (childWind.GetType() != typeof(MainWindow)) continue;
+                MainWindow window = childWind as MainWindow;
+                if (window.Width < 1) continue;
+                window.hub.Visibility = Visibility.Hidden;
+            }
+        }
+        private void UnlockWindows()
+        {
+            foreach (var childWind in Application.Current.Windows)
+            {
+                if (childWind.GetType() != typeof(MainWindow)) continue;
+                MainWindow window = childWind as MainWindow;
+                if (window.Width < 1) continue;
+                window.hub.Visibility = Visibility.Visible;
+            }
+        }
+        private void CloseChildWindows()
+        {
+            var childWindows = Application.Current.Windows.Cast<Window>().Where(w => w != Application.Current.MainWindow).ToList();
+            window.hub.ConsolidateOrphanedItems = false;
+            foreach (var window in childWindows)
+                window.Close();
+        }
+        public void DefineSizing()
+        {
+            int W;
+            if (settings.ReferanceWidth < 200)
+                W = (int)(40 * SystemParameters.PrimaryScreenWidth / 100);
+            else
+                W = 40 * settings.ReferanceWidth / 100;
+            window.layoutE.selectImage.MaxWidth = W;
+            window.screenE.tileImage.MaxWidth = W;
+            window.screenE.tileImage16.MaxWidth = W;
+            window.tile32E.x16Image.MaxWidth = W;
+            window.enemyE.canvas.Width = window.enemyE.layoutBMP.PixelWidth;
+        }
         #endregion Methods
 
         #region Events
-        private void Window_Loaded(object sender, RoutedEventArgs e)
+        private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
-
+            //Check for Update
+            if (settings.DontUpdate) return;
+            using (HttpClient client = new HttpClient())
+            {
+                client.DefaultRequestHeaders.UserAgent.ParseAdd("Mozilla/5.0 (compatible; Grand/3.0)");
+                try
+                {
+                    HttpResponseMessage response = await client.GetAsync(Const.ReproURL);
+                    response.EnsureSuccessStatusCode();
+                    string json = await response.Content.ReadAsStringAsync();
+                    dynamic release = JsonSerializer.Deserialize<dynamic>(json);
+                    string tag = release.tag_name;
+                    if (tag != Const.EditorVersion && !Settings.IsPastVersion(tag))
+                    {
+                        var result = MessageBox.Show($"There is a new version of this editor ({tag}) do you want to download the update?", "New Version", MessageBoxButton.YesNo);
+                        if (result == MessageBoxResult.Yes)
+                        {
+                            //Start Downloading
+                            string url = release.assets[0].browser_download_url;
+                            response = await client.GetAsync(url);
+                            response.EnsureSuccessStatusCode();
+                            using (Stream contentStream = await response.Content.ReadAsStreamAsync())
+                            {
+                                using (FileStream fileStream = new FileStream("TeheManX4 Editor " + tag + ".exe", FileMode.Create, FileAccess.Write, FileShare.None))
+                                {
+                                    await contentStream.CopyToAsync(fileStream);
+                                }
+                            }
+                            Process.Start(Directory.GetCurrentDirectory() + "/" + "TeheManX Editor " + tag + ".exe");
+                            Application.Current.Shutdown();
+                        }
+                    }
+                }
+                catch (HttpRequestException)
+                {
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
+            }
         }
         private void Window_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
@@ -463,7 +553,7 @@ namespace TeheManX_Editor.Forms
                         return;
                     }
                 }
-                Application.Current.Shutdown();
+                CloseChildWindows();
             }
         }
         private void Window_PreviewKeyDown(object sender, KeyEventArgs e)

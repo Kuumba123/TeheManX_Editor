@@ -2,7 +2,12 @@
 {
     static class Const
     {
+        public static readonly string ReproURL = "https://api.github.com/repos/Kuumba123/TeheManX_Editor/releases/latest";
         public const string EditorVersion = "1.0";
+        public static readonly string[] PastVersions =
+        {
+            "1.0"
+        };
         public const int EnemyOffset = 8; //For Enemy Labels
         public const int MaxUndo = 512;
         public enum GameId

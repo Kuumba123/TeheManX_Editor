@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TeheManX_Editor.Forms"
         mc:Ignorable="d"
-        Title="TeheMan X Editor Settings" Height="350" Width="350" ResizeMode="CanMinimize" WindowStartupLocation="CenterScreen" Closing="Window_Closing">
+        Title="TeheMan X Editor Settings" Height="350" Width="350"  ResizeMode="NoResize" WindowStartupLocation="CenterScreen" Closing="Window_Closing">
     <Window.Resources>
         <Style TargetType="CheckBox">
             <Setter Property="Foreground" Value="White"/>
@@ -40,6 +40,11 @@
                     <Label HorizontalAlignment="Center">Options</Label>
                 </StackPanel>
                 <CheckBox x:Name="saveOnTestCheck" Checked="saveOnTestCheck_Checked" Unchecked="saveOnTestCheck_Unchecked">Save on Test</CheckBox>
+                <StackPanel Orientation="Horizontal">
+                    <local:NumInt FontSize="22" x:Name="displayInt" ValueChanged="displayInt_ValueChanged" FormatString="" ParsingNumberStyle="Integer" ShowButtonSpinner="False" Minimum="0" Maximum="9000" Height="30" Width="55"></local:NumInt>
+                    <Label>Display Referance Width</Label>
+                </StackPanel>
+                <CheckBox x:Name="dontUpdateCheck" Checked="dontUpdateCheck_Change" Unchecked="dontUpdateCheck_Change">Dont check for Updates</CheckBox>
             </StackPanel>
         </Grid>
     </ScrollViewer>

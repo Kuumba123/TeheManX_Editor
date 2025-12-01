@@ -5,6 +5,8 @@
         #region Properties
         public string EmuPath { get; set; }
         public bool SaveOnTest { get; set; }
+        public int ReferanceWidth { get; set; }
+        public bool DontUpdate { get; set; }
         #endregion Properties
 
         #region Constructors
@@ -21,6 +23,15 @@
             s.EmuPath = "";
             s.SaveOnTest = true;
             return s;
+        }
+        public static bool IsPastVersion(string ver)
+        {
+            foreach (var v in Const.PastVersions)
+            {
+                if (v == ver)
+                    return true;
+            }
+            return false;
         }
         #endregion Methods
     }
