@@ -99,10 +99,6 @@
                 <Button Style="{StaticResource TileButton}" Click="Page_Click">3</Button>
                 <Button Style="{StaticResource TileButton}" Click="Page_Click">4</Button>
                 <Button Style="{StaticResource TileButton}" Click="Page_Click">5</Button>
-                <Button Style="{StaticResource TileButton}" Click="Page_Click">6</Button>
-                <Button Style="{StaticResource TileButton}" Click="Page_Click">7</Button>
-                <Button Style="{StaticResource TileButton}" Click="Page_Click">8</Button>
-                <Button Style="{StaticResource TileButton}" Click="Page_Click">9</Button>
             </StackPanel>
             
             <!--Tile Image for Selected 16x16 Tile & Grid Buttons-->

@@ -75,10 +75,6 @@
             <Button Style="{StaticResource TileButton}" Click="Tile16Button_Click">3</Button>
             <Button Style="{StaticResource TileButton}" Click="Tile16Button_Click">4</Button>
             <Button Style="{StaticResource TileButton}" Click="Tile16Button_Click">5</Button>
-            <Button Style="{StaticResource TileButton}" Click="Tile16Button_Click">6</Button>
-            <Button Style="{StaticResource TileButton}" Click="Tile16Button_Click">7</Button>
-            <Button Style="{StaticResource TileButton}" Click="Tile16Button_Click">8</Button>
-            <Button Style="{StaticResource TileButton}" Click="Tile16Button_Click">9</Button>
         </StackPanel>
         <Border Grid.Column="1" Grid.Row="1" BorderBrush="White" BorderThickness="2" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0">
             <Grid x:Name="x16grid">

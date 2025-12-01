@@ -185,10 +185,6 @@
                     <Button Style="{StaticResource TileButton}" Click="Tile16PageButton_Click">3</Button>
                     <Button Style="{StaticResource TileButton}" Click="Tile16PageButton_Click">4</Button>
                     <Button Style="{StaticResource TileButton}" Click="Tile16PageButton_Click">5</Button>
-                    <Button Style="{StaticResource TileButton}" Click="Tile16PageButton_Click">6</Button>
-                    <Button Style="{StaticResource TileButton}" Click="Tile16PageButton_Click">7</Button>
-                    <Button Style="{StaticResource TileButton}" Click="Tile16PageButton_Click">8</Button>
-                    <Button Style="{StaticResource TileButton}" Click="Tile16PageButton_Click">9</Button>
                 </StackPanel>
                 <Border BorderBrush="White" BorderThickness="2" HorizontalAlignment="Left" Margin="0">
                     <Grid>
