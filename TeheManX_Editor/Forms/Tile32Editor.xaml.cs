@@ -172,6 +172,13 @@ namespace TeheManX_Editor.Forms
                 tile16Cursor.Visibility = Visibility.Visible;
             }
         }
+        public void UpdateTile32Ints(int offset)
+        {
+            MainWindow.window.tile32E.topLeftInt.Value = BitConverter.ToUInt16(SNES.rom, offset + selectedTile * 8 + 0);
+            MainWindow.window.tile32E.topRightInt.Value = BitConverter.ToUInt16(SNES.rom, offset + selectedTile * 8 + 2);
+            MainWindow.window.tile32E.bottomLeftInt.Value = BitConverter.ToUInt16(SNES.rom, offset + selectedTile * 8 + 4);
+            MainWindow.window.tile32E.bottomRightInt.Value = BitConverter.ToUInt16(SNES.rom, offset + selectedTile * 8 + 6);
+        }
         #endregion Methods
 
         #region Events
@@ -231,11 +238,7 @@ namespace TeheManX_Editor.Forms
             selectedTile = id;
 
             int offset = SNES.CpuToOffset(BitConverter.ToInt32(SNES.rom, Const.Tile32DataPointersOffset[Level.BG] + Level.Id * 3));
-
-            MainWindow.window.tile32E.topLeftInt.Value = BitConverter.ToUInt16(SNES.rom, offset + selectedTile * 8 + 0);
-            MainWindow.window.tile32E.topRightInt.Value = BitConverter.ToUInt16(SNES.rom, offset + selectedTile * 8 + 2);
-            MainWindow.window.tile32E.bottomLeftInt.Value = BitConverter.ToUInt16(SNES.rom, offset + selectedTile * 8 + 4);
-            MainWindow.window.tile32E.bottomRightInt.Value = BitConverter.ToUInt16(SNES.rom, offset + selectedTile * 8 + 6);
+            UpdateTile32Ints(offset);
             DrawTile();
             tileInt.Value = selectedTile;
             ChangePageTxt();
@@ -262,6 +265,9 @@ namespace TeheManX_Editor.Forms
                 return;
             }
             int offset = SNES.CpuToOffset(BitConverter.ToInt32(SNES.rom, Const.Tile32DataPointersOffset[Level.BG] + Level.Id * 3));
+            if (MainWindow.undos.Count == Const.MaxUndo)
+                MainWindow.undos.RemoveAt(0);
+            MainWindow.undos.Add(Undo.CreateTile32Undo((ushort)selectedTile, BinaryPrimitives.ReadUInt64LittleEndian(SNES.rom.AsSpan(offset + selectedTile * 8))));
             BinaryPrimitives.WriteUInt16LittleEndian(SNES.rom.AsSpan(offset + selectedTile * 8 + (selectedInnerTile * 2)), (ushort)id);
 
             SNES.edit = true;
@@ -275,6 +281,7 @@ namespace TeheManX_Editor.Forms
             else if (selectedInnerTile == 3)
                 MainWindow.window.tile32E.bottomRightInt.Value = (ushort)id;
             DrawTile();
+            DrawTiles();
             UpdateTile16SelectionUI();
 
             MainWindow.window.layoutE.DrawLayout();
@@ -314,6 +321,7 @@ namespace TeheManX_Editor.Forms
             MainWindow.window.tile32E.bottomLeftInt.Value = BitConverter.ToUInt16(SNES.rom, offset + selectedTile * 8 + 4);
             MainWindow.window.tile32E.bottomRightInt.Value = BitConverter.ToUInt16(SNES.rom, offset + selectedTile * 8 + 6);
             DrawTile();
+            DrawTiles();
             ChangePageTxt();
             UpdateTile32SelectionUI();
             UpdateTile16SelectionUI();
@@ -329,6 +337,7 @@ namespace TeheManX_Editor.Forms
             BinaryPrimitives.WriteUInt16LittleEndian(SNES.rom.AsSpan(offset + selectedTile * 8 + 0), (ushort)(int)e.NewValue);
             SNES.edit = true;
             DrawTile();
+            DrawTiles();
             UpdateTile16SelectionUI();
 
             MainWindow.window.layoutE.DrawLayout();
@@ -346,9 +355,14 @@ namespace TeheManX_Editor.Forms
             if ((ushort)(int)e.NewValue == BitConverter.ToUInt16(SNES.rom, offset + selectedTile * 8 + 2))
                 return;
 
+            if (MainWindow.undos.Count == Const.MaxUndo)
+                MainWindow.undos.RemoveAt(0);
+            MainWindow.undos.Add(Undo.CreateTile32Undo((ushort)selectedTile, BinaryPrimitives.ReadUInt64LittleEndian(SNES.rom.AsSpan(offset + selectedTile * 8))));
+
             BinaryPrimitives.WriteUInt16LittleEndian(SNES.rom.AsSpan(offset + selectedTile * 8 + 2), (ushort)(int)e.NewValue);
             SNES.edit = true;
             DrawTile();
+            DrawTiles();
             UpdateTile16SelectionUI();
 
             MainWindow.window.layoutE.DrawLayout();
@@ -366,9 +380,14 @@ namespace TeheManX_Editor.Forms
             if ((ushort)(int)e.NewValue == BitConverter.ToUInt16(SNES.rom, offset + selectedTile * 8 + 4))
                 return;
 
+            if (MainWindow.undos.Count == Const.MaxUndo)
+                MainWindow.undos.RemoveAt(0);
+            MainWindow.undos.Add(Undo.CreateTile32Undo((ushort)selectedTile, BinaryPrimitives.ReadUInt64LittleEndian(SNES.rom.AsSpan(offset + selectedTile * 8))));
+
             BinaryPrimitives.WriteUInt16LittleEndian(SNES.rom.AsSpan(offset + selectedTile * 8 + 4), (ushort)(int)e.NewValue);
             SNES.edit = true;
             DrawTile();
+            DrawTiles();
             UpdateTile16SelectionUI();
 
             MainWindow.window.layoutE.DrawLayout();
@@ -386,9 +405,14 @@ namespace TeheManX_Editor.Forms
             if ((ushort)(int)e.NewValue == BitConverter.ToUInt16(SNES.rom, offset + selectedTile * 8 + 6))
                 return;
 
+            if (MainWindow.undos.Count == Const.MaxUndo)
+                MainWindow.undos.RemoveAt(0);
+            MainWindow.undos.Add(Undo.CreateTile32Undo((ushort)selectedTile, BinaryPrimitives.ReadUInt64LittleEndian(SNES.rom.AsSpan(offset + selectedTile * 8))));
+
             BinaryPrimitives.WriteUInt16LittleEndian(SNES.rom.AsSpan(offset + selectedTile * 8 + 6), (ushort)(int)e.NewValue);
             SNES.edit = true;
             DrawTile();
+            DrawTiles();
             UpdateTile16SelectionUI();
 
             MainWindow.window.layoutE.DrawLayout();

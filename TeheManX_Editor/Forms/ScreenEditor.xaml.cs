@@ -255,7 +255,7 @@ namespace TeheManX_Editor.Forms
             Grid.SetRowSpan(screenCursor16, 1);
             screenCursor16.Visibility = Visibility.Hidden;
         }
-        private void Update32x32TileList(bool allScreen = false) //Get the 16x16 Tile Screen Data and Create a list of 32x32 Tiles
+        public void Update32x32TileList(bool allScreen = false) //Get the 16x16 Tile Screen Data and Create a list of 32x32 Tiles
         {
             tiles32.Clear();
 
@@ -289,7 +289,7 @@ namespace TeheManX_Editor.Forms
                 }
             }
         }
-        private void Update32x32TileCountText()
+        public void Update32x32TileCountText()
         {
             if (tiles32.Count == pastTiles32Count) return;
             tile32CountTextBlock.Text = $"32x32 Tile Count:{tiles32.Count:X3}";

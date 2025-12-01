@@ -1,9 +1,5 @@
 ﻿using System;
 using System.Buffers.Binary;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TeheManX_Editor.Forms;
 
 namespace TeheManX_Editor
@@ -17,7 +13,8 @@ namespace TeheManX_Editor
             Layout,
             Screen,
             X32,
-            X16
+            X16,
+            Collision
         }
         #endregion Constants
 
@@ -29,7 +26,7 @@ namespace TeheManX_Editor
         #region Methods
         public static void ApplyUndo(Undo undo)
         {
-            switch ((UndoType)undo.type)
+            switch (undo.type)
             {
                 case UndoType.Layout:
                     undo.ApplyLayoutUndo();
@@ -38,21 +35,22 @@ namespace TeheManX_Editor
                     undo.ApplyScreenUndo();
                     break;
                 case UndoType.X32:
-                    //undo.ApplyX32Undo();
+                    undo.ApplyTile32Undo();
                     break;
                 case UndoType.X16:
-                    //undo.ApplyX16Undo();
+                    undo.ApplyTile16Undo();
+                    break;
+                case UndoType.Collision:
+                    undo.ApplyTileCollisionUndo();
                     break;
             }
         }
-        /*Layout Undo*/
         internal static Undo CreateLayoutUndo(int offset)
         {
             Undo undo = new Undo();
-            undo.type = 0; // Layout Undo Type
             byte[] undoData = new byte[0x6];
             BinaryPrimitives.WriteInt32LittleEndian(undoData.AsSpan(0), offset);
-            undoData[4] = (byte)Level.Id;
+            undoData[4] = (byte)Level.BG;
             undoData[5] = Level.Layout[Level.Id, Level.BG, offset];
             undo.data = undoData;
             undo.type = UndoType.Layout;
@@ -62,9 +60,8 @@ namespace TeheManX_Editor
         {
             int offset = BinaryPrimitives.ReadInt32LittleEndian(this.data.AsSpan(0));
             int layoutId = this.data[4];
-            byte previousTile = this.data[5];
-            byte currentTile = Level.Layout[layoutId, Level.BG, offset];
-            Level.Layout[layoutId, Level.BG, offset] = previousTile;
+            byte previousScreen = this.data[5];
+            Level.Layout[Level.Id, layoutId, offset] = previousScreen;
             SNES.edit = true;
 
             if (Level.BG == layoutId)
@@ -73,7 +70,6 @@ namespace TeheManX_Editor
                 MainWindow.window.enemyE.DrawLayout();
             }
         }
-        /*Screen Undo*/
         internal static Undo CreateScreenUndo(byte screen, byte x, byte y)
         {
             byte[] undoData = new byte[7];
@@ -183,10 +179,107 @@ namespace TeheManX_Editor
                         }
                     }
                 }
+                MainWindow.window.screenE.Update32x32TileList();
+                MainWindow.window.screenE.Update32x32TileCountText();
                 MainWindow.window.screenE.DrawScreen16();
             }
+        }
+        internal static Undo CreateTile32Undo(ushort tileId32,ulong val)
+        {
+            byte[] undoData = new byte[11];
+            BinaryPrimitives.WriteUInt16LittleEndian(undoData.AsSpan(), tileId32);
+            BinaryPrimitives.WriteUInt64LittleEndian(undoData.AsSpan(2), val);
+            undoData[10] = (byte)Level.BG;
+
+            return new Undo() { data = undoData, type = UndoType.X32 };
+        }
+        internal void ApplyTile32Undo()
+        {
+            ushort tileId32 = BinaryPrimitives.ReadUInt16LittleEndian(data.AsSpan());
+            ulong previousVal = BinaryPrimitives.ReadUInt64LittleEndian(data.AsSpan(2));
+
+            byte layerBG = data[10];
+
+            int offset = SNES.CpuToOffset(BitConverter.ToInt32(SNES.rom, Const.Tile32DataPointersOffset[layerBG] + Level.Id * 3));
+            BinaryPrimitives.WriteUInt64LittleEndian(SNES.rom.AsSpan(offset + tileId32 * 8), previousVal);
+            SNES.edit = true;
 
 
+            MainWindow.window.layoutE.DrawLayout();
+            MainWindow.window.layoutE.DrawScreen();
+            if (!MainWindow.window.screenE.mode16)
+            {
+                MainWindow.window.screenE.DrawScreen();
+                MainWindow.window.screenE.DrawTiles();
+                MainWindow.window.screenE.DrawTile();
+            }
+            MainWindow.window.tile32E.DrawTiles();
+            if (MainWindow.window.tile32E.selectedTile == tileId32)
+            {
+                MainWindow.window.tile32E.UpdateTile32Ints(offset);
+                MainWindow.window.tile32E.UpdateTile16SelectionUI();
+                MainWindow.window.tile32E.DrawTile();
+            }
+            MainWindow.window.enemyE.DrawLayout();
+        }
+        internal static Undo CreateTile16Undo(ushort tileId16, ulong val)
+        {
+            byte[] undoData = new byte[11];
+            BinaryPrimitives.WriteUInt16LittleEndian(undoData.AsSpan(), tileId16);
+            BinaryPrimitives.WriteUInt64LittleEndian(undoData.AsSpan(2), val);
+            undoData[10] = (byte)Level.BG;
+
+            return new Undo() { data = undoData, type = UndoType.X16 };
+        }
+        internal void ApplyTile16Undo()
+        {
+            ushort tileId16 = BinaryPrimitives.ReadUInt16LittleEndian(data.AsSpan());
+            ulong previousVal = BinaryPrimitives.ReadUInt64LittleEndian(data.AsSpan(2));
+
+            byte layerBG = data[10];
+
+            int offset = SNES.CpuToOffset(BitConverter.ToInt32(SNES.rom, Const.Tile16DataPointersOffset[layerBG] + Level.Id * 3));
+            BinaryPrimitives.WriteUInt64LittleEndian(SNES.rom.AsSpan(offset + tileId16 * 8), previousVal);
+            SNES.edit = true;
+
+
+            MainWindow.window.layoutE.DrawLayout();
+            MainWindow.window.layoutE.DrawScreen();
+            if (!MainWindow.window.screenE.mode16)
+            {
+                MainWindow.window.screenE.DrawScreen();
+                MainWindow.window.screenE.DrawTiles();
+                MainWindow.window.screenE.DrawTile();
+            }
+            MainWindow.window.tile32E.DrawTiles();
+            MainWindow.window.tile32E.DrawTile();
+            MainWindow.window.tile16E.Draw16xTiles();
+            if (MainWindow.window.tile16E.selectedTile == tileId16)
+            {
+                MainWindow.window.tile16E.UpdateTileAttributeUI();
+                MainWindow.window.tile16E.UpdateTile8SelectionUI();
+                MainWindow.window.tile16E.DrawTile();
+            }
+            MainWindow.window.enemyE.DrawLayout();
+        }
+        internal static Undo CreateCollisionUndo(ushort tileId16, byte val)
+        {
+            byte[] undoData = new byte[3];
+            undoData[0] = val;
+            BinaryPrimitives.WriteUInt16LittleEndian(undoData.AsSpan(1), tileId16);
+
+            return new Undo() { data = undoData , type = UndoType.Collision};
+        }
+        internal void ApplyTileCollisionUndo()
+        {
+            int offset = SNES.CpuToOffset(BitConverter.ToInt32(SNES.rom, Const.TileCollisionDataPointersOffset + Level.Id * 3));
+            ushort tileId16 = BinaryPrimitives.ReadUInt16LittleEndian(data.AsSpan(1));
+            offset += tileId16;
+            SNES.rom[offset] = data[0];
+            SNES.edit = true;
+
+            if (MainWindow.window.tile16E.selectedTile == tileId16)
+                MainWindow.window.tile16E.collisionInt.Value = data[0];
         }
         #endregion Methods
     }
