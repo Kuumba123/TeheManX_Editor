@@ -54,7 +54,7 @@
                             <Button Click="MMX1_DecompressClick">Decompress Tiles</Button>
                             <Button Click="MMX1_CompressClick" Grid.Column="1">Compress Tiles</Button>
                             <Button Click="MMX1_ReplaceCompressClick" Grid.Row="1">Replace Compressed Tiles</Button>
-                            <Button Grid.Row="1" Grid.Column="1">Edit Palette</Button>
+                            <Button Grid.Row="1" Grid.Column="1" Click="MMX1_PaletteEditorClick">Edit Palette</Button>
                         </Grid>
                     </StackPanel>
                 </Expander>
@@ -75,7 +75,7 @@
                             <Button Click="MMX2_DecompressClick">Decompress Tiles</Button>
                             <Button Click="MMX2_CompressClick" Grid.Column="1">Compress Tiles</Button>
                             <Button Click="MMX2_ReplaceCompressClick" Grid.Row="1">Replace Compressed Tiles</Button>
-                            <Button Grid.Row="1" Grid.Column="1">Edit Palette</Button>
+                            <Button Grid.Row="1" Grid.Column="1" Click="MMX1_PaletteEditorClick">Edit Palette</Button>
                         </Grid>
                     </StackPanel>
                 </Expander>
@@ -96,7 +96,7 @@
                             <Button Click="MMX2_DecompressClick">Decompress Tiles</Button>
                             <Button Click="MMX2_CompressClick" Grid.Column="1">Compress Tiles</Button>
                             <Button Click="MMX2_ReplaceCompressClick" Grid.Row="1">Replace Compressed Tiles</Button>
-                            <Button Grid.Row="1" Grid.Column="1">Edit Palette</Button>
+                            <Button Grid.Row="1" Grid.Column="1" Click="MMX1_PaletteEditorClick">Edit Palette</Button>
                         </Grid>
                     </StackPanel>
                 </Expander>
