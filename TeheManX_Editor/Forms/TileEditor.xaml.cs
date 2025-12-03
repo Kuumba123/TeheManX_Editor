@@ -24,7 +24,7 @@ namespace TeheManX_Editor.Forms
         #region Methods
         public void AssignLimits()
         {
-            if (Level.Id >= Const.PlayableLevelsCount)
+            if (Level.Id >= Const.PlayableLevelsCount || (Const.Id == Const.GameId.MegaManX3 && Level.Id > 0xE))
             {
                 // Disable UI
                 MainWindow.window.tileE.bgTileSetInt.IsEnabled = false;
@@ -35,14 +35,22 @@ namespace TeheManX_Editor.Forms
                 return;
             }
 
-            // Take of Background Tile UI
+            // Enable Background Tile UI
             MainWindow.window.tileE.bgTileSetInt.IsEnabled = true;
 
 
             //Get Max Amount of BG Tile Settings
-            ushort[] offsets = new ushort[Const.PlayableLevelsCount];
+            int id;
+            if (Const.Id == Const.GameId.MegaManX3 && Level.Id > 0xE) id = (Level.Id - 0xF) + 2; //Buffalo or Beetle
+            else id = Level.Id;
+
+            int maxLevels;
+            if (Const.Id == Const.GameId.MegaManX3) maxLevels = 0xF;
+            else maxLevels = Const.PlayableLevelsCount;
+
+            ushort[] offsets = new ushort[maxLevels];
             Buffer.BlockCopy(SNES.rom, Const.BackgroundTileInfoOffset, offsets, 0, offsets.Length * 2);
-            ushort toFindOffset = offsets[Level.Id];
+            ushort toFindOffset = offsets[id];
             int index = Array.IndexOf(offsets, toFindOffset);
             int maxBGTiles = ((offsets[index + 1] - toFindOffset) / 2) - 1;
 
@@ -58,7 +66,7 @@ namespace TeheManX_Editor.Forms
                 MainWindow.window.tileE.bgTileSetInt.Value = 0;
             }
             // Set Background Tile Values
-            int listOffset = BitConverter.ToUInt16(SNES.rom, Const.BackgroundTileInfoOffset + Level.Id * 2) + Const.BackgroundTileInfoOffset;
+            int listOffset = BitConverter.ToUInt16(SNES.rom, Const.BackgroundTileInfoOffset + id * 2) + Const.BackgroundTileInfoOffset;
             int offset = BitConverter.ToUInt16(SNES.rom, listOffset + (int)MainWindow.window.tileE.bgTileSetInt.Value * 2) + Const.BackgroundTileInfoOffset;
 
             if (BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset)) != 0)
@@ -102,7 +110,11 @@ namespace TeheManX_Editor.Forms
             if (Level.Id >= Const.PlayableLevelsCount || MainWindow.window.tileE.bgTileSetInt.Value == null)
                 return;
 
-            int listOffset = BitConverter.ToUInt16(SNES.rom, Const.BackgroundTileInfoOffset + Level.Id * 2) + Const.BackgroundTileInfoOffset;
+            int id;
+            if (Const.Id == Const.GameId.MegaManX3 && Level.Id > 0xE) id = (Level.Id - 0xF) + 2; //Buffalo or Beetle
+            else id = Level.Id;
+
+            int listOffset = BitConverter.ToUInt16(SNES.rom, Const.BackgroundTileInfoOffset + id * 2) + Const.BackgroundTileInfoOffset;
             int offset = BitConverter.ToUInt16(SNES.rom, listOffset + (int)MainWindow.window.tileE.bgTileSetInt.Value * 2) + Const.BackgroundTileInfoOffset;
 
             Level.TileSet = (int)MainWindow.window.tileE.bgTileSetInt.Value;
@@ -138,7 +150,12 @@ namespace TeheManX_Editor.Forms
         {
             if (e.NewValue == null || Level.Id >= Const.PlayableLevelsCount || SNES.rom == null)
                 return;
-            int listOffset = BitConverter.ToUInt16(SNES.rom, Const.BackgroundTileInfoOffset + Level.Id * 2) + Const.BackgroundTileInfoOffset;
+
+            int id;
+            if (Const.Id == Const.GameId.MegaManX3 && Level.Id > 0xE) id = (Level.Id - 0xF) + 2; //Buffalo or Beetle
+            else id = Level.Id;
+
+            int listOffset = BitConverter.ToUInt16(SNES.rom, Const.BackgroundTileInfoOffset + id * 2) + Const.BackgroundTileInfoOffset;
             int offset = BitConverter.ToUInt16(SNES.rom, listOffset + (int)MainWindow.window.tileE.bgTileSetInt.Value * 2) + Const.BackgroundTileInfoOffset;
             if (BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset)) != 0)
             {
@@ -161,7 +178,11 @@ namespace TeheManX_Editor.Forms
             if (e.NewValue == null || Level.Id >= Const.PlayableLevelsCount || SNES.rom == null)
                 return;
 
-            int listOffset = BitConverter.ToUInt16(SNES.rom, Const.BackgroundTileInfoOffset + Level.Id * 2) + Const.BackgroundTileInfoOffset;
+            int id;
+            if (Const.Id == Const.GameId.MegaManX3 && Level.Id > 0xE) id = (Level.Id - 0xF) + 2; //Buffalo or Beetle
+            else id = Level.Id;
+
+            int listOffset = BitConverter.ToUInt16(SNES.rom, Const.BackgroundTileInfoOffset + id * 2) + Const.BackgroundTileInfoOffset;
             int offset = BitConverter.ToUInt16(SNES.rom, listOffset + (int)MainWindow.window.tileE.bgTileSetInt.Value * 2) + Const.BackgroundTileInfoOffset;
 
             ushort val = (ushort)(int)e.NewValue;
@@ -177,7 +198,11 @@ namespace TeheManX_Editor.Forms
             if (e.NewValue == null || Level.Id >= Const.PlayableLevelsCount || SNES.rom == null)
                 return;
 
-            int listOffset = BitConverter.ToUInt16(SNES.rom, Const.BackgroundTileInfoOffset + Level.Id * 2) + Const.BackgroundTileInfoOffset;
+            int id;
+            if (Const.Id == Const.GameId.MegaManX3 && Level.Id > 0xE) id = (Level.Id - 0xF) + 2; //Buffalo or Beetle
+            else id = Level.Id;
+
+            int listOffset = BitConverter.ToUInt16(SNES.rom, Const.BackgroundTileInfoOffset + id * 2) + Const.BackgroundTileInfoOffset;
             int offset = BitConverter.ToUInt16(SNES.rom, listOffset + (int)MainWindow.window.tileE.bgTileSetInt.Value * 2) + Const.BackgroundTileInfoOffset;
 
             ushort val = (ushort)(int)e.NewValue;
@@ -192,6 +217,11 @@ namespace TeheManX_Editor.Forms
         {
             if (Level.Id >= Const.PlayableLevelsCount || SNES.rom == null || _suppressBgSrcBoxTextChanged)
                 return;
+
+            int id;
+            if (Const.Id == Const.GameId.MegaManX3 && Level.Id > 0xE) id = (Level.Id - 0xF) + 2; //Buffalo or Beetle
+            else id = Level.Id;
+
             int srcAddr = 0;
             try
             {
@@ -203,7 +233,7 @@ namespace TeheManX_Editor.Forms
             {
                 return;
             }
-            int listOffset = BitConverter.ToUInt16(SNES.rom, Const.BackgroundTileInfoOffset + Level.Id * 2) + Const.BackgroundTileInfoOffset;
+            int listOffset = BitConverter.ToUInt16(SNES.rom, Const.BackgroundTileInfoOffset + id * 2) + Const.BackgroundTileInfoOffset;
             int offset = BitConverter.ToUInt16(SNES.rom, listOffset + (int)MainWindow.window.tileE.bgTileSetInt.Value * 2) + Const.BackgroundTileInfoOffset;
 
 
@@ -219,7 +249,11 @@ namespace TeheManX_Editor.Forms
             if (e.NewValue == null || Level.Id >= Const.PlayableLevelsCount || SNES.rom == null)
                 return;
 
-            int listOffset = BitConverter.ToUInt16(SNES.rom, Const.BackgroundTileInfoOffset + Level.Id * 2) + Const.BackgroundTileInfoOffset;
+            int id;
+            if (Const.Id == Const.GameId.MegaManX3 && Level.Id > 0xE) id = (Level.Id - 0xF) + 2; //Buffalo or Beetle
+            else id = Level.Id;
+
+            int listOffset = BitConverter.ToUInt16(SNES.rom, Const.BackgroundTileInfoOffset + id * 2) + Const.BackgroundTileInfoOffset;
             int offset = BitConverter.ToUInt16(SNES.rom, listOffset + (int)MainWindow.window.tileE.bgTileSetInt.Value * 2) + Const.BackgroundTileInfoOffset;
 
             ushort val = (ushort)(int)e.NewValue;
@@ -235,7 +269,11 @@ namespace TeheManX_Editor.Forms
             if (Level.Id >= Const.PlayableLevelsCount || SNES.rom == null)
                 return;
 
-            int listOffset = BitConverter.ToUInt16(SNES.rom, Const.BackgroundTileInfoOffset + Level.Id * 2) + Const.BackgroundTileInfoOffset;
+            int id;
+            if (Const.Id == Const.GameId.MegaManX3 && Level.Id > 0xE) id = (Level.Id - 0xF) + 2; //Buffalo or Beetle
+            else id = Level.Id;
+
+            int listOffset = BitConverter.ToUInt16(SNES.rom, Const.BackgroundTileInfoOffset + id * 2) + Const.BackgroundTileInfoOffset;
             int offset = BitConverter.ToUInt16(SNES.rom, listOffset + (int)MainWindow.window.tileE.bgTileSetInt.Value * 2) + Const.BackgroundTileInfoOffset;
 
             if (MainWindow.window.tileE.romOffsetCheck.IsChecked == true)

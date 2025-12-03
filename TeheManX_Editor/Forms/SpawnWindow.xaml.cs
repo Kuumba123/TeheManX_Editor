@@ -22,7 +22,7 @@ namespace TeheManX_Editor.Forms
         #region Methods
         public void SetSpawnSettings()
         {
-            if (Level.Id >= Const.PlayableLevelsCount)
+            if (Level.Id >= Const.PlayableLevelsCount || (Const.Id == Const.GameId.MegaManX3 && Level.Id > 0xE))
             {
                 spawnInt.IsEnabled = false;
                 objectTileInt.IsEnabled = false;
@@ -42,26 +42,34 @@ namespace TeheManX_Editor.Forms
                 bg2IntBaseY.IsEnabled = false;
                 megaFlipInt.IsEnabled = false;
                 collisionInt.IsEnabled = false;
+
+                unknownInt.IsEnabled = false;
+                unknown2Int.IsEnabled = false;
             }
             else
             {
                 //calculate the max amount of checkpoints for the level
                 int maxCheckpoints = 0;
                 int checkpointSize = (Const.Id == Const.GameId.MegaManX) ? 0x1D : 0x1F;
-                if (Level.Id != (Const.PlayableLevelsCount - 1))
+
+                int maxLevels;
+                if (Const.Id == Const.GameId.MegaManX3) maxLevels = 0xF;
+                else maxLevels = Const.PlayableLevelsCount;
+
+                if (Level.Id != (maxLevels - 1))
                 {
                     //get the start of the next level's checkpoint list
                     int nextOffset = BitConverter.ToUInt16(SNES.rom, Const.CheckpointOffset + (Level.Id + 1) * 2);
-                    int currentOffset = BitConverter.ToUInt16(SNES.rom, Const.CheckpointOffset + Level.Id * 2); 
+                    int currentOffset = BitConverter.ToUInt16(SNES.rom, Const.CheckpointOffset + Level.Id * 2);
 
                     if (Const.Id != Const.GameId.MegaManX)
                     {
                         //Note: MegaMan X2 does not keep the offsets in order
-                        ushort[] offsetList = new ushort[Const.PlayableLevelsCount];
-                        for (int i = 0; i < Const.PlayableLevelsCount; i++)
+                        ushort[] offsetList = new ushort[maxLevels];
+                        for (int i = 0; i < maxLevels; i++)
                             offsetList[i] = BitConverter.ToUInt16(SNES.rom, Const.CheckpointOffset + i * 2);
                         Array.Sort(offsetList);
-                        nextOffset = offsetList[Array.IndexOf(offsetList,(ushort)currentOffset) + 1];
+                        nextOffset = offsetList[Array.IndexOf(offsetList, (ushort)currentOffset) + 1];
                     }
                     maxCheckpoints = ((nextOffset - currentOffset) / 2) - 1;
                 }
@@ -429,13 +437,17 @@ namespace TeheManX_Editor.Forms
                 return;
             }
             // 1st we are getting the amount of checkpoints in each level
-            byte[] checkpointsCount = new byte[Const.PlayableLevelsCount];
+            int maxLevels;
+            if (Const.Id == Const.GameId.MegaManX3) maxLevels = 0xF;
+            else maxLevels = Const.PlayableLevelsCount;
+
+            byte[] checkpointsCount = new byte[maxLevels];
 
 
-            for (int s = 0; s < Const.PlayableLevelsCount; s++)
+            for (int s = 0; s < maxLevels; s++)
             {
                 int maxCheckpoints = 0;
-                if (s != (Const.PlayableLevelsCount - 1))
+                if (s != (maxLevels - 1))
                 {
                     int nextOffset = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(Const.CheckpointOffset + (s + 1) * 2));
                     int currentOffset = BitConverter.ToUInt16(SNES.rom, Const.CheckpointOffset + s * 2);
@@ -443,8 +455,8 @@ namespace TeheManX_Editor.Forms
                     if (true)
                     {
                         //Note: MegaMan X2 does not keep the offsets in order
-                        ushort[] offsetList = new ushort[Const.PlayableLevelsCount];
-                        for (int i = 0; i < Const.PlayableLevelsCount; i++)
+                        ushort[] offsetList = new ushort[maxLevels];
+                        for (int i = 0; i < maxLevels; i++)
                             offsetList[i] = BitConverter.ToUInt16(SNES.rom, Const.CheckpointOffset + i * 2);
                         Array.Sort(offsetList);
                         nextOffset = offsetList[Array.IndexOf(offsetList, (ushort)currentOffset) + 1];
@@ -482,7 +494,7 @@ namespace TeheManX_Editor.Forms
                 if (numInt.Value == null)
                     return;
                 int total = 0;
-                for (int i = 0; i < Const.PlayableLevelsCount; i++)
+                for (int i = 0; i < maxLevels; i++)
                 {
                     if (i != Level.Id)
                         total += checkpointsCount[i];
@@ -495,7 +507,7 @@ namespace TeheManX_Editor.Forms
                     return;
                 }
                 //update the current level's max checkpoints
-                List<byte[]>[] checkpointData = new List<byte[]>[Const.PlayableLevelsCount];
+                List<byte[]>[] checkpointData = new List<byte[]>[maxLevels];
 
                 // initialize each List<>
                 for (int i = 0; i < checkpointData.Length; i++)
@@ -504,7 +516,7 @@ namespace TeheManX_Editor.Forms
                 int checkpointSize = (Const.Id == Const.GameId.MegaManX) ? 0x1D : 0x1F;
 
                 // now fill in the orignal checkpoint data
-                for (int s = 0; s < Const.PlayableLevelsCount; s++)
+                for (int s = 0; s < maxLevels; s++)
                 {
                     int first = BitConverter.ToUInt16(SNES.rom, Const.CheckpointOffset + s * 2);
                     int listOffset = BitConverter.ToUInt16(SNES.rom, Const.CheckpointOffset + s * 2) + Const.CheckpointOffset;
@@ -531,11 +543,11 @@ namespace TeheManX_Editor.Forms
                 }
 
                 // Now test outputting the checkpoint data
-                int checkpointDataStartOffset = Const.CheckpointOffset + Const.PlayableLevelsCount * 2 + Const.MaxTotalCheckpoints * 2;
-                int checkpointPointersStartOffset = Const.CheckpointOffset + Const.PlayableLevelsCount * 2;
+                int checkpointDataStartOffset = Const.CheckpointOffset + maxLevels * 2 + Const.MaxTotalCheckpoints * 2;
+                int checkpointPointersStartOffset = Const.CheckpointOffset + maxLevels * 2;
 
 
-                for (int s = 0; s < Const.PlayableLevelsCount; s++)
+                for (int s = 0; s < maxLevels; s++)
                 {
                     for (int i = 0; i < checkpointData[s].Count; i++)
                     {
@@ -550,9 +562,9 @@ namespace TeheManX_Editor.Forms
 
 
                 // Now write the start of each level's checkpoint pointers
-                checkpointPointersStartOffset = Const.CheckpointOffset + Const.PlayableLevelsCount * 2;
+                checkpointPointersStartOffset = Const.CheckpointOffset + maxLevels * 2;
 
-                for (int s = 0; s < Const.PlayableLevelsCount; s++)
+                for (int s = 0; s < maxLevels; s++)
                 {
                     BinaryPrimitives.WriteUInt16LittleEndian(SNES.rom.AsSpan(Const.CheckpointOffset + s * 2), (ushort)(checkpointPointersStartOffset - Const.CheckpointOffset));
                     checkpointPointersStartOffset += checkpointData[s].Count * 2;

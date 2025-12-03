@@ -80,7 +80,12 @@ namespace TeheManX_Editor
             undoData[3] = 0; // Screen Undo Type
             undoData[4] = (byte)Level.BG;
 
-            int offset = SNES.CpuToOffset(BitConverter.ToInt32(SNES.rom, Const.ScreenDataPointersOffset[Level.BG] + Level.Id * 3));
+            int Id;
+            if (Const.Id == Const.GameId.MegaManX3 && Level.Id == 0xE) Id = 0x10; //special case for MMX3 rekt version of dophler 2
+            else if (Const.Id == Const.GameId.MegaManX3 && Level.Id > 0xE) Id = (Level.Id - 0xF) + 0xE; //Buffalo or Beetle
+            else Id = Level.Id;
+
+            int offset = SNES.CpuToOffset(BitConverter.ToInt32(SNES.rom, Const.ScreenDataPointersOffset[Level.BG] + Id * 3));
 
             ushort tileId = BitConverter.ToUInt16(SNES.rom, offset + screen * 0x80 + x * 2 + y * 16);
             BinaryPrimitives.WriteUInt16LittleEndian(undoData.AsSpan(5), tileId);
@@ -137,9 +142,15 @@ namespace TeheManX_Editor
                 byte x = this.data[1];
                 byte y = this.data[2];
                 byte layer = this.data[4];
+
+                int Id;
+                if (Const.Id == Const.GameId.MegaManX3 && Level.Id == 0xE) Id = 0x10; //special case for MMX3 rekt version of dophler 2
+                else if (Const.Id == Const.GameId.MegaManX3 && Level.Id > 0xE) Id = (Level.Id - 0xF) + 0xE; //Buffalo or Beetle
+                else Id = Level.Id;
+
                 ushort previousTileId = BinaryPrimitives.ReadUInt16LittleEndian(this.data.AsSpan(5));
                 int offset = x * 2 + y * 16 + screen * 0x80;
-                offset += SNES.CpuToOffset(BitConverter.ToInt32(SNES.rom, Const.ScreenDataPointersOffset[layer] + Level.Id * 3));
+                offset += SNES.CpuToOffset(BitConverter.ToInt32(SNES.rom, Const.ScreenDataPointersOffset[layer] + Id * 3));
                 BinaryPrimitives.WriteUInt16LittleEndian(SNES.rom.AsSpan(offset), previousTileId);
                 MainWindow.window.layoutE.DrawLayout();
                 MainWindow.window.layoutE.DrawScreen();
@@ -201,7 +212,12 @@ namespace TeheManX_Editor
 
             byte layerBG = data[10];
 
-            int offset = SNES.CpuToOffset(BitConverter.ToInt32(SNES.rom, Const.Tile32DataPointersOffset[layerBG] + Level.Id * 3));
+            int Id;
+            if (Const.Id == Const.GameId.MegaManX3 && Level.Id == 0xE) Id = 0x10; //special case for MMX3 rekt version of dophler 2
+            else if (Const.Id == Const.GameId.MegaManX3 && Level.Id > 0xE) Id = (Level.Id - 0xF) + 0xE; //Buffalo or Beetle
+            else Id = Level.Id;
+
+            int offset = SNES.CpuToOffset(BitConverter.ToInt32(SNES.rom, Const.Tile32DataPointersOffset[layerBG] + Id * 3));
             BinaryPrimitives.WriteUInt64LittleEndian(SNES.rom.AsSpan(offset + tileId32 * 8), previousVal);
             SNES.edit = true;
 
@@ -239,7 +255,12 @@ namespace TeheManX_Editor
 
             byte layerBG = data[10];
 
-            int offset = SNES.CpuToOffset(BitConverter.ToInt32(SNES.rom, Const.Tile16DataPointersOffset[layerBG] + Level.Id * 3));
+            int Id;
+            if (Const.Id == Const.GameId.MegaManX3 && Level.Id == 0xE) Id = 0x10; //special case for MMX3 rekt version of dophler 2
+            else if (Const.Id == Const.GameId.MegaManX3 && Level.Id > 0xE) Id = (Level.Id - 0xF) + 0xE; //Buffalo or Beetle
+            else Id = Level.Id;
+
+            int offset = SNES.CpuToOffset(BitConverter.ToInt32(SNES.rom, Const.Tile16DataPointersOffset[layerBG] + Id * 3));
             BinaryPrimitives.WriteUInt64LittleEndian(SNES.rom.AsSpan(offset + tileId16 * 8), previousVal);
             SNES.edit = true;
 
@@ -273,7 +294,12 @@ namespace TeheManX_Editor
         }
         internal void ApplyTileCollisionUndo()
         {
-            int offset = SNES.CpuToOffset(BitConverter.ToInt32(SNES.rom, Const.TileCollisionDataPointersOffset + Level.Id * 3));
+            int Id;
+            if (Const.Id == Const.GameId.MegaManX3 && Level.Id == 0xE) Id = 0x10; //special case for MMX3 rekt version of dophler 2
+            else if (Const.Id == Const.GameId.MegaManX3 && Level.Id > 0xE) Id = (Level.Id - 0xF) + 0xE; //Buffalo or Beetle
+            else Id = Level.Id;
+
+            int offset = SNES.CpuToOffset(BitConverter.ToInt32(SNES.rom, Const.TileCollisionDataPointersOffset + Id * 3));
             ushort tileId16 = BinaryPrimitives.ReadUInt16LittleEndian(data.AsSpan(1));
             offset += tileId16;
             SNES.rom[offset] = data[0];

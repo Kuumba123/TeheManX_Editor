@@ -140,10 +140,9 @@ namespace TeheManX_Editor.Forms
                     int r = Grid.GetRow(sender as UIElement);
 
                     int id;
-                    if (Const.Id == Const.GameId.MegaManX3 && Level.Id == 0xE)
-                        id = 0xB; //special case for MMX3 rekt version of dophler 2
-                    else
-                        id = Level.Id;
+                    if (Const.Id == Const.GameId.MegaManX3 && Level.Id == 0xE) id = 0xB; //special case for MMX3 rekt version of dophler 2
+                    else if (Const.Id == Const.GameId.MegaManX3 && Level.Id > 0xE) id = (Level.Id - 0xF) + 2;
+                    else id = Level.Id;
 
                     int infoOffset = SNES.CpuToOffset(BitConverter.ToUInt16(SNES.rom, Const.PaletteInfoOffset + id * 2 + Const.PaletteStageBase), Const.PaletteBank);
 

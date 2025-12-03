@@ -31,7 +31,12 @@ namespace TeheManX_Editor
         }
         public static unsafe void Draw16xTile(int id, int x, int y, int stride, IntPtr dest)
         {
-            int offset = SNES.CpuToOffset(BinaryPrimitives.ReadInt32LittleEndian(SNES.rom.AsSpan(Const.Tile16DataPointersOffset[BG] + Id * 3)) + id * 8);
+            int stageId;
+            if (Const.Id == Const.GameId.MegaManX3 && Id == 0xE) stageId = 0x10; //special case for MMX3 rekt version of dophler 2
+            else if (Const.Id == Const.GameId.MegaManX3 && Id > 0xE) stageId = (Id - 0xF) + 0xE; //Buffalo or Beetle
+            else stageId = Id;
+
+            int offset = SNES.CpuToOffset(BinaryPrimitives.ReadInt32LittleEndian(SNES.rom.AsSpan(Const.Tile16DataPointersOffset[BG] + stageId * 3)) + id * 8);
             byte* buffer = (byte*)dest;
 
             Color backColor = Palette[0, 0];
@@ -82,8 +87,13 @@ namespace TeheManX_Editor
         }
         public static unsafe void DrawScreen(int s, int stride, IntPtr ptr)
         {
-            int offset = SNES.CpuToOffset(BinaryPrimitives.ReadInt32LittleEndian(SNES.rom.AsSpan(Const.ScreenDataPointersOffset[BG] + Id * 3))) + s * 0x80;
-            int tile32Offset = SNES.CpuToOffset(BinaryPrimitives.ReadInt32LittleEndian(SNES.rom.AsSpan(Const.Tile32DataPointersOffset[BG] + Id * 3)));
+            int id;
+            if (Const.Id == Const.GameId.MegaManX3 && Id == 0xE) id = 0x10; //special case for MMX3 rekt version of dophler 2
+            else if (Const.Id == Const.GameId.MegaManX3 && Id > 0xE) id = (Id - 0xF) + 0xE; //Buffalo or Beetle
+            else id = Id;
+
+            int offset = SNES.CpuToOffset(BinaryPrimitives.ReadInt32LittleEndian(SNES.rom.AsSpan(Const.ScreenDataPointersOffset[BG] + id * 3))) + s * 0x80;
+            int tile32Offset = SNES.CpuToOffset(BinaryPrimitives.ReadInt32LittleEndian(SNES.rom.AsSpan(Const.Tile32DataPointersOffset[BG] + id * 3)));
 
             for (int y = 0; y < 8; y++)
             {
@@ -100,8 +110,13 @@ namespace TeheManX_Editor
         }
         public static unsafe void DrawScreen(int s,int drawX,int drawY, int stride, IntPtr ptr)
         {
-            int offset = SNES.CpuToOffset(BinaryPrimitives.ReadInt32LittleEndian(SNES.rom.AsSpan(Const.ScreenDataPointersOffset[BG] + Id * 3))) + s * 0x80;
-            int tile32Offset = SNES.CpuToOffset(BinaryPrimitives.ReadInt32LittleEndian(SNES.rom.AsSpan(Const.Tile32DataPointersOffset[BG] + Id * 3)));
+            int id;
+            if (Const.Id == Const.GameId.MegaManX3 && Id == 0xE) id = 0x10; //special case for MMX3 rekt version of dophler 2
+            else if (Const.Id == Const.GameId.MegaManX3 && Id > 0xE) id = (Id - 0xF) + 0xE; //Buffalo or Beetle
+            else id = Id;
+
+            int offset = SNES.CpuToOffset(BinaryPrimitives.ReadInt32LittleEndian(SNES.rom.AsSpan(Const.ScreenDataPointersOffset[BG] + id * 3))) + s * 0x80;
+            int tile32Offset = SNES.CpuToOffset(BinaryPrimitives.ReadInt32LittleEndian(SNES.rom.AsSpan(Const.Tile32DataPointersOffset[BG] + id * 3)));
 
             for (int y = 0; y < 8; y++)
             {
@@ -134,7 +149,12 @@ namespace TeheManX_Editor
             {
                 for (int i = 0; i < Const.LevelsCount; i++)
                 {
-                    int infoOffset = SNES.CpuToOffset(BinaryPrimitives.ReadInt32LittleEndian(SNES.rom.AsSpan(Const.LayoutPointersOffset[l] + i * 3)));
+                    int id;
+                    if (Const.Id == Const.GameId.MegaManX3 && i == 0xE) id = 0x10; //special case for MMX3 rekt version of dophler 2
+                    else if (Const.Id == Const.GameId.MegaManX3 && i > 0xE) id = (i - 0xF) + 0xE; //Buffalo or Beetle
+                    else id = i;
+                    int layoutLength = 0;
+                    int infoOffset = SNES.CpuToOffset(BinaryPrimitives.ReadInt32LittleEndian(SNES.rom.AsSpan(Const.LayoutPointersOffset[l] + id * 3)));
 
                     Array.Clear(temp, 0, temp.Length);
                     int destIndex = 0;
@@ -146,12 +166,15 @@ namespace TeheManX_Editor
                     temp[0] = SNES.rom[infoOffset];     //width
                     temp[1] = SNES.rom[infoOffset + 1]; //height
                     temp[2] = SNES.rom[infoOffset + 2]; //screen count (not needed for layout but is nice to know)
+                    Const.ScreenCount[i, l] = temp[2];
                     infoOffset += 3;
+                    layoutLength += 3;
 
                     while (true)
                     {
                         controlB = SNES.rom[infoOffset];
                         infoOffset++;
+                        layoutLength++;
 
                         if (controlB == 0xFF)
                             break;
@@ -161,6 +184,7 @@ namespace TeheManX_Editor
 
                         controlB = SNES.rom[infoOffset];
                         infoOffset++;
+                        layoutLength++;
 
                         //Write Loop
                         while (count != 0)
@@ -246,12 +270,13 @@ namespace TeheManX_Editor
                 int repeatCount = 1;
                 int incCount = 1;
 
-                // Measure repeat and increment runs
+                // Measure repeat runs
                 while (i + repeatCount < total &&
                        data[i + repeatCount] == start &&
                        repeatCount < 0x7F)
                     repeatCount++;
 
+                // Measure increment runs
                 while (i + incCount < total &&
                        data[i + incCount] == (byte)(data[i + incCount - 1] + 1) &&
                        incCount < 0x7F)
@@ -304,7 +329,11 @@ namespace TeheManX_Editor
                         return false;
                     }
                     //Save Layout to Rom
-                    int offset = SNES.CpuToOffset(BinaryPrimitives.ReadInt32LittleEndian(SNES.rom.AsSpan(Const.LayoutPointersOffset[l] + i * 3)));
+                    int id;
+                    if (Const.Id == Const.GameId.MegaManX3 && i == 0xE) id = 0x10; //special case for MMX3 rekt version of dophler 2
+                    else if (Const.Id == Const.GameId.MegaManX3 && i > 0xE) id = (i - 0xF) + 0xE; //Buffalo or Beetle
+                    else id = i;
+                    int offset = SNES.CpuToOffset(BinaryPrimitives.ReadInt32LittleEndian(SNES.rom.AsSpan(Const.LayoutPointersOffset[l] + id * 3)));
                     Array.Copy(compressedLayout, 0, SNES.rom, offset, compressedLayout.Length);
                 }
             }
@@ -325,6 +354,8 @@ namespace TeheManX_Editor
             {
                 for (int i = 0; i < Const.PlayableLevelsCount; i++)
                 {
+                    if (Const.Id == Const.GameId.MegaManX3 && i > 0xE) break; // Buffalo or Beetle
+
                     stage = i;
                     Enemies[i].Clear();
                     //Get Address of Enemy Data
@@ -379,6 +410,8 @@ namespace TeheManX_Editor
         {
             for (int id = 0; id < Const.PlayableLevelsCount; id++)
             {
+                if (Const.Id == Const.GameId.MegaManX3 && id > 0xE) break; //Buffalo or Beetle
+
                 List<Enemy> sorted = Enemies[id].OrderBy(e => e.Column).ToList();
 
                 MemoryStream ms = new MemoryStream(0x660);
@@ -449,10 +482,9 @@ namespace TeheManX_Editor
             if (Id < Const.PlayableLevelsCount)
             {
                 int id;
-                if (Const.Id == Const.GameId.MegaManX3 && Id == 0xE)
-                    id = 0xB; //special case for MMX3 rekt version of dophler 2
-                else
-                    id = Id;
+                if (Const.Id == Const.GameId.MegaManX3 && Id == 0xE) id = 0xB; //special case for MMX3 rekt version of dophler 2
+                else if (Const.Id == Const.GameId.MegaManX3 && Id > 0xE) id = (Id - 0xF) + 2;
+                else id = Id;
 
                 int infoOffset = SNES.CpuToOffset(BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(Const.PaletteInfoOffset + id * 2 + Const.PaletteStageBase)), Const.PaletteBank);
 
@@ -502,7 +534,11 @@ namespace TeheManX_Editor
         public static void LoadDynamicBackgroundTiles()
         {
             //Load Dynamic Background Tiles
-            int stageOffset = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(Const.BackgroundTileInfoOffset + Id * 2)) + Const.BackgroundTileInfoOffset;
+            int id;
+            if (Const.Id == Const.GameId.MegaManX3 && Id > 0xE) id = (Id & 1) + 2; //Buffalo or Beetle
+            else id = Id;
+            
+            int stageOffset = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(Const.BackgroundTileInfoOffset + id * 2)) + Const.BackgroundTileInfoOffset;
             int offset = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(stageOffset + TileSet * 2)) + Const.BackgroundTileInfoOffset;
 
             ushort transferSize = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset));
@@ -566,10 +602,9 @@ namespace TeheManX_Editor
         public static void DecompressLevelTiles() //also loads dynamic background tiles and pallete data for those tiles
         {
             int id;
-            if (Const.Id == Const.GameId.MegaManX3 && Id == 0xE)
-                id = 0xB; //special case for MMX3 rekt version of dophler 2
-            else
-                id = Id;
+            if (Const.Id == Const.GameId.MegaManX3 && Id == 0xE) id = 0xB; //special case for MMX3 rekt version of dophler 2
+            else if (Const.Id == Const.GameId.MegaManX3 && Id > 0xE) id = (Id - 0xF) + 2; //Buffalo or Beetle
+            else id = Id;
 
             int infoOffset = SNES.CpuToOffset(BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(Const.LoadTileSetInfoOffset + id * 2 + Const.LoadTileSetStageBase)), Const.LoadTileSetBank);
 
@@ -682,6 +717,6 @@ namespace TeheManX_Editor
                 }
             }
         }
-    }
         #endregion Methods
+    }
 }

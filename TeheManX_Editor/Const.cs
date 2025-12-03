@@ -64,7 +64,7 @@
         public static int TileCollisionDataPointersOffset;
 
         public static byte[,] LayoutLength;
-        public static int[,] ScreenCount;
+        public static int[,] ScreenCount = new int[MaxLevels, 2];
         public static int[,] Tile32Count;
         public static int[,] Tile16Count;
         public static int[] EnemiesLength;
@@ -203,46 +203,6 @@
                     {0x08, 0x08 },
                     {0x06, 0x08 },
                     {0x06, 0x08 }
-};
-            public static readonly int[,] ScreenCount = new int[0x25, 2]
-{
-                    {0x24, 0x15 },
-                    {0x35, 0xF  },
-                    {0x3D, 0xD  },
-                    {0x39, 0x20 },
-                    {0x33, 0x14 },
-                    {0x3A, 0x4  },
-                    {0x30, 0x16 },
-                    {0x2A, 0x11 },
-                    {0x37, 0x13 },
-                    {0x24, 0xF  },
-                    {0x1E, 0x10 },
-                    {0x18, 0x5  },
-                    {0x3 , 0x2  },
-                    {0x33, 0xD  },
-                    {0x2 , 0x2  },
-                    {0x2 , 0x2  },
-                    {0x2 , 0x2  },
-                    {0x2 , 0x2  },
-                    {0x2 , 0x2  },
-                    {0x2 , 0x2  },
-                    {0x2 , 0x2  },
-                    {0x2 , 0x2  },
-                    {0x2 , 0x2  },
-                    {0x2 , 0x2  },
-                    {0x2 , 0x2  },
-                    {0x2 , 0x2  },
-                    {0x2 , 0x2  },
-                    {0x3 , 0x3  },
-                    {0x3 , 0x3  },
-                    {0x3 , 0x3  },
-                    {0x3 , 0x3  },
-                    {0x3 , 0x3  },
-                    {0x3 , 0x3  },
-                    {0x3 , 0x3  },
-                    {0x3 , 0x3  },
-                    {0x2 , 0x3  },
-                    {0xE , 0x3  }
 };
             public static readonly int[,] Tile32Count = new int[0x25, 2]
             {
@@ -390,7 +350,7 @@
                 public const int BackgroundTileInfoOffset = 0x31D6B;
             }
             public static readonly byte[,] LayoutLength = new byte[0x1B, 2]
-{
+            {
                     {0x8C, 0x20 },
                     {0x3E, 0x24 },
                     {0x38, 0x24 },
@@ -418,39 +378,9 @@
                     {0x5C, 0x54 },
                     {0x5C, 0x54 },
                     {0x5C, 0x54 }
-};
-            public static readonly int[,] ScreenCount = new int[0x1B, 2]
-{
-                    {0x2A, 0xF  },
-                    {0x3A, 0x20 },
-                    {0x2E, 0x7  },
-                    {0x3B, 0x1E },
-                    {0x31, 0x19 },
-                    {0x3F, 0xE  },
-                    {0x36, 0x4  },
-                    {0x3E, 0x16 },
-                    {0x3C, 0x1A },
-                    {0x36, 0x4  },
-                    {0x1E, 0x5  },
-                    {0x27, 0x3  },
-                    {0x16, 0x7  },
-                    {0x3B, 0x20 },
-                    {0x3F, 0xE  },
-                    {0x3F, 0xE  },
-                    {0x3F, 0xE  },
-                    {0x3F, 0xE  },
-                    {0x3F, 0xE  },
-                    {0x3F, 0xE  },
-                    {0x3F, 0xE  },
-                    {0x3F, 0xE  },
-                    {0x3F, 0xE  },
-                    {0x3F, 0xE  },
-                    {0x3F, 0xE  },
-                    {0x3F, 0xE  },
-                    {0x3F, 0xE  }
-};
+            };
             public static readonly int[,] Tile32Count = new int[0x1B, 2]
-{
+            {
                     {0x1C8, 0xF6},
                     {0x36E, 0x51},
                     {0x257, 0x61},
@@ -478,9 +408,9 @@
                     {0x1E6, 0x84},
                     {0x1E6, 0x84},
                     {0x1E6, 0x84}
-};
+            };
             public static readonly int[,] Tile16Count = new int[0x1B, 2]
-{
+            {
                     {0x3A3,  0x394 },
                     {0x3B3,  0x3B1 },
                     {0x2F0,  0x2E8 },
@@ -528,8 +458,8 @@
         }
         public static class MegaManX3
         {
-            public const int LevelsCount = 0x25;
-            public const int PlayableLevelsCount = 0xF;
+            public const int LevelsCount = 0x11;
+            public const int PlayableLevelsCount = 0x11;
 
             public const int CompressedTilesAmount = 0xDD;
 
@@ -560,87 +490,27 @@
 
             public const int BankCount = 64;
 
-            public static readonly byte[,] LayoutLength = new byte[0x25, 2]
-{
-                    {0x4C, 0x3A },
-                    {0x4C, 0x26 },
-                    {0x38, 0x36 },
-                    {0x42, 0x0E },
-                    {0x60, 0x42 },
-                    {0x54, 0x42 },
-                    {0x4E, 0x32 },
-                    {0x52, 0x1C },
-                    {0x30, 0x1C },
-                    {0x2E, 0x3A },
-                    {0x4E, 0x40 },
-                    {0x46, 0x20 },
-                    {0x22, 0x10 },
-                    {0x2A, 0x0A },
-                    {0x38, 0x36 },
-                    {0, 0 },
-                    {0x46, 0x20 },
-                    {0x4C, 0x26 },
-                    {0x4C, 0x26 },
-                    {0x4C, 0x26 },
-                    {0x4C, 0x26 },
-                    {0x4C, 0x26 },
-                    {0x4C, 0x26 },
-                    {0x4C, 0x26 },
-                    {0x4C, 0x26 },
-                    {0x4C, 0x26 },
-                    {0x4C, 0x26 },
-                    {0x4C, 0x26 },
-                    {0x4C, 0x26 },
-                    {0x4C, 0x26 },
-                    {0x4C, 0x26 },
-                    {0x4C, 0x26 },
-                    {0x4C, 0x26 },
-                    {0x4C, 0x26 },
-                    {0x4C, 0x26 },
-                    {0x4C, 0x26 },
-                    {0x4C, 0x26 }
-};
-            public static readonly int[,] ScreenCount = new int[0x25, 2]
-{
-                    {0x24, 0x1E },
-                    {0x3E, 0x9  },
-                    {0x32, 0x1F },
-                    {0x3B, 0x7  },
-                    {0x3B, 0x1E },
-                    {0x3C, 0xE  },
-                    {0x35, 0xF  },
-                    {0x2F, 0xA  },
-                    {0x36, 0x19 },
-                    {0x23, 0x7  },
-                    {0x2F, 0xD  },
-                    {0x30, 0x7  },
-                    {0x1C, 0x3  },
-                    {0x17, 0x3  },
-                    {0x32, 0x1F },
-                    {0x3B, 0x7  },
-                    {0x30, 0x7  },
-                    {0x3E, 0x9  },
-                    {0x3E, 0x9  },
-                    {0x3E, 0x9  },
-                    {0x3E, 0x9  },
-                    {0x3E, 0x9  },
-                    {0x3E, 0x9  },
-                    {0x3E, 0x9  },
-                    {0x3E, 0x9  },
-                    {0x3E, 0x9  },
-                    {0x3E, 0x9  },
-                    {0x3E, 0x9  },
-                    {0x3E, 0x9  },
-                    {0x3E, 0x9  },
-                    {0x3E, 0x9  },
-                    {0x3E, 0x9  },
-                    {0x3E, 0x9  },
-                    {0x3E, 0x9  },
-                    {0x3E, 0x9  },
-                    {0x3E, 0x9  },
-                    {0x3E, 0x9  }
-};
-            public static readonly int[,] Tile32Count = new int[0x25, 2]
+            public static readonly byte[,] LayoutLength = new byte[0x11, 2]
+            {
+                    {0x4C, 0x3A }, 
+                    {0x4C, 0x26 }, 
+                    {0x38, 0x36 }, 
+                    {0x42, 0x0E }, 
+                    {0x60, 0x42 }, 
+                    {0x54, 0x42 }, 
+                    {0x4E, 0x32 }, 
+                    {0x52, 0x1C }, 
+                    {0x30, 0x1C }, 
+                    {0x2E, 0x3A }, 
+                    {0x4E, 0x40 }, 
+                    {0x46, 0x20 }, 
+                    {0x22, 0x10 }, 
+                    {0x2A, 0x0A }, 
+                    {0x46, 0x20 }, 
+                    {0x38, 0x36 }, 
+                    {0x42, 0x0E }
+            };
+            public static readonly int[,] Tile32Count = new int[0x11, 2]
             {
                     { 0x2FF, 0x11C  },
                     { 0x54C, 0x79   },
@@ -656,31 +526,11 @@
                     { 0x335, 0x8C   },
                     { 0x205, 0x3B   },
                     { 0x1E1, 0x44   },
-                    { 0x4E8, 0x184  },
-                    { 0x3F7, 0x78   },
                     { 0x528, 0x8C   },
-                    { 0x54C, 0x79   },
-                    { 0x54C, 0x79   },
-                    { 0x54C, 0x79   },
-                    { 0x54C, 0x79   },
-                    { 0x54C, 0x79   },
-                    { 0x54C, 0x79   },
-                    { 0x54C, 0x79   },
-                    { 0x54C, 0x79   },
-                    { 0x54C, 0x79   },
-                    { 0x54C, 0x79   },
-                    { 0x54C, 0x79   },
-                    { 0x54C, 0x79   },
-                    { 0x54C, 0x79   },
-                    { 0x54C, 0x79   },
-                    { 0x54C, 0x79   },
-                    { 0x54C, 0x79   },
-                    { 0x54C, 0x79   },
-                    { 0x54C, 0x79   },
-                    { 0x54C, 0x79   },
-                    { 0x54C, 0x79   }
+                    { 0x4E8, 0x184  },
+                    { 0x3F7, 0x78   }
             };
-            public static readonly int[,] Tile16Count = new int[0x25, 2]
+            public static readonly int[,] Tile16Count = new int[0x11, 2]
 {
                     { 0x37C, 0x3FF  },
                     { 0x35D, 0x400  },
@@ -696,32 +546,12 @@
                     { 0x13F, 0x293  },
                     { 0x1F4, 0x1F3  },
                     { 0x114, 0x1B7  },
-                    { 0x2F9, 0x2E5  },
-                    { 0x34B, 0x33F  },
                     { 0x181, 0x293  },
-                    { 0x35D, 0x400  },
-                    { 0x35D, 0x400  },
-                    { 0x35D, 0x400  },
-                    { 0x35D, 0x400  },
-                    { 0x35D, 0x400  },
-                    { 0x35D, 0x400  },
-                    { 0x35D, 0x400  },
-                    { 0x35D, 0x400  },
-                    { 0x35D, 0x400  },
-                    { 0x35D, 0x400  },
-                    { 0x35D, 0x400  },
-                    { 0x35D, 0x400  },
-                    { 0x35D, 0x400  },
-                    { 0x35D, 0x400  },
-                    { 0x35D, 0x400  },
-                    { 0x35D, 0x400  },
-                    { 0x35D, 0x400  },
-                    { 0x35D, 0x400  },
-                    { 0x35D, 0x400  },
-                    { 0x35D, 0x400  }
+                    { 0x2F9, 0x2E5  },
+                    { 0x34B, 0x33F  }
             };
             public static readonly int[] EnemiesLength =
-{
+            {
                 0x2F1,
                 0x3B4,
                 0x3A7,
@@ -783,7 +613,6 @@
                 TileCollisionDataPointersOffset = MegaManX.TileCollisionDataPointersOffset;
 
                 LayoutLength = MegaManX.LayoutLength;
-                ScreenCount = MegaManX.ScreenCount;
                 Tile32Count = MegaManX.Tile32Count;
                 Tile16Count = MegaManX.Tile16Count;
                 EnemiesLength = MegaManX.EnemiesLength;
@@ -828,7 +657,6 @@
                 TileCollisionDataPointersOffset = MegaManX2.TileCollisionDataPointersOffset;
 
                 LayoutLength = MegaManX2.LayoutLength;
-                ScreenCount = MegaManX2.ScreenCount;
                 Tile32Count = MegaManX2.Tile32Count;
                 Tile16Count = MegaManX2.Tile16Count;
                 EnemiesLength = MegaManX2.EnemiesLength;
@@ -877,7 +705,6 @@
                 TileCollisionDataPointersOffset = MegaManX3.TileCollisionDataPointersOffset;
 
                 LayoutLength = MegaManX3.LayoutLength;
-                ScreenCount = MegaManX3.ScreenCount;
                 Tile32Count = MegaManX3.Tile32Count;
                 Tile16Count = MegaManX3.Tile16Count;
                 EnemiesLength = MegaManX3.EnemiesLength;
