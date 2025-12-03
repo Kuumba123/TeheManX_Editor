@@ -303,7 +303,7 @@
         }
         public static class MegaManX2
         {
-            public const int LevelsCount = 0x1B;
+            public const int LevelsCount = 0xD;
             public const int PlayableLevelsCount = 0xD;
 
             public const int CompressedTilesAmount = 0xA5;
@@ -349,7 +349,7 @@
                 public const int CheckpointOffset = 0x324C6;
                 public const int BackgroundTileInfoOffset = 0x31D6B;
             }
-            public static readonly byte[,] LayoutLength = new byte[0x1B, 2]
+            public static readonly byte[,] LayoutLength = new byte[0xD, 2]
             {
                     {0x8C, 0x20 },
                     {0x3E, 0x24 },
@@ -363,23 +363,9 @@
                     {0x5A, 0x14 },
                     {0x16, 0x10 },
                     {0x5A, 0x1E },
-                    {0x28, 0x2A },
-                    {0x40, 0x24 },
-                    {0x5C, 0x54 },
-                    {0x5C, 0x54 },
-                    {0x5C, 0x54 },
-                    {0x5C, 0x54 },
-                    {0x5C, 0x54 },
-                    {0x5C, 0x54 },
-                    {0x5C, 0x54 },
-                    {0x5C, 0x54 },
-                    {0x5C, 0x54 },
-                    {0x5C, 0x54 },
-                    {0x5C, 0x54 },
-                    {0x5C, 0x54 },
-                    {0x5C, 0x54 }
+                    {0x28, 0x2A }
             };
-            public static readonly int[,] Tile32Count = new int[0x1B, 2]
+            public static readonly int[,] Tile32Count = new int[0xD, 2]
             {
                     {0x1C8, 0xF6},
                     {0x36E, 0x51},
@@ -393,23 +379,9 @@
                     {0x11A, 0x26},
                     {0x124, 0x31},
                     {0x172, 0x17},
-                    {0xA5 , 0x4F},
-                    {0x1B3, 0x51},
-                    {0x1E6, 0x84},
-                    {0x1E6, 0x84},
-                    {0x1E6, 0x84},
-                    {0x1E6, 0x84},
-                    {0x1E6, 0x84},
-                    {0x1E6, 0x84},
-                    {0x1E6, 0x84},
-                    {0x1E6, 0x84},
-                    {0x1E6, 0x84},
-                    {0x1E6, 0x84},
-                    {0x1E6, 0x84},
-                    {0x1E6, 0x84},
-                    {0x1E6, 0x84}
+                    {0xA5 , 0x4F}
             };
-            public static readonly int[,] Tile16Count = new int[0x1B, 2]
+            public static readonly int[,] Tile16Count = new int[0xD, 2]
             {
                     {0x3A3,  0x394 },
                     {0x3B3,  0x3B1 },
@@ -423,21 +395,7 @@
                     {0x113,  0x113 },
                     {0xC7 ,  0xC3  },
                     {0xCE ,  0x2B  },
-                    {0x13B,  0x12F },
-                    {0x2BA,  0x3B1 },
-                    {0x28C,  0x26B },
-                    {0x28C,  0x26B },
-                    {0x28C,  0x26B },
-                    {0x28C,  0x26B },
-                    {0x28C,  0x26B },
-                    {0x28C,  0x26B },
-                    {0x28C,  0x26B },
-                    {0x28C,  0x26B },
-                    {0x28C,  0x26B },
-                    {0x28C,  0x26B },
-                    {0x28C,  0x26B },
-                    {0x28C,  0x26B },
-                    {0x28C,  0x26B }
+                    {0x13B,  0x12F }
             };
             public static readonly int[] EnemiesLength =
             {
