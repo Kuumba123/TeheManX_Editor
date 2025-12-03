@@ -14,9 +14,9 @@
         </Grid.ColumnDefinitions>
         
         <!--Layout Viewer-->
-        <Viewbox Width="auto" HorizontalAlignment="Left">
-            <Canvas x:Name="canvas" Width="768" Height="512" ClipToBounds="True" PreviewMouseMove="canvas_PreviewMouseMove" PreviewMouseUp="canvas_PreviewMouseUp">
-                <Image x:Name="layoutImage" x:FieldModifier="public"/>
+        <Viewbox Grid.ColumnSpan="2" HorizontalAlignment="Left">
+            <Canvas x:Name="canvas" Height="512" ClipToBounds="True" PreviewMouseMove="canvas_PreviewMouseMove" PreviewMouseUp="canvas_PreviewMouseUp">
+                <Image x:Name="layoutImage" x:FieldModifier="public" HorizontalAlignment="Left" VerticalAlignment="Top"/>
             </Canvas>
         </Viewbox>
         <TextBlock x:Name="camLbl" Grid.Row="0" IsHitTestVisible="False" Foreground="White" FontFamily="Consolas" Margin="5,0,0,0" HorizontalAlignment="Left" FontSize="20"></TextBlock>
