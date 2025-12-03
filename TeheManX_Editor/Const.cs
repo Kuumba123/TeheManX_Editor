@@ -26,9 +26,9 @@
         /*Expansion Constants*/
         public static readonly int[] ExpandMaxScreens = { 0x43, 0x21 };     //for MMX1 only
         public static readonly int[] ExpandMaxScreens2 = { 0x3F, 0x21 };    //for MMX2 & MMX3
-        public static readonly int[] ExpandMaxTiles32 = { 0x500, 0x300 };
+        public static readonly int[] ExpandMaxTiles32 = { 0x540, 0x300 };
         public static int ExpandMaxTiles16 = 0x600; //shared between both layers
-        public static int ExpandLayoutLength = 0x400; //for both layers
+        public static int ExpandLayoutLength = 0x300; //for both layers
 
         /*Variable Constants*/
         public static GameId Id = 0;    //Game ID (0=MMX1, 1=MMX2, 2=MMX3)
