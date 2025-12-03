@@ -286,16 +286,6 @@ namespace TeheManX_Editor
                 bool useRepeat = repeatCount >= incCount;
                 int runLength = useRepeat ? repeatCount : incCount;
 
-                // use real width for column wrapping
-                int col = i % width;
-
-                // Only skip zeros that fall outside the active width (padding)
-                if (useRepeat && start == 0 && runLength <= 3 && (col + runLength) > width)
-                {
-                    i += runLength;
-                    continue;
-                }
-
                 byte control = (byte)runLength;
                 if (useRepeat)
                     control |= 0x80;
