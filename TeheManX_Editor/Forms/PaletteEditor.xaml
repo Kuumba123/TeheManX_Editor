@@ -21,7 +21,7 @@
         <StackPanel Grid.Column="1">
             <StackPanel Orientation="Horizontal">
                 <TextBlock x:Name="palTxt" Foreground="White" FontFamily="Consolas" FontSize="20" Margin="5,0,0,0" Width="115" VerticalAlignment="Center">Palette: 0</TextBlock>
-                <Button Style="{StaticResource TileButton}">⚙️</Button>
+                <Button Style="{StaticResource TileButton}" Click="GearBtn_Click">⚙️</Button>
             </StackPanel>
             <Border BorderBrush="White" BorderThickness="2" HorizontalAlignment="Left" VerticalAlignment="Top">
                 <Grid x:Name="paletteGrid"  Width="256" Height="128">

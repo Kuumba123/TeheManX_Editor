@@ -1,11 +1,13 @@
-﻿using System.Windows.Controls;
-using System.Windows.Media.Imaging;
-using System.Windows.Media;
-using System.Windows;
-using System.Windows.Shapes;
-using System.Windows.Input;
-using System;
+﻿using System;
 using System.Buffers.Binary;
+using System.Collections.Generic;
+using System.IO;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using System.Windows.Shapes;
 
 namespace TeheManX_Editor.Forms
 {
@@ -211,6 +213,147 @@ namespace TeheManX_Editor.Forms
                 DrawVramTiles();
                 UpdateCursor();
             }
+        }
+        private void GearBtn_Click(object sender, RoutedEventArgs e)
+        {
+            if (Level.Id >= Const.PlayableLevelsCount)
+            {
+                MessageBox.Show("You can't edit palettes in this level!");
+                return;
+            }
+
+            int id;
+            if (Const.Id == Const.GameId.MegaManX3 && Level.Id == 0xE) id = 0xB; //special case for MMX3 rekt version of dophler 2
+            else if (Const.Id == Const.GameId.MegaManX3 && Level.Id > 0xE) id = (Level.Id - 0xF) + 2;
+            else id = Level.Id;
+
+            int infoOffset = SNES.CpuToOffset(BitConverter.ToUInt16(SNES.rom, Const.PaletteInfoOffset + id * 2 + Const.PaletteStageBase), Const.PaletteBank);
+
+            if (SNES.rom[infoOffset] == 0)
+            {
+                return;
+            }
+
+            int colorAmount = SNES.rom[infoOffset]; //how many colors are going to be dumped
+            int colorDataOffset = SNES.CpuToOffset(BitConverter.ToUInt16(SNES.rom, infoOffset + 1), Const.PaletteColorBank); //where the colors are located
+
+            Window window = new Window() { ResizeMode = ResizeMode.NoResize , SizeToContent = SizeToContent.WidthAndHeight , Title = "Palette Tools"};
+            window.Closed += (s, e) => { };
+
+            Button importBtn = new Button() { Content = "Import Palette Colors" , Width = 210};
+            importBtn.Click += (s, e) =>
+            {
+                using (var fd = new System.Windows.Forms.OpenFileDialog())
+                {
+                    fd.Filter = "YYCHR PAL or TXT|*.pal;*.txt";
+                    fd.Title = "Select an PAL or Gimp TXT File";
+
+                    List<Color> colors = new List<Color>();
+
+                    if (fd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                    {
+                        string file = fd.FileName;
+                        if (System.IO.Path.GetExtension(file).ToLower() == ".pal")
+                        {
+                            byte[] data = File.ReadAllBytes(file);
+                            {
+                                int i = 0;
+                                while (true)
+                                {
+                                    Color color = Color.FromRgb(data[i], data[i + 1], data[i + 2]);
+                                    colors.Add(color);
+                                    i += 3;
+                                    if (i >= data.Length)
+                                        break;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            string[] lines = File.ReadAllLines(file);
+                            foreach (var l in lines)
+                            {
+                                if (l.Trim() == "" || l.Trim() == "\n") continue;
+
+                                uint val = Convert.ToUInt32(l.Replace("#", "").Trim(), 16);
+                                Color color;
+                                color = Color.FromRgb((byte)(val >> 16), (byte)((val >> 8) & 0xFF), (byte)(val & 0xFF));
+                                colors.Add(color);
+                            }
+                        }
+
+                        for (int i = 0; i < colors.Count; i++)
+                        {
+                            if (i > (colorAmount - 1)) break;
+                            ushort newC = (ushort)(colors[i].B / 8 * 1024 + colors[i].G / 8 * 32 + colors[i].R / 8);
+                            BinaryPrimitives.WriteUInt16LittleEndian(SNES.rom.AsSpan(colorDataOffset + i * 2), newC);
+                        }
+                        Level.AssignPallete();
+                        DrawVramTiles();
+                        DrawPalette();
+                        MessageBox.Show("Colors Imported!");
+                        window.Close();
+                    }
+                }
+            };
+
+            Button exportBtn = new Button() { Content = "Export Palette Colors" , Width = 210 };
+            exportBtn.Click += (s, e) =>
+            {
+                using (var fd = new System.Windows.Forms.SaveFileDialog())
+                {
+                    fd.Filter =
+                        "YYCHR PAL (*.pal)|*.pal|" +
+                        "Text File (*.txt)|*.txt";
+
+                    fd.Title = "Save as an PAL or Gimp TXT File";
+
+                    if (fd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                    {
+                        string file = fd.FileName;
+                        if (fd.FilterIndex == 1)
+                        {
+                            MemoryStream ms = new MemoryStream();
+                            BinaryWriter bw = new BinaryWriter(ms);
+                            for (int i = 0; i < colorAmount; i++)
+                            {
+                                Rectangle rect = paletteGrid.Children[i] as Rectangle;
+                                SolidColorBrush brush = (SolidColorBrush)rect.Fill;
+                                Color color = brush.Color;
+                                bw.Write(color.R);
+                                bw.Write(color.G);
+                                bw.Write(color.B);
+                            }
+                            bw.Close();
+                            File.WriteAllBytes(file, ms.ToArray());
+                            ms.Close();
+                        }
+                        else
+                        {
+                            List<string> lines = new List<string>();
+
+                            for (int i = 0; i < colorAmount; i++)
+                            {
+                                Rectangle rect = paletteGrid.Children[i] as Rectangle;
+                                SolidColorBrush brush = (SolidColorBrush)rect.Fill;
+                                Color color = brush.Color;
+                                lines.Add($"#{color.R:X2}{color.G:X2}{color.B:X2}");
+                            }
+                            File.WriteAllLines(file, lines.ToArray());
+                        }
+                        MessageBox.Show("Colors Exported!");
+                        window.Close();
+                    }
+                }
+            };
+
+
+            StackPanel stackPanel = new StackPanel();
+            stackPanel.Children.Add(importBtn);
+            stackPanel.Children.Add(exportBtn);
+
+            window.Content = stackPanel;
+            window.ShowDialog();
         }
         #endregion Events
     }
