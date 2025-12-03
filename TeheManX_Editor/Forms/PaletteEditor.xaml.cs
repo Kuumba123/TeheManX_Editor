@@ -288,6 +288,7 @@ namespace TeheManX_Editor.Forms
                             ushort newC = (ushort)(colors[i].B / 8 * 1024 + colors[i].G / 8 * 32 + colors[i].R / 8);
                             BinaryPrimitives.WriteUInt16LittleEndian(SNES.rom.AsSpan(colorDataOffset + i * 2), newC);
                         }
+                        SNES.edit = true;
                         Level.AssignPallete();
                         DrawVramTiles();
                         DrawPalette();
