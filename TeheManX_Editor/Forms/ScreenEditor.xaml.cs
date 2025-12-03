@@ -349,9 +349,15 @@ namespace TeheManX_Editor.Forms
             int y = (int)p.Y;
             int cX = SNES.GetSelectedTile(x, MainWindow.window.screenE.screenImage.ActualWidth, 8);
             int cY = SNES.GetSelectedTile(y, MainWindow.window.screenE.screenImage.ActualHeight, 8);
+
+            int Id;
+            if (Const.Id == Const.GameId.MegaManX3 && Level.Id == 0xE) Id = 0x10; //special case for MMX3 rekt version of dophler 2
+            else if (Const.Id == Const.GameId.MegaManX3 && Level.Id > 0xE) Id = (Level.Id - 0xF) + 0xE; //Buffalo or Beetle
+            else Id = Level.Id;
+
             if (e.ChangedButton == MouseButton.Right)
             {
-                int offset = SNES.CpuToOffset(BitConverter.ToInt32(SNES.rom, Const.ScreenDataPointersOffset[Level.BG] + Level.Id * 3));
+                int offset = SNES.CpuToOffset(BitConverter.ToInt32(SNES.rom, Const.ScreenDataPointersOffset[Level.BG] + Id * 3));
                 selectedTile = BitConverter.ToUInt16(SNES.rom, offset + (screenId * 0x80) + (cX * 2) + (cY * 16));
                 tile32Int.Value = selectedTile;
                 DrawTile();
@@ -359,11 +365,6 @@ namespace TeheManX_Editor.Forms
             }
             else
             {
-                int Id;
-                if (Const.Id == Const.GameId.MegaManX3 && Level.Id == 0xE) Id = 0x10; //special case for MMX3 rekt version of dophler 2
-                else if (Const.Id == Const.GameId.MegaManX3 && Level.Id > 0xE) Id = (Level.Id - 0xF) + 0xE; //Buffalo or Beetle
-                else Id = Level.Id;
-
                 int offset = SNES.CpuToOffset(BitConverter.ToInt32(SNES.rom, Const.ScreenDataPointersOffset[Level.BG] + Id * 3));
                 screenDown = true;
                 ushort tileId = BitConverter.ToUInt16(SNES.rom, offset + screenId * 0x80 + cX * 2 + cY * 16);
