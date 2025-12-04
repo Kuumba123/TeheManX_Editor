@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TeheManX_Editor.Forms"
         mc:Ignorable="d"
-        Title="All Screens in the Background Layer" SizeToContent="WidthAndHeight" ContentRendered="Window_ContentRendered" Closed="Window_Closed">
+        Title="All Screens in the Background Layer" Width="906" Height="839" ContentRendered="Window_ContentRendered" Closed="Window_Closed">
     <Grid Background="Black">
         <UniformGrid HorizontalAlignment="Left" VerticalAlignment="Top" x:Name="layoutGrid" Rows="33" Columns="33" Width="890" Height="800"/>
     </Grid>
