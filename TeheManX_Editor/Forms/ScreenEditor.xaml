@@ -234,7 +234,7 @@
                     <local:NumInt FontFamily="Consolas" ParsingNumberStyle="HexNumber" FormatString="X" Width="69" Height="40" Value="2" FontSize="33" Maximum="239" MinHeight="0" x:Name="screenInt16" Minimum="0" AllowTextInput="True" ValueChanged="screenInt16_ValueChanged"/>
                     <Button Margin="5,5,0,5" Padding="0" Width="130" Height="40" Click="ScreenGrid16Btn_Click">Show Screen Grid</Button>
                     <Button Margin="5" Padding="0" Width="110" Height="40" Click="TileGrid16Btn_Click">Show Tile Grid</Button>
-                    <Button Margin="5" Padding="0" Width="25" Height="24" Click="Confirm16Button_Click">✅</Button>
+                    <Button Margin="5" Padding="-2" Width="20" Height="20" Click="Confirm16Button_Click">✅</Button>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal">
                     <!--Tile Image for Selected 16x16 Tile-->
