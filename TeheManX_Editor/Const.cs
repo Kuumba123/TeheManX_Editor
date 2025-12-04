@@ -245,45 +245,46 @@
                     {0x62 , 0x12}
             };
             public static readonly int[,] Tile16Count = new int[0x25, 2]
-{
-                    {0x363 , 0x388 },
-                    {0x2D7 , 0x290 },
-                    {0x356 , 0x350 },
-                    {0x365 , 0x35D },
-                    {0x325 , 0x324 },
-                    {0x2D4 , 0x2C5 },
-                    {0x2AE , 0x2AD },
-                    {0x36F , 0x33F },
-                    {0x2E0 , 0x2E2 },
-                    {0x1EC , 0x1DF },
-                    {0x26A , 0x251 },
-                    {0x1DC , 0x1B8 },
-                    {0x106 , 0xFA  },
-                    {0x325 , 0x350 },
-                    {0x1C ,  0x38  },
-                    {0x1C ,  0x38  },
-                    {0x1C ,  0x38  },
-                    {0x1C ,  0x38  },
-                    {0x1C ,  0x38  },
-                    {0x1C ,  0x38  },
-                    {0x1C ,  0x38  },
-                    {0x1C ,  0x38  },
-                    {0x1C ,  0x38  },
-                    {0x1C ,  0x38  },
-                    {0x1C ,  0x38  },
-                    {0x1C ,  0x38  },
-                    {0x1C ,  0x38  },
-                    {0x6F ,  0x68  },
-                    {0x6F ,  0x68  },
-                    {0x6F ,  0x68  },
-                    {0x6F ,  0x68  },
-                    {0x6F ,  0x68  },
-                    {0x6F ,  0x68  },
-                    {0x6F ,  0x68  },
-                    {0x6F ,  0x68  },
-                    {0x6F ,  0x68  },
-                    {0xA8 ,  0x68  }
+            {
+                    {0x388, 0x388},
+                    {0x2D7, 0x2D7},
+                    {0x356, 0x356},
+                    {0x365, 0x365},
+                    {0x325, 0x325},
+                    {0x2D4, 0x2D4},
+                    {0x2AE, 0x2AE},
+                    {0x36F, 0x36F},
+                    {0x2E2, 0x2E2},
+                    {0x1EC, 0x1EC},
+                    {0x26A, 0x26A},
+                    {0x1DC, 0x1DC},
+                    {0x106, 0x106},
+                    {0x350, 0x350},
+                    {0x38,  0x38 },
+                    {0x38,  0x38 },
+                    {0x38,  0x38 },
+                    {0x38,  0x38 },
+                    {0x38,  0x38 },
+                    {0x38,  0x38 },
+                    {0x38,  0x38 },
+                    {0x38,  0x38 },
+                    {0x38,  0x38 },
+                    {0x38,  0x38 },
+                    {0x38,  0x38 },
+                    {0x38,  0x38 },
+                    {0x38,  0x38 },
+                    {0x6F,  0x6F },
+                    {0x6F,  0x6F },
+                    {0x6F,  0x6F },
+                    {0x6F,  0x6F },
+                    {0x6F,  0x6F },
+                    {0x6F,  0x6F },
+                    {0x6F,  0x6F },
+                    {0x6F,  0x6F },
+                    {0x6F,  0x6F },
+                    {0xA8,  0xA8 }
             };
+
             public static readonly int[] EnemiesLength = 
             {
                 0x2C8,
@@ -383,20 +384,21 @@
             };
             public static readonly int[,] Tile16Count = new int[0xD, 2]
             {
-                    {0x3A3,  0x394 },
-                    {0x3B3,  0x3B1 },
-                    {0x2F0,  0x2E8 },
-                    {0x2BA,  0x2B5 },
-                    {0x2F3,  0x2F2 },
-                    {0x28C,  0x26B },
-                    {0x261,  0x2B5 },
-                    {0x31A,  0x312 },
-                    {0x2BE,  0x2B7 },
-                    {0x113,  0x113 },
-                    {0xC7 ,  0xC3  },
-                    {0xCE ,  0x2B  },
-                    {0x13B,  0x12F }
+                    {0x3A3, 0x3A3},
+                    {0x3B3, 0x3B3},
+                    {0x2F0, 0x2F0},
+                    {0x2BA, 0x2BA},
+                    {0x2F3, 0x2F3},
+                    {0x28C, 0x28C},
+                    {0x2B5, 0x2B5},
+                    {0x31A, 0x31A},
+                    {0x2BE, 0x2BE},
+                    {0x113, 0x113},
+                    {0xC7,  0xC7 },
+                    {0xCE,  0xCE },
+                    {0x13B, 0x13B}
             };
+
             public static readonly int[] EnemiesLength =
             {
                 0x235,
@@ -489,25 +491,26 @@
                     { 0x3F7, 0x78   }
             };
             public static readonly int[,] Tile16Count = new int[0x11, 2]
-{
-                    { 0x37C, 0x3FF  },
-                    { 0x35D, 0x400  },
-                    { 0x2F9, 0x2E5  },
-                    { 0x34B, 0x33F  },
-                    { 0x35A, 0x356  },
-                    { 0x1DC, 0x24E  },
-                    { 0x3FC, 0x39B  },
-                    { 0x251, 0x3B0  },
-                    { 0x333, 0x331  },
-                    { 0x250, 0x283  },
-                    { 0x2D5, 0x2DF  },
-                    { 0x13F, 0x293  },
-                    { 0x1F4, 0x1F3  },
-                    { 0x114, 0x1B7  },
-                    { 0x181, 0x293  },
-                    { 0x2F9, 0x2E5  },
-                    { 0x34B, 0x33F  }
+            {
+                    {0x3FF, 0x3FF},
+                    {0x400, 0x400},
+                    {0x2F9, 0x2F9},
+                    {0x34B, 0x34B},
+                    {0x35A, 0x35A},
+                    {0x24E, 0x24E},
+                    {0x3FC, 0x3FC},
+                    {0x3B0, 0x3B0},
+                    {0x333, 0x333},
+                    {0x283, 0x283},
+                    {0x2DF, 0x2DF},
+                    {0x293, 0x293},
+                    {0x1F4, 0x1F4},
+                    {0x1B7, 0x1B7},
+                    {0x293, 0x293},
+                    {0x2F9, 0x2F9},
+                    {0x34B, 0x34B}
             };
+
             public static readonly int[] EnemiesLength =
             {
                 0x2F1,
