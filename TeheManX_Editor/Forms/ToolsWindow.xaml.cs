@@ -14,14 +14,29 @@ namespace TeheManX_Editor.Forms
     /// </summary>
     public partial class ToolsWindow : Window
     {
+        #region Fields
+        public static bool mmxOpen;
+        public static bool mmx2Open;
+        public static bool mmx3Open;
+        #endregion Fields
+
         #region Constructors
         public ToolsWindow()
         {
             InitializeComponent();
+            expandMMX.IsExpanded = mmxOpen;
+            expandMMX2.IsExpanded = mmx2Open;
+            expandMMX3.IsExpanded = mmx3Open;
         }
         #endregion Constructors
 
         #region Events
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            mmxOpen = expandMMX.IsExpanded;
+            mmx2Open = expandMMX2.IsExpanded;
+            mmx3Open = expandMMX3.IsExpanded;
+        }
         /*
          *  MegaMan X Tools Events
          */

@@ -1,8 +1,7 @@
 {
   "profiles": {
     "TeheManX_Editor": {
-      "commandName": "Project",
-      "commandLineArgs": "\"C:\\Users\\kuumb\\Desktop\\Program\\ASM\\SNESASM\\Editor_Test\\MMX1.sfc\""
+      "commandName": "Project"
     }
   }
 }

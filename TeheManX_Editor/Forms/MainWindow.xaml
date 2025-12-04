@@ -4,9 +4,13 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:dragablz="http://dragablz.net/winfx/xaml/dragablz"
-        xmlns:forms="clr-namespace:TeheManX_Editor.Forms"
+        xmlns:dockablz="clr-namespace:Dragablz.Dockablz;assembly=Dragablz"
+        xmlns:forms="clr-namespace:TeheManX_Editor.Forms" xmlns:system="clr-namespace:System;assembly=mscorlib"
         mc:Ignorable="d"
         Title="TeheMan X Editor" Width="1205" Height="930" MinHeight="600" MinWidth="465" Closing="Window_Closing" PreviewKeyDown="Window_PreviewKeyDown" PreviewMouseDown="Window_PreviewMouseDown" Loaded="Window_Loaded">
+    <Window.Resources>
+        <system:String x:Key="Partition">QuickStart</system:String>
+    </Window.Resources>
     <Grid Name="grid" Background="Black">
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>
@@ -26,65 +30,67 @@
             <Button Name="undoBtn" Style="{StaticResource ToolButton}" HorizontalAlignment="Left" Click="undoBtn_Click">Undo</Button>
         </DockPanel>
 
-        <dragablz:TabablzControl Grid.Row="1" Name="hub" AllowDrop="True" Visibility="Hidden" ConsolidateOrphanedItems="True" Background="Black">
-            <dragablz:TabablzControl.InterTabController>
-                <dragablz:InterTabController />
-            </dragablz:TabablzControl.InterTabController>
+        <dockablz:Layout x:Name="dock" Partition="{StaticResource Partition}" x:FieldModifier="public" Grid.Row="1" Foreground="Blue">
+            <dragablz:TabablzControl Grid.Row="1" Name="hub" AllowDrop="True" Visibility="Hidden" ConsolidateOrphanedItems="True" Background="Black">
+                <dragablz:TabablzControl.InterTabController>
+                    <dragablz:InterTabController x:Name="controller" Partition="{StaticResource Partition}"/>
+                </dragablz:TabablzControl.InterTabController>
 
-            <TabItem Name="layoutTab" IsSelected="True">
-                <TabItem.Header>
-                    <Button Style="{StaticResource TabButton}">Layout</Button>
-                </TabItem.Header>
-                <forms:LayoutEditor x:Name="layoutE"/>
-            </TabItem>
-            <TabItem Name="screenTab">
-                <TabItem.Header>
-                    <Button Style="{StaticResource TabButton}">Screen</Button>
-                </TabItem.Header>
-                <forms:ScreenEditor x:Name="screenE"/>
-            </TabItem>
-            <TabItem Name="tile32Tab">
-                <TabItem.Header>
-                    <Button Style="{StaticResource TabButton}">32x32</Button>
-                </TabItem.Header>
-                <forms:Tile32Editor x:Name="tile32E"/>
-            </TabItem>
-            <TabItem Name="tile16Tab">
-                <TabItem.Header>
-                    <Button Style="{StaticResource TabButton}">16x16</Button>
-                </TabItem.Header>
-                <forms:Tile16Editor x:Name="tile16E"/>
-            </TabItem>
-            <TabItem Name="paletteTab">
-                <TabItem.Header>
-                    <Button Style="{StaticResource TabButton}">Palette</Button>
-                </TabItem.Header>
-                <forms:PaletteEditor x:Name="paletteE"/>
-            </TabItem>
-            <TabItem Name="enemyTab">
-                <TabItem.Header>
-                    <Button Style="{StaticResource TabButton}">Enemy</Button>
-                </TabItem.Header>
-                <forms:EnemyEditor x:Name="enemyE"/>
-            </TabItem>
-            <TabItem Name="spawnTab">
-                <TabItem.Header>
-                    <Button Style="{StaticResource TabButton}">Spawn</Button>
-                </TabItem.Header>
-                <forms:SpawnWindow x:Name="spawnE"/>
-            </TabItem>
-            <TabItem Name="camTab">
-                <TabItem.Header>
-                    <Button Style="{StaticResource TabButton}">Camera</Button>
-                </TabItem.Header>
-                <forms:CameraEditor x:Name="camE"/>
-            </TabItem>
-            <TabItem Name="tileTab">
-                <TabItem.Header>
-                    <Button Style="{StaticResource TabButton}">VRAM Tiles</Button>
-                </TabItem.Header>
-                <forms:TileEditor x:Name="tileE"/>
-            </TabItem>
-        </dragablz:TabablzControl>
+                <TabItem Name="layoutTab" IsSelected="True">
+                    <TabItem.Header>
+                        <Button Style="{StaticResource TabButton}">Layout</Button>
+                    </TabItem.Header>
+                    <forms:LayoutEditor x:Name="layoutE"/>
+                </TabItem>
+                <TabItem Name="screenTab">
+                    <TabItem.Header>
+                        <Button Style="{StaticResource TabButton}">Screen</Button>
+                    </TabItem.Header>
+                    <forms:ScreenEditor x:Name="screenE"/>
+                </TabItem>
+                <TabItem Name="tile32Tab">
+                    <TabItem.Header>
+                        <Button Style="{StaticResource TabButton}">32x32</Button>
+                    </TabItem.Header>
+                    <forms:Tile32Editor x:Name="tile32E"/>
+                </TabItem>
+                <TabItem Name="tile16Tab">
+                    <TabItem.Header>
+                        <Button Style="{StaticResource TabButton}">16x16</Button>
+                    </TabItem.Header>
+                    <forms:Tile16Editor x:Name="tile16E"/>
+                </TabItem>
+                <TabItem Name="paletteTab">
+                    <TabItem.Header>
+                        <Button Style="{StaticResource TabButton}">Palette</Button>
+                    </TabItem.Header>
+                    <forms:PaletteEditor x:Name="paletteE"/>
+                </TabItem>
+                <TabItem Name="enemyTab">
+                    <TabItem.Header>
+                        <Button Style="{StaticResource TabButton}">Enemy</Button>
+                    </TabItem.Header>
+                    <forms:EnemyEditor x:Name="enemyE"/>
+                </TabItem>
+                <TabItem Name="spawnTab">
+                    <TabItem.Header>
+                        <Button Style="{StaticResource TabButton}">Spawn</Button>
+                    </TabItem.Header>
+                    <forms:SpawnWindow x:Name="spawnE"/>
+                </TabItem>
+                <TabItem Name="camTab">
+                    <TabItem.Header>
+                        <Button Style="{StaticResource TabButton}">Camera</Button>
+                    </TabItem.Header>
+                    <forms:CameraEditor x:Name="camE"/>
+                </TabItem>
+                <TabItem Name="tileTab">
+                    <TabItem.Header>
+                        <Button Style="{StaticResource TabButton}">VRAM Tiles</Button>
+                    </TabItem.Header>
+                    <forms:TileEditor x:Name="tileE"/>
+                </TabItem>
+            </dragablz:TabablzControl>
+        </dockablz:Layout>
     </Grid>
 </Window>

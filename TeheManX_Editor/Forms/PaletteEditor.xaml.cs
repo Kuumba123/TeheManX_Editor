@@ -237,8 +237,7 @@ namespace TeheManX_Editor.Forms
             int colorAmount = SNES.rom[infoOffset]; //how many colors are going to be dumped
             int colorDataOffset = SNES.CpuToOffset(BitConverter.ToUInt16(SNES.rom, infoOffset + 1), Const.PaletteColorBank); //where the colors are located
 
-            Window window = new Window() { ResizeMode = ResizeMode.NoResize , SizeToContent = SizeToContent.WidthAndHeight , Title = "Palette Tools"};
-            window.Closed += (s, e) => { };
+            Window window = new Window() { ResizeMode = ResizeMode.NoResize , WindowStartupLocation = WindowStartupLocation.CenterScreen , SizeToContent = SizeToContent.WidthAndHeight , Title = "Palette Tools"};
 
             Button importBtn = new Button() { Content = "Import Palette Colors" , Width = 210};
             importBtn.Click += (s, e) =>

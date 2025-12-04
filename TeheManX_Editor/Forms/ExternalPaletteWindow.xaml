@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TeheManX_Editor.Forms"
         mc:Ignorable="d"
-        Title="Palettes" Height="330" Width="500" ResizeMode="NoResize">
+        Title="Palettes" Height="330" Width="500" ResizeMode="NoResize" WindowStartupLocation="CenterScreen">
     <Window.Resources>
         <Style TargetType="TextBlock">
             <Setter Property="FontFamily" Value="Consolas" />

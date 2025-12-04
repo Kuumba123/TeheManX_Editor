@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TeheManX_Editor.Forms"
         mc:Ignorable="d"
-        Title="Tools Window" Height="450" Width="450" WindowStartupLocation="CenterScreen" ResizeMode="NoResize">
+        Title="Tools Window" Height="450" Width="450" WindowStartupLocation="CenterScreen" ResizeMode="NoResize" Closing="Window_Closing">
     <Window.Resources>
         <ResourceDictionary>
             <Style TargetType="Label">
@@ -37,7 +37,7 @@
     <Grid Background="#060606">
         <ScrollViewer>
             <StackPanel>
-                <Expander>
+                <Expander x:Name="expandMMX">
                     <Expander.Header>
                         <TextBlock>MegaMan X Tools</TextBlock>
                     </Expander.Header>
@@ -58,7 +58,7 @@
                         </Grid>
                     </StackPanel>
                 </Expander>
-                <Expander>
+                <Expander x:Name="expandMMX2">
                     <Expander.Header>
                         <TextBlock>MegaMan X2 Tools</TextBlock>
                     </Expander.Header>
@@ -79,7 +79,7 @@
                         </Grid>
                     </StackPanel>
                 </Expander>
-                <Expander>
+                <Expander x:Name="expandMMX3">
                     <Expander.Header>
                         <TextBlock>MegaMan X3 Tools</TextBlock>
                     </Expander.Header>

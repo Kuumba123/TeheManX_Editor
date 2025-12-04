@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -50,6 +51,39 @@ namespace TeheManX_Editor.Forms
                 }
                 DefineSizing();
 
+                if (File.Exists("Layout.json"))
+                {
+                    var options = new JsonSerializerOptions
+                    {
+                        NumberHandling = JsonNumberHandling.AllowNamedFloatingPointLiterals
+                    };
+
+                    Layout? layout = JsonSerializer.Deserialize<Layout>(File.ReadAllText("Layout.json"), options);
+                    LoadLayout(layout.MainWindowLayout, window);
+
+                    foreach (var child in layout.WindowLayouts)
+                    {
+                        MainWindow win = new MainWindow();
+                        LoadLayout(child, win);
+                        win.Show();
+                    }
+
+                    LayoutWindow.layoutLeft = layout.LayoutLeft;
+                    LayoutWindow.layoutTop = layout.LayoutTop;
+                    LayoutWindow.layoutWidth = layout.LayoutWidth;
+                    LayoutWindow.layoutHeight = layout.LayoutHeight;
+                    LayoutWindow.layoutState = layout.LayoutState;
+
+                    ColorDialog.pickerLeft = layout.PickerLeft;
+                    ColorDialog.pickerTop = layout.PickerTop;
+
+                    ToolsWindow.mmxOpen = layout.MegaManXOpen;
+                    ToolsWindow.mmx2Open = layout.MegaManX2Open;
+                    ToolsWindow.mmx3Open = layout.MegaManX3Open;
+                    
+                }
+                LockWindows();
+
                 string[] args = Environment.GetCommandLineArgs();
 
                 if (args.Length == 2) //Open Game Files using args
@@ -78,7 +112,7 @@ namespace TeheManX_Editor.Forms
                     Level.AssignPallete();
                     Level.LoadLevelTiles();
                     Update();
-                    hub.Visibility = Visibility.Visible;
+                    UnlockWindows();
                 }
             }
             else
@@ -404,7 +438,7 @@ namespace TeheManX_Editor.Forms
                     Level.AssignPallete();
                     Level.LoadLevelTiles();
                     Update();
-                    hub.Visibility = Visibility.Visible;
+                    UnlockWindows();
                 }
             }
         }
@@ -445,13 +479,223 @@ namespace TeheManX_Editor.Forms
             }
             return true;
         }
-        private void SaveLayout()
+        private void SaveLayout() //TODO: eventually figure out way to save docking layouts
         {
+            Layout layout = new Layout();
+            layout.WindowLayouts = new List<WindowLayout>();
 
+            if (LayoutWindow.isOpen)
+            {
+                LayoutWindow.isOpen = false;
+                LayoutWindow.layoutLeft = layoutWindow.Left;
+                LayoutWindow.layoutTop = layoutWindow.Top;
+                LayoutWindow.layoutWidth = layoutWindow.Width;
+                LayoutWindow.layoutHeight = layoutWindow.Height;
+                LayoutWindow.layoutState = (int)layoutWindow.WindowState;
+            }
+            layout.LayoutLeft = layoutWindow.Left;
+            layout.LayoutTop = layoutWindow.Top;
+            layout.LayoutWidth = layoutWindow.Width;
+            layout.LayoutHeight = layoutWindow.Height;
+            layout.LayoutState = LayoutWindow.layoutState;
+
+            layout.PickerLeft = ColorDialog.pickerLeft;
+            layout.PickerTop = ColorDialog.pickerTop;
+
+            layout.MegaManXOpen = ToolsWindow.mmxOpen;
+            layout.MegaManX2Open = ToolsWindow.mmx2Open;
+            layout.MegaManX3Open = ToolsWindow.mmx3Open;
+
+            foreach (Window childWind in Application.Current.Windows)
+            {
+                if (childWind.GetType() != typeof(MainWindow)) continue;
+                MainWindow window = childWind as MainWindow;
+                if (window.Width < 1) continue;
+
+                WindowLayout windowLayout = new WindowLayout();
+                windowLayout.Top = window.Top;
+                windowLayout.Left = window.Left;
+                windowLayout.Width = window.Width;
+                windowLayout.Height = window.Height;
+                windowLayout.Max = window.max;
+                windowLayout.WindowState = (int)window.WindowState;
+
+                if (window.dock.Content.GetType() == typeof(Dragablz.Dockablz.Branch))
+                {
+                    // Save type as string
+                    windowLayout.Type = typeof(BranchLayout).AssemblyQualifiedName;
+
+                    List<Dragablz.Dockablz.Branch> branches = new List<Dragablz.Dockablz.Branch>();
+                    List<Dragablz.Dockablz.Branch> innerBranches = new List<Dragablz.Dockablz.Branch>();
+                    branches.Add(window.dock.Content as Dragablz.Dockablz.Branch);
+                    List<string> tabs = new List<string>();
+
+                BranchLoop:
+                    foreach (var b in branches)
+                    {
+                        if (b.FirstItem.GetType() == typeof(Dragablz.Dockablz.Branch))
+                        {
+                            innerBranches.Add(new Dragablz.Dockablz.Branch()
+                            {
+                                Orientation = ((Dragablz.Dockablz.Branch)b.FirstItem).Orientation,
+                                FirstItem = ((Dragablz.Dockablz.Branch)b.FirstItem).FirstItem,
+                                FirstItemLength = ((Dragablz.Dockablz.Branch)b.FirstItem).FirstItemLength,
+                                SecondItem = b.SecondItem,
+                                SecondItemLength = b.SecondItemLength
+                            });
+                        }
+                        else
+                        {
+                            foreach (var t in ((Dragablz.TabablzControl)branches[0].FirstItem).Items)
+                            {
+                                if (t.GetType() != typeof(TabItem)) continue;
+                                tabs.Add(((TabItem)t).Name);
+                            }
+                        }
+
+                        if (b.SecondItem.GetType() == typeof(Dragablz.Dockablz.Branch))
+                        {
+                            innerBranches.Add(new Dragablz.Dockablz.Branch()
+                            {
+                                Orientation = ((Dragablz.Dockablz.Branch)b.SecondItem).Orientation,
+                                FirstItem = ((Dragablz.Dockablz.Branch)b.SecondItem).FirstItem,
+                                FirstItemLength = ((Dragablz.Dockablz.Branch)b.SecondItem).FirstItemLength,
+                                SecondItem = ((Dragablz.Dockablz.Branch)b.SecondItem).SecondItem,
+                                SecondItemLength = ((Dragablz.Dockablz.Branch)b.SecondItem).SecondItemLength
+                            });
+                        }
+                        else
+                        {
+                            foreach (var t in ((Dragablz.TabablzControl)branches[0].SecondItem).Items)
+                            {
+                                if (t.GetType() != typeof(TabItem)) continue;
+                                tabs.Add(((TabItem)t).Name);
+                            }
+                        }
+                    }
+
+                    branches.Clear();
+                    if (innerBranches.Count != 0)
+                    {
+                        branches = new List<Dragablz.Dockablz.Branch>(innerBranches);
+                        innerBranches.Clear();
+                        goto BranchLoop;
+                    }
+
+                    windowLayout.Child = tabs;
+                }
+                else
+                {
+                    // Save type as string
+                    windowLayout.Type = typeof(Dragablz.TabablzControl).AssemblyQualifiedName;
+
+                    List<string> tabs = new List<string>();
+                    foreach (var t in window.hub.GetOrderedHeaders())
+                    {
+                        if (t.GetType() != typeof(Dragablz.DragablzItem)) continue;
+                        tabs.Add(((TabItem)t.Content).Name);
+                    }
+                    windowLayout.Child = tabs;
+                }
+
+                if (window == MainWindow.window)
+                    layout.MainWindowLayout = windowLayout;
+                else
+                    layout.WindowLayouts.Add(windowLayout);
+            }
+
+            //Done
+            JsonSerializerOptions options = new JsonSerializerOptions
+            {
+                WriteIndented = true,
+                NumberHandling = JsonNumberHandling.AllowNamedFloatingPointLiterals
+            };
+            string json = JsonSerializer.Serialize(layout, options);
+            File.WriteAllText("Layout.json", json);
         }
-        private void LoadLayout()
+        private void LoadLayout(WindowLayout winlayout, MainWindow win)
         {
+            win.WindowStartupLocation = WindowStartupLocation.Manual;
+            win.Left = winlayout.Left;
+            win.Top = winlayout.Top;
+            win.Width = winlayout.Width;
+            win.Height = winlayout.Height;
 
+            if (winlayout.Max)
+                win.max = true;
+            else
+                win.Uid = winlayout.WindowState.ToString();
+
+            if (win != window)
+            {
+                win.hub.Items.Clear();
+                object child = winlayout.Child;
+
+                // Convert the stored string back into a Type
+                Type type = Type.GetType(winlayout.Type);
+
+                if (type != typeof(Dragablz.TabablzControl))
+                {
+                    // Branch layout area (TO BE IMPLEMENTED LATER)
+                }
+                else
+                {
+                    // TabablzControl
+                    if (child is JsonElement je && je.ValueKind == JsonValueKind.Array)
+                    {
+                        foreach (var j in je.EnumerateArray())
+                        {
+                            string t = j.GetString() ?? j.ToString();
+
+                            if (t == "layoutTab")
+                            {
+                                window.hub.RemoveFromSource(window.layoutTab);
+                                win.hub.AddToSource(window.layoutTab);
+                            }
+                            else if (t == "screenTab")
+                            {
+                                window.hub.RemoveFromSource(window.screenTab);
+                                win.hub.AddToSource(window.screenTab);
+                            }
+                            else if (t == "tile32Tab")
+                            {
+                                window.hub.RemoveFromSource(window.tile32Tab);
+                                win.hub.AddToSource(window.tile32Tab);
+                            }
+                            else if (t == "tile16Tab")
+                            {
+                                window.hub.RemoveFromSource(window.tile16Tab);
+                                win.hub.AddToSource(window.tile16Tab);
+                            }
+                            else if (t == "enemyTab")
+                            {
+                                window.hub.RemoveFromSource(window.enemyTab);
+                                win.hub.AddToSource(window.enemyTab);
+                            }
+                            else if (t == "spawnTab")
+                            {
+                                window.hub.RemoveFromSource(window.spawnTab);
+                                win.hub.AddToSource(window.spawnTab);
+                            }
+                            else if (t == "paletteTab")
+                            {
+                                window.hub.RemoveFromSource(window.paletteTab);
+                                win.hub.AddToSource(window.paletteTab);
+                            }
+                            else if (t == "camTab")
+                            {
+                                window.hub.RemoveFromSource(window.camTab);
+                                win.hub.AddToSource(window.camTab);
+                            }
+                            else if (t == "tileTab")
+                            {
+                                window.hub.RemoveFromSource(window.tileTab);
+                                win.hub.AddToSource(window.tileTab);
+                            }
+                        }
+                    }
+                }
+            }
         }
         private void LockWindows()
         {
@@ -472,6 +716,7 @@ namespace TeheManX_Editor.Forms
                 if (window.Width < 1) continue;
                 window.hub.Visibility = Visibility.Visible;
             }
+            window.Focus();
         }
         private void CloseChildWindows()
         {
@@ -498,6 +743,14 @@ namespace TeheManX_Editor.Forms
         #region Events
         private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            if (this.max) //Layout Stuff
+            {
+                this.WindowStyle = WindowStyle.None;
+                this.WindowState = WindowState.Maximized;
+            }
+            else if (this.Uid != "")
+                this.WindowState = (WindowState)Convert.ToInt32(this.Uid);
+
             //Check for Update
             if (settings.DontUpdate) return;
             using (HttpClient client = new HttpClient())
@@ -571,6 +824,7 @@ namespace TeheManX_Editor.Forms
                         return;
                     }
                 }
+                SaveLayout();
                 CloseChildWindows();
             }
         }

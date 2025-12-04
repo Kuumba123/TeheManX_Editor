@@ -13,6 +13,11 @@ namespace TeheManX_Editor.Forms
     {
         #region Fields
         public static bool isOpen;
+        public static double layoutWidth = -1;
+        public static double layoutHeight;
+        public static double layoutLeft;
+        public static double layoutTop;
+        public static int layoutState;
         #endregion Fields
 
         #region Constructors
@@ -21,6 +26,21 @@ namespace TeheManX_Editor.Forms
             InitializeComponent();
 
             BuildLayoutGrid();
+
+            if (layoutWidth != -1)
+            {
+                this.Left = layoutLeft;
+                this.Top = layoutTop;
+                this.Width = layoutWidth;
+                this.Height = layoutHeight;
+                if (this.WindowState != (WindowState)layoutState)
+                {
+                    this.Loaded += (s, e) =>
+                    {
+                        this.WindowState = (WindowState)layoutState;
+                    };
+                }
+            }
         }
         #endregion Constructors
 
@@ -151,6 +171,11 @@ namespace TeheManX_Editor.Forms
         private void Window_Closed(object sender, EventArgs e)
         {
             isOpen = false;
+            layoutLeft = this.Left;
+            layoutTop = this.Top;
+            layoutWidth = this.Width;
+            layoutHeight = this.Height;
+            layoutState = (int)this.WindowState;
         }
         #endregion Events
     }
