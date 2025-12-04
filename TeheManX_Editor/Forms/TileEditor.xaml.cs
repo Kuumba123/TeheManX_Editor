@@ -187,7 +187,7 @@ namespace TeheManX_Editor.Forms
 
             ushort val = (ushort)(int)e.NewValue;
 
-            if (BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset)) == val)
+            if (BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset)) == 0 || BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset)) == val)
                 return;
 
             BinaryPrimitives.WriteUInt16LittleEndian(SNES.rom.AsSpan(offset), val);
@@ -207,7 +207,7 @@ namespace TeheManX_Editor.Forms
 
             ushort val = (ushort)(int)e.NewValue;
 
-            if (BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + 2)) == val)
+            if (BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset)) == 0 || BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + 2)) == val)
                 return;
 
             BinaryPrimitives.WriteUInt16LittleEndian(SNES.rom.AsSpan(offset + 2), val);
@@ -237,7 +237,7 @@ namespace TeheManX_Editor.Forms
             int offset = BitConverter.ToUInt16(SNES.rom, listOffset + (int)MainWindow.window.tileE.bgTileSetInt.Value * 2) + Const.BackgroundTileInfoOffset;
 
 
-            if ((BinaryPrimitives.ReadInt32LittleEndian(SNES.rom.AsSpan(offset + 4)) & 0x7FFFFF) == (srcAddr & 0x7FFFFF))
+            if (BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset)) == 0 || (BinaryPrimitives.ReadInt32LittleEndian(SNES.rom.AsSpan(offset + 4)) & 0x7FFFFF) == (srcAddr & 0x7FFFFF))
                 return;
             if (Const.Id == Const.GameId.MegaManX == false)
                 srcAddr |= 0x800000;
@@ -258,7 +258,7 @@ namespace TeheManX_Editor.Forms
 
             ushort val = (ushort)(int)e.NewValue;
 
-            if (BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + 7)) == val)
+            if (BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset)) == 0 || BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset)) == 0 || BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + 7)) == val)
                 return;
 
             BinaryPrimitives.WriteUInt16LittleEndian(SNES.rom.AsSpan(offset + 7), val);
