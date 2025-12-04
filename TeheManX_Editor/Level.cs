@@ -444,7 +444,7 @@ namespace TeheManX_Editor
                 }
 
                 // Final size check
-                if (ms.Length > Const.EnemiesLength[id])
+                if (ms.Length > Const.EnemiesLength[id] && !SNES.expanded)
                 {
                     MessageBox.Show(
                         $"Enemy Data for Stage {id:X2} too large ({ms.Length:X}). Max {Const.EnemiesLength[id]:X}",
