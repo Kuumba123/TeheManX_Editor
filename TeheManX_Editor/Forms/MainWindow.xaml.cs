@@ -751,6 +751,8 @@ namespace TeheManX_Editor.Forms
             else if (this.Uid != "")
                 this.WindowState = (WindowState)Convert.ToInt32(this.Uid);
 
+            if (this != window) return;
+
             //Check for Update
             if (settings.DontUpdate) return;
             using (HttpClient client = new HttpClient())
@@ -761,25 +763,25 @@ namespace TeheManX_Editor.Forms
                     HttpResponseMessage response = await client.GetAsync(Const.ReproURL);
                     response.EnsureSuccessStatusCode();
                     string json = await response.Content.ReadAsStringAsync();
-                    dynamic release = JsonSerializer.Deserialize<dynamic>(json);
-                    string tag = release.tag_name;
+                    JsonElement release = JsonSerializer.Deserialize<JsonElement>(json);
+                    string tag = release.GetProperty("tag_name").GetString();
                     if (tag != Const.EditorVersion && !Settings.IsPastVersion(tag))
                     {
                         var result = MessageBox.Show($"There is a new version of this editor ({tag}) do you want to download the update?", "New Version", MessageBoxButton.YesNo);
                         if (result == MessageBoxResult.Yes)
                         {
                             //Start Downloading
-                            string url = release.assets[0].browser_download_url;
+                            string url = release.GetProperty("assets")[0].GetProperty("browser_download_url").GetString();
                             response = await client.GetAsync(url);
                             response.EnsureSuccessStatusCode();
                             using (Stream contentStream = await response.Content.ReadAsStreamAsync())
                             {
-                                using (FileStream fileStream = new FileStream("TeheManX4 Editor " + tag + ".exe", FileMode.Create, FileAccess.Write, FileShare.None))
+                                using (FileStream fileStream = new FileStream("TeheManX Editor " + tag + ".exe", FileMode.Create, FileAccess.Write, FileShare.None))
                                 {
                                     await contentStream.CopyToAsync(fileStream);
                                 }
                             }
-                            Process.Start(Directory.GetCurrentDirectory() + "/" + "TeheManX Editor " + tag + ".exe");
+                            Process.Start(Directory.GetCurrentDirectory() + "\\" + "TeheManX Editor " + tag + ".exe");
                             Application.Current.Shutdown();
                         }
                     }
