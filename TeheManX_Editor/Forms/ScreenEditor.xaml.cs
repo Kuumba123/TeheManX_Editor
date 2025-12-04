@@ -869,93 +869,90 @@ namespace TeheManX_Editor.Forms
         }
         private void Confirm16Button_Click(object sender, RoutedEventArgs e)
         {
-            if (!SNES.expanded)
+            if (tiles32.Count > Const.Tile32Count[Level.Id, Level.BG])
             {
-                if (tiles32.Count > Const.Tile32Count[Level.Id,Level.BG])
-                {
-                    MessageBox.Show($"Max amount of 32x32 is: {Const.Tile32Count[Level.Id, Level.BG]:X}");
-                    return;
-                }
-
-                //Save Level as 32x32 Tiles
-                Dictionary<ulong, ushort> tileDictionary = new Dictionary<ulong, ushort>();
-
-                ushort index = 0;
-
-                foreach (ulong key in tiles32)
-                {
-                    tileDictionary[key] = index;
-                    index++;
-                }
-
-                byte[] data = screenData16;
-
-                int Id;
-                if (Const.Id == Const.GameId.MegaManX3 && Level.Id == 0xE) Id = 0x10; //special case for MMX3 rekt version of dophler 2
-                else if (Const.Id == Const.GameId.MegaManX3 && Level.Id > 0xE) Id = (Level.Id - 0xF) + 0xE; //Buffalo or Beetle
-                else Id = Level.Id;
-
-                int screenDestBase = SNES.CpuToOffset(BitConverter.ToInt32(SNES.rom, Const.ScreenDataPointersOffset[Level.BG] + Id * 3));
-
-                //Create the Screen Data
-                for (int screen = 0; screen < Const.ScreenCount[Level.Id,Level.BG]; screen++)
-                {
-                    int screenBase = screen * 0x200;
-
-                    for (int y = 0; y < 8; y++)
-                    {
-                        int rowBase = screenBase + y * 64;
-
-                        for (int x = 0; x < 8; x++)
-                        {
-                            int baseOffset = rowBase + x * 4;
-
-                            ushort TL = (ushort)(data[baseOffset + 0] | (data[baseOffset + 1] << 8));
-                            ushort TR = (ushort)(data[baseOffset + 2] | (data[baseOffset + 3] << 8));
-                            ushort BL = (ushort)(data[baseOffset + 32] | (data[baseOffset + 33] << 8));
-                            ushort BR = (ushort)(data[baseOffset + 34] | (data[baseOffset + 35] << 8));
-
-                            ulong key = ((ulong)TL)
-                                      | ((ulong)TR << 16)
-                                      | ((ulong)BL << 32)
-                                      | ((ulong)BR << 48);
-
-                            ushort value = tileDictionary[key];
-                            BinaryPrimitives.WriteUInt16LittleEndian(SNES.rom.AsSpan(screenDestBase + screen * 0x80 + x * 2 + y * 16), value);
-                        }
-                    }
-                }
-
-                int tile32DestBase = SNES.CpuToOffset(BitConverter.ToInt32(SNES.rom, Const.Tile32DataPointersOffset[Level.BG] + Id * 3));
-                foreach (var tile in tileDictionary)
-                {
-                    int offset = tile.Value * 8 + tile32DestBase;
-                    BinaryPrimitives.WriteUInt64LittleEndian(SNES.rom.AsSpan(offset), tile.Key);
-                }
-
-                //Clear Screen Undos of 16x16 Mode & Undos of 32x32 Tile Edits
-                if (MainWindow.undos.Count != 0)
-                {
-                    for (int i = (MainWindow.undos.Count - 1); i != -1; i--)
-                    {
-                        if (MainWindow.undos[i].type == TeheManX_Editor.Undo.UndoType.Screen || MainWindow.undos[i].type == TeheManX_Editor.Undo.UndoType.X32)
-                            MainWindow.undos.RemoveAt(i);
-                    }
-                }
-
-                //Done
-                screenInt.Value = screenId;
-                MainWindow.window.layoutE.DrawLayout();
-                MainWindow.window.layoutE.DrawScreen();
-                MainWindow.window.enemyE.DrawLayout();
-
-                mode16 = false;
-                DrawTiles();
-                DrawTile();
-
-                tile16ModeGrid.Visibility =  Visibility.Collapsed;
-                tile32ModeGrid.Visibility = Visibility.Visible;
+                MessageBox.Show($"Max amount of 32x32 is: {Const.Tile32Count[Level.Id, Level.BG]:X}");
+                return;
             }
+
+            //Save Level as 32x32 Tiles
+            Dictionary<ulong, ushort> tileDictionary = new Dictionary<ulong, ushort>();
+
+            ushort index = 0;
+
+            foreach (ulong key in tiles32)
+            {
+                tileDictionary[key] = index;
+                index++;
+            }
+
+            byte[] data = screenData16;
+
+            int Id;
+            if (Const.Id == Const.GameId.MegaManX3 && Level.Id == 0xE) Id = 0x10; //special case for MMX3 rekt version of dophler 2
+            else if (Const.Id == Const.GameId.MegaManX3 && Level.Id > 0xE) Id = (Level.Id - 0xF) + 0xE; //Buffalo or Beetle
+            else Id = Level.Id;
+
+            int screenDestBase = SNES.CpuToOffset(BitConverter.ToInt32(SNES.rom, Const.ScreenDataPointersOffset[Level.BG] + Id * 3));
+
+            //Create the Screen Data
+            for (int screen = 0; screen < Const.ScreenCount[Level.Id, Level.BG]; screen++)
+            {
+                int screenBase = screen * 0x200;
+
+                for (int y = 0; y < 8; y++)
+                {
+                    int rowBase = screenBase + y * 64;
+
+                    for (int x = 0; x < 8; x++)
+                    {
+                        int baseOffset = rowBase + x * 4;
+
+                        ushort TL = (ushort)(data[baseOffset + 0] | (data[baseOffset + 1] << 8));
+                        ushort TR = (ushort)(data[baseOffset + 2] | (data[baseOffset + 3] << 8));
+                        ushort BL = (ushort)(data[baseOffset + 32] | (data[baseOffset + 33] << 8));
+                        ushort BR = (ushort)(data[baseOffset + 34] | (data[baseOffset + 35] << 8));
+
+                        ulong key = ((ulong)TL)
+                                  | ((ulong)TR << 16)
+                                  | ((ulong)BL << 32)
+                                  | ((ulong)BR << 48);
+
+                        ushort value = tileDictionary[key];
+                        BinaryPrimitives.WriteUInt16LittleEndian(SNES.rom.AsSpan(screenDestBase + screen * 0x80 + x * 2 + y * 16), value);
+                    }
+                }
+            }
+
+            int tile32DestBase = SNES.CpuToOffset(BitConverter.ToInt32(SNES.rom, Const.Tile32DataPointersOffset[Level.BG] + Id * 3));
+            foreach (var tile in tileDictionary)
+            {
+                int offset = tile.Value * 8 + tile32DestBase;
+                BinaryPrimitives.WriteUInt64LittleEndian(SNES.rom.AsSpan(offset), tile.Key);
+            }
+
+            //Clear Screen Undos of 16x16 Mode & Undos of 32x32 Tile Edits
+            if (MainWindow.undos.Count != 0)
+            {
+                for (int i = (MainWindow.undos.Count - 1); i != -1; i--)
+                {
+                    if (MainWindow.undos[i].type == TeheManX_Editor.Undo.UndoType.Screen || MainWindow.undos[i].type == TeheManX_Editor.Undo.UndoType.X32)
+                        MainWindow.undos.RemoveAt(i);
+                }
+            }
+
+            //Done
+            screenInt.Value = screenId;
+            MainWindow.window.layoutE.DrawLayout();
+            MainWindow.window.layoutE.DrawScreen();
+            MainWindow.window.enemyE.DrawLayout();
+
+            mode16 = false;
+            DrawTiles();
+            DrawTile();
+
+            tile16ModeGrid.Visibility = Visibility.Collapsed;
+            tile32ModeGrid.Visibility = Visibility.Visible;
         }
         private void tile16Int_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
