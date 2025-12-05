@@ -161,7 +161,6 @@ namespace TeheManX_Editor.Forms
         }
         private bool ValidEnemyAdd()
         {
-
            if (Level.Id >= Const.PlayableLevelsCount || (Const.Id == Const.GameId.MegaManX3 && Level.Id > 0xE))
             {
                 MessageBox.Show("Enemies cannot be added to this level.", "Error");
@@ -271,7 +270,6 @@ namespace TeheManX_Editor.Forms
             // Must be actively panning AND middle button must still be pressed
             if (!isPanning)
                 return;
-            System.Diagnostics.Stopwatch sw = System.Diagnostics.Stopwatch.StartNew();
             Point pos = e.GetPosition(canvas);
 
             double dx = pos.X - panStartMouse.X;
@@ -279,6 +277,9 @@ namespace TeheManX_Editor.Forms
 
             viewerX = panStartViewerX - (int)dx;
             viewerY = panStartViewerY - (int)dy;
+
+            if (viewerX < 0) viewerX = 0;
+            if (viewerY < 0) viewerY = 0;
 
             MainWindow.window.UpdateEnemyViewerCam();
             DrawLayout();
