@@ -64,7 +64,7 @@
                     <StackPanel Orientation="Horizontal">
                         <!--Column-->
                         <TextBlock Width="70" FontSize="18" Foreground="White" FontFamily="Consolas">Column:</TextBlock>
-                        <local:NumInt x:Name="columnInt" Width="60" ButtonSpinnerWidth="20" FontSize="22" Value="0" Maximum="#5" Minimum="0" MaxLength="3" IsEnabled="False" ValueChanged="colInt_ValueChanged"/>
+                        <local:NumInt x:Name="columnInt" Width="60" ButtonSpinnerWidth="20" FontSize="22" Value="0" Maximum="#100" Minimum="0" MaxLength="3" IsEnabled="False" ValueChanged="colInt_ValueChanged"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
                     </StackPanel>
