@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Buffers.Binary;
 using System.Collections.Generic;
-using System.Runtime.Intrinsics.Arm;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -28,6 +27,11 @@ namespace TeheManX_Editor.Forms
         public FrameworkElement control = new FrameworkElement();
         bool down = false;
         Point point;
+        //For Moving Camera Via Mouse
+        private bool isPanning = false;
+        private Point panStartMouse;
+        private int panStartViewerX;
+        private int panStartViewerY;
         #endregion Properties
 
         #region Constructors
@@ -43,18 +47,55 @@ namespace TeheManX_Editor.Forms
         public void DrawLayout()
         {
             layoutBMP.Lock();
-            for (int y = 0; y < 2; y++)
+
+            int bmpWidth = layoutBMP.PixelWidth;
+            int bmpHeight = layoutBMP.PixelHeight;
+
+            int tileX = viewerX >> 8;   // 256-pixel screen index
+            int tileY = viewerY >> 8;
+            int offX = viewerX & 0xFF;  // sub-screen offset (0–255)
+            int offY = viewerY & 0xFF;
+
+            unsafe
             {
-                for (int x = 0; x < 3; x++)
+                byte* ptr = (byte*)layoutBMP.BackBuffer;
+                int size = layoutBMP.BackBufferStride * bmpHeight;
+                System.Runtime.CompilerServices.Unsafe.InitBlock(ptr, 0, (uint)size);
+            }
+
+            for (int sy = 0; sy < 3; sy++)
+            {
+                for (int sx = 0; sx < 4; sx++)
                 {
-                    Level.DrawScreen(Level.Layout[Level.Id, Level.BG, ((viewerY >> 8) + y) * 32 + ((viewerX >> 8) + x)], x * 256, y * 256, layoutBMP.BackBufferStride, layoutBMP.BackBuffer);
+                    int screenIndexX = tileX + sx;
+                    int screenIndexY = tileY + sy;
+
+                    // bounds check so we never index outside Layout
+                    if (screenIndexX < 0 || screenIndexX >= 32) continue;
+                    if (screenIndexY < 0 || screenIndexY >= 32) continue;
+
+                    int layoutIndex = screenIndexY * 32 + screenIndexX;
+
+                    int drawX = sx * 256 - offX;
+                    int drawY = sy * 256 - offY;
+
+                    Level.DrawScreen_Clamped(
+                        Level.Layout[Level.Id, Level.BG, layoutIndex],
+                        drawX, drawY,
+                        layoutBMP.BackBufferStride,
+                        layoutBMP.BackBuffer,
+                        bmpWidth, bmpHeight
+                    );
                 }
             }
-            layoutBMP.AddDirtyRect(new Int32Rect(0, 0, 768, 512));
+
+            layoutBMP.AddDirtyRect(new Int32Rect(0, 0, bmpWidth, bmpHeight));
             layoutBMP.Unlock();
         }
         public void DrawEnemies()
         {
+            DisableSelect();
+
             foreach (var r in enemyLabels)
                 r.Visibility = Visibility.Collapsed;
 
@@ -77,6 +118,22 @@ namespace TeheManX_Editor.Forms
                 Canvas.SetLeft(enemyLabels[i], Level.Enemies[Level.Id][i].X - viewerX - Const.EnemyOffset);
                 Canvas.SetTop(enemyLabels[i], Level.Enemies[Level.Id][i].Y - viewerY - Const.EnemyOffset);
                 enemyLabels[i].Visibility = Visibility.Visible;
+            }
+        }
+        private void UpdateEnemyLabelPositions()
+        {
+            foreach (EnemyLabel lbl in enemyLabels)
+            {
+                if (lbl.Visibility != Visibility.Visible)
+                    break; //if the label is not visable that means we are done re-positioning
+
+                Enemy en = (Enemy)lbl.Tag; // the world-position data
+
+                double x = en.X - viewerX - Const.EnemyOffset;
+                double y = en.Y - viewerY - Const.EnemyOffset;
+
+                Canvas.SetLeft(lbl, x);
+                Canvas.SetTop(lbl, y);
             }
         }
         private void DisableSelect() //Disable editing Enemy Properties
@@ -190,6 +247,52 @@ namespace TeheManX_Editor.Forms
             obj = null;
             down = false;
             canvas.ReleaseMouseCapture();
+        }
+        private void LayoutImage_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            // Ignore if not middle mouse button
+            if (e.ChangedButton != MouseButton.Middle)
+                return;
+
+            isPanning = true;
+            panStartMouse = e.GetPosition(canvas);
+            panStartViewerX = viewerX;
+            panStartViewerY = viewerY;
+
+            Mouse.OverrideCursor = Cursors.ScrollAll;
+        }
+        private void LayoutImage_PreviewMouseMove(object sender, MouseEventArgs e)
+        {
+            // Must be actively panning AND middle button must still be pressed
+            if (!isPanning)
+                return;
+            System.Diagnostics.Stopwatch sw = System.Diagnostics.Stopwatch.StartNew();
+            Point pos = e.GetPosition(canvas);
+
+            double dx = pos.X - panStartMouse.X;
+            double dy = pos.Y - panStartMouse.Y;
+
+            viewerX = panStartViewerX - (int)dx;
+            viewerY = panStartViewerY - (int)dy;
+
+            MainWindow.window.UpdateEnemyViewerCam();
+            DrawLayout();
+            UpdateEnemyLabelPositions();
+            sw.Stop();
+            System.Diagnostics.Debug.WriteLine($"Time: {sw.ElapsedMilliseconds} ms");
+        }
+        private void LayoutImage_PreviewMouseUp(object sender, MouseButtonEventArgs e)
+        {
+            isPanning = false;
+            Mouse.OverrideCursor = null;
+        }
+        private void LayoutImage_MouseLeave(object sender, MouseEventArgs e)
+        {
+            if (isPanning)
+            {
+                isPanning = false;
+                Mouse.OverrideCursor = null;
+            }
         }
         private void idInt_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {

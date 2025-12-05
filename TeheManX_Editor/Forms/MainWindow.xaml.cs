@@ -166,7 +166,7 @@ namespace TeheManX_Editor.Forms
         }
         public void UpdateEnemyViewerCam()
         {
-            window.enemyE.camLbl.Text = "X:" + Convert.ToString(window.enemyE.viewerX >> 8, 16).PadLeft(4, '0').ToUpper() + " Y:" + Convert.ToString(window.enemyE.viewerY, 16).PadLeft(4, '0').ToUpper();
+            window.enemyE.camLbl.Text = "X:" + Convert.ToString(window.enemyE.viewerX, 16).PadLeft(4, '0').ToUpper() + " Y:" + Convert.ToString(window.enemyE.viewerY, 16).PadLeft(4, '0').ToUpper();
         }
         private void MainKeyCheck(string key)
         {
@@ -379,45 +379,55 @@ namespace TeheManX_Editor.Forms
         {
             if (!notFocus)  //check if NumInt is focused
                 return;
+            int speed;
+            if (settings.InvertSpeed)
+                speed = 1;
+            else
+                speed = 0x100;
+
+            if (Keyboard.IsKeyDown(Key.LeftShift))
+            {
+                if (settings.InvertSpeed)
+                    speed = 0x100;
+                else
+                    speed = 1;
+            }
+
             if (key == "W")
             {
-                if (window.enemyE.viewerY != 0)
-                {
-                    window.enemyE.viewerY -= 0x100;
-                    window.enemyE.DrawLayout();
-                    window.enemyE.DrawEnemies();
-                    UpdateEnemyViewerCam();
-                }
+                window.enemyE.viewerY -= speed;
+                if (window.enemyE.viewerY < 0) 
+                    window.enemyE.viewerY = 0;
+                window.enemyE.DrawLayout();
+                window.enemyE.DrawEnemies();
+                UpdateEnemyViewerCam();
             }
             else if (key == "S")
             {
-                if ((window.enemyE.viewerY >> 8) < (32 - 2))
-                {
-                    window.enemyE.viewerY += 0x100;
-                    window.enemyE.DrawLayout();
-                    window.enemyE.DrawEnemies();
-                    UpdateEnemyViewerCam();
-                }
+                window.enemyE.viewerY += speed;
+                if (window.enemyE.viewerY > 0x1FFF)
+                    window.enemyE.viewerY = 0x1FFF;
+                window.enemyE.DrawLayout();
+                window.enemyE.DrawEnemies();
+                UpdateEnemyViewerCam();
             }
             else if (key == "D")
             {
-                if ((window.enemyE.viewerX >> 8) < (32 - 3))
-                {
-                    window.enemyE.viewerX += 0x100;
-                    window.enemyE.DrawLayout();
-                    window.enemyE.DrawEnemies();
-                    UpdateEnemyViewerCam();
-                }
+                window.enemyE.viewerX += speed;
+                if (window.enemyE.viewerX > 0x1FFF)
+                    window.enemyE.viewerX = 0x1FFF;
+                window.enemyE.DrawLayout();
+                window.enemyE.DrawEnemies();
+                UpdateEnemyViewerCam();
             }
             else if (key == "A")
             {
-                if (window.enemyE.viewerX != 0)
-                {
-                    window.enemyE.viewerX -= 0x100;
-                    window.enemyE.DrawLayout();
-                    window.enemyE.DrawEnemies();
-                    UpdateEnemyViewerCam();
-                }
+                window.enemyE.viewerX -= speed;
+                if (window.enemyE.viewerX < 0)
+                    window.enemyE.viewerX = 0;
+                window.enemyE.DrawLayout();
+                window.enemyE.DrawEnemies();
+                UpdateEnemyViewerCam();
             }
         }
         private int GetHubIndex()

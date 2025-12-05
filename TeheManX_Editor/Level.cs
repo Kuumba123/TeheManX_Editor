@@ -85,6 +85,76 @@ namespace TeheManX_Editor
                 }
             }
         }
+        public static unsafe void Draw16xTile_Clamped(int id, int x, int y,int stride, IntPtr dest,int bmpWidth, int bmpHeight)
+        {
+            int stageId;
+            if (Const.Id == Const.GameId.MegaManX3 && Id == 0xE)
+                stageId = 0x10;
+            else if (Const.Id == Const.GameId.MegaManX3 && Id > 0xE)
+                stageId = (Id - 0xF) + 0xE;
+            else
+                stageId = Id;
+
+            int offset = SNES.CpuToOffset(
+                BinaryPrimitives.ReadInt32LittleEndian(
+                    SNES.rom.AsSpan(Const.Tile16DataPointersOffset[BG] + stageId * 3))
+                + id * 8);
+
+            byte* buffer = (byte*)dest;
+            Color backColor = Palette[0, 0];
+
+            // precalc bounds
+            int maxX = bmpWidth - 1;
+            int maxY = bmpHeight - 1;
+
+            for (int i = 0; i < 4; i++)
+            {
+                ushort val = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + i * 2));
+                int tileOffset = (val & 0x3FF) * 0x20;
+                int set = (val >> 10) & 7;
+
+                bool flipH = (val & 0x4000) != 0;
+                bool flipV = (val & 0x8000) != 0;
+
+                int tileX = x + ((i & 1) * 8);
+                int tileY = y + ((i >> 1) * 8);
+
+                for (int row = 0; row < 8; row++)
+                {
+                    int srcRow = flipV ? (7 - row) : row;
+                    int py = tileY + srcRow;
+                    if (py < 0 || py > maxY) continue;
+
+                    int base1 = tileOffset + (row * 2);
+                    int base2 = tileOffset + 0x10 + (row * 2);
+
+                    for (int col = 0; col < 8; col++)
+                    {
+                        int srcCol = flipH ? (7 - col) : col;
+                        int px = tileX + srcCol;
+                        if (px < 0 || px > maxX) continue;
+
+                        int bit = 7 - col;
+                        int p0 = (Tiles[base1] >> bit) & 1;
+                        int p1 = (Tiles[base1 + 1] >> bit) & 1;
+                        int p2 = (Tiles[base2] >> bit) & 1;
+                        int p3 = (Tiles[base2 + 1] >> bit) & 1;
+
+                        byte index = (byte)(p0 | (p1 << 1) | (p2 << 2) | (p3 << 3));
+                        Color color = index == 0 ? backColor : Palette[set, index];
+
+                        uint pixel = color.B
+                                    | ((uint)color.G << 8)
+                                    | ((uint)color.R << 16)
+                                    | 0xFF000000;
+
+                        int destIndex = (py * stride) + (px * 4);
+                        *(uint*)(buffer + destIndex) = pixel;
+                    }
+                }
+            }
+        }
+
         public static unsafe void DrawScreen(int s, int stride, IntPtr ptr)
         {
             int id;
@@ -128,6 +198,29 @@ namespace TeheManX_Editor
                     Draw16xTile(BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(tile32Offset + (tileId32 * 8) + 2)), x * 32 + 16 + drawX, y * 32 + drawY, stride, ptr);
                     Draw16xTile(BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(tile32Offset + (tileId32 * 8) + 4)), x * 32 + drawX, y * 32 + 16 + drawY, stride, ptr);
                     Draw16xTile(BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(tile32Offset + (tileId32 * 8) + 6)), x * 32 + 16 + drawX, y * 32 + 16 + drawY, stride, ptr);
+                }
+            }
+        }
+        public static unsafe void DrawScreen_Clamped(int s, int drawX, int drawY, int stride, IntPtr ptr, int bmpWidth, int bmpHeight)
+        {
+            int id;
+            if (Const.Id == Const.GameId.MegaManX3 && Id == 0xE) id = 0x10; //special case for MMX3 rekt version of dophler 2
+            else if (Const.Id == Const.GameId.MegaManX3 && Id > 0xE) id = (Id - 0xF) + 0xE; //Buffalo or Beetle
+            else id = Id;
+
+            int offset = SNES.CpuToOffset(BinaryPrimitives.ReadInt32LittleEndian(SNES.rom.AsSpan(Const.ScreenDataPointersOffset[BG] + id * 3))) + s * 0x80;
+            int tile32Offset = SNES.CpuToOffset(BinaryPrimitives.ReadInt32LittleEndian(SNES.rom.AsSpan(Const.Tile32DataPointersOffset[BG] + id * 3)));
+
+            for (int y = 0; y < 8; y++)
+            {
+                for (int x = 0; x < 8; x++)
+                {
+                    ushort tileId32 = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + (x * 2) + (y * 16)));
+
+                    Draw16xTile_Clamped(BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(tile32Offset + (tileId32 * 8))), x * 32 + drawX, y * 32 + drawY, stride, ptr, bmpWidth, bmpHeight);
+                    Draw16xTile_Clamped(BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(tile32Offset + (tileId32 * 8) + 2)), x * 32 + 16 + drawX, y * 32 + drawY, stride, ptr, bmpWidth, bmpHeight);
+                    Draw16xTile_Clamped(BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(tile32Offset + (tileId32 * 8) + 4)), x * 32 + drawX, y * 32 + 16 + drawY, stride, ptr, bmpWidth, bmpHeight);
+                    Draw16xTile_Clamped(BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(tile32Offset + (tileId32 * 8) + 6)), x * 32 + 16 + drawX, y * 32 + 16 + drawY, stride, ptr, bmpWidth, bmpHeight);
                 }
             }
         }

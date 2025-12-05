@@ -7,6 +7,7 @@
         public bool SaveOnTest { get; set; }
         public int ReferanceWidth { get; set; }
         public bool DontUpdate { get; set; }
+        public bool InvertSpeed { get; set; }
         #endregion Properties
 
         #region Constructors
