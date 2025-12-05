@@ -1,5 +1,4 @@
-﻿using static TeheManX_Editor.Const;
-
+﻿
 namespace TeheManX_Editor
 {
     static class Const
@@ -698,38 +697,41 @@ namespace TeheManX_Editor
             }
 
             if (expanded)
-            {
-                for (int i = 0; i < PlayableLevelsCount; i++)
-                {
-                    LayoutLength[i, 0] = ExpandLayoutLength;
-                    LayoutLength[i, 1] = ExpandLayoutLength;
-
-                    if (Id == GameId.MegaManX)
-                        ScreenCount[i, 0] = ExpandMaxScreens[0];
-                    else
-                        ScreenCount[i, 0] = ExpandMaxScreens2[0];
-                    ScreenCount[i, 1] = ExpandMaxScreens[1];
-
-                    Tile32Count[i, 0] = ExpandMaxTiles32[0];
-                    Tile32Count[i, 1] = ExpandMaxTiles32[1];
-
-                    Tile16Count[i, 0] = ExpandMaxTiles16;
-                    Tile16Count[i, 0] = ExpandMaxTiles16;
-                }
-
-                if (gameId == GameId.MegaManX)
-                    EnemyDataBank = MegaManX.BankCount;
-                else if (gameId == GameId.MegaManX2)
-                    EnemyDataBank = MegaManX2.BankCount;
-                else
-                    EnemyDataBank = MegaManX3.BankCount;
-
-                EnemyPointersOffset = (SNES.OffsetToCpu(EnemyPointersOffset) & 0x7FFF) + EnemyDataBank * 0x8000;
-            }
+                AssignExpand();
         }
         public static void AssignExpand()
         {
+            LayoutLength = (int[,])LayoutLength.Clone();
+            ScreenCount = (int[,])ScreenCount.Clone();
+            Tile32Count = (int[,])Tile32Count.Clone();
+            Tile16Count = (int[,])Tile32Count.Clone();
 
+            for (int i = 0; i < PlayableLevelsCount; i++)
+            {
+                LayoutLength[i, 0] = ExpandLayoutLength;
+                LayoutLength[i, 1] = ExpandLayoutLength;
+
+                if (Id == GameId.MegaManX)
+                    ScreenCount[i, 0] = ExpandMaxScreens[0];
+                else
+                    ScreenCount[i, 0] = ExpandMaxScreens2[0];
+                ScreenCount[i, 1] = ExpandMaxScreens[1];
+
+                Tile32Count[i, 0] = ExpandMaxTiles32[0];
+                Tile32Count[i, 1] = ExpandMaxTiles32[1];
+
+                Tile16Count[i, 0] = ExpandMaxTiles16;
+                Tile16Count[i, 0] = ExpandMaxTiles16;
+            }
+
+            if (Id == GameId.MegaManX)
+                EnemyDataBank = MegaManX.BankCount;
+            else if (Id == GameId.MegaManX2)
+                EnemyDataBank = MegaManX2.BankCount;
+            else
+                EnemyDataBank = MegaManX3.BankCount;
+
+            EnemyPointersOffset = (SNES.OffsetToCpu(EnemyPointersOffset) & 0x7FFF) + EnemyDataBank * 0x8000;
         }
     }
 }

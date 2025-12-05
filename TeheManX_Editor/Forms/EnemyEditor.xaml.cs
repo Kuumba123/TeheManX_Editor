@@ -328,9 +328,8 @@ namespace TeheManX_Editor.Forms
                         dumpAddr = SNES.OffsetToCpu(i * 0xCC * 8 + 1 * i + startWrite + Const.PlayableLevelsCount * 2);
                         BinaryPrimitives.WriteUInt16LittleEndian(SNES.rom.AsSpan(writeOffset), (ushort)(dumpAddr & 0xFFFF));
                     }
-                    //Update Enemy Bank + Offset
+                    //Update Enemy Pointer
                     Const.EnemyPointersOffset = (SNES.OffsetToCpu(Const.EnemyPointersOffset) & 0x7FFF) + bankCount * 0x8000;
-                    Const.EnemyDataBank = bankCount;
                 }
 
                 //Write Enemy Data Banks
@@ -387,12 +386,7 @@ namespace TeheManX_Editor.Forms
                             else
                                 maxScreens = Const.ExpandMaxScreens2[0];
                             dumpOffset += maxScreens * 0x80;
-
-                            //Set Max Screens for Layer 1
-                            Const.ScreenCount[i, 0] = maxScreens;
                         }
-                        //Set Max Screens for Layer 2
-                        Const.ScreenCount[i, 1] = Const.ExpandMaxScreens[1];
 
                         //Dump Existing Screen Data (Layer 2)
                         Array.Copy(SNES.rom, SNES.CpuToOffset(BitConverter.ToInt32(SNES.rom, Const.ScreenDataPointersOffset[1] + id * 3)), SNES.rom, dumpOffset, Const.ScreenCount[i, 1] * 0x80);
@@ -420,10 +414,6 @@ namespace TeheManX_Editor.Forms
                         dumpAddr = SNES.OffsetToCpu(dumpOffset) | addrMask;
                         BinaryPrimitives.WriteUInt16LittleEndian(SNES.rom.AsSpan(Const.Tile32DataPointersOffset[1] + id * 3), (ushort)(dumpAddr & 0xFFFF));
                         SNES.rom[Const.Tile32DataPointersOffset[1] + id * 3 + 2] = (byte)((dumpAddr >> 16) & 0xFF);
-
-                        //Set Max 32x32 Tiles for Layer 1 & 2
-                        Const.Tile32Count[i, 0] = Const.ExpandMaxTiles32[0];
-                        Const.Tile32Count[i, 1] = Const.ExpandMaxTiles32[1];
 
                         //Increament Dump Offset
                         dumpOffset += Const.ExpandMaxTiles32[1] * 8;
@@ -457,17 +447,9 @@ namespace TeheManX_Editor.Forms
                         if ((dumpOffset % 0x8000) != 0)
                             dumpOffset += 0x8000 - (dumpOffset % 0x8000);
 
-                        //Set Max 16x16 Tiles for Layer 1 & 2
-                        Const.Tile16Count[i, 0] = Const.ExpandMaxTiles16;
-                        Const.Tile16Count[i, 1] = Const.ExpandMaxTiles16;
-
                         //Increament Dump Offset to Next Bank
                         if ((dumpOffset % 0x8000) != 0)
                             dumpOffset += 0x8000 - (dumpOffset % 0x8000);
-
-                        //Set New Layout Length
-                        Const.LayoutLength[i, 0] = Const.ExpandLayoutLength;
-                        Const.LayoutLength[i, 1] = Const.ExpandLayoutLength;
                     }
                 }
                 else //Expand Code for MegaMan X3
@@ -476,9 +458,14 @@ namespace TeheManX_Editor.Forms
                 }
 
 
-                    //Done
-                    SNES.edit = true;
+                //Done
+                SNES.edit = true;
                 SNES.expanded = true;
+                Const.AssignExpand();
+                MainWindow.window.layoutE.AssignLimits();
+                MainWindow.window.screenE.AssignLimits();
+                MainWindow.window.tile32E.AssignLimits();
+                MainWindow.window.tile16E.AssignLimits();
                 MessageBox.Show("Expansion Applied for Layout , Screen , 32x32 , 16x16 Enemy tabs!");
             };
             Button deleteAllBtn = new Button() { Content = "Delete All" };
