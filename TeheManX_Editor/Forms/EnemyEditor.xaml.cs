@@ -50,6 +50,8 @@ namespace TeheManX_Editor.Forms
 
             int bmpWidth = layoutBMP.PixelWidth;
             int bmpHeight = layoutBMP.PixelHeight;
+            nint bufferP = layoutBMP.BackBuffer;
+            int stride = layoutBMP.BackBufferStride;
 
             int tileX = viewerX >> 8;   // 256-pixel screen index
             int tileY = viewerY >> 8;
@@ -58,9 +60,12 @@ namespace TeheManX_Editor.Forms
 
             unsafe
             {
-                byte* ptr = (byte*)layoutBMP.BackBuffer;
-                int size = layoutBMP.BackBufferStride * bmpHeight;
-                System.Runtime.CompilerServices.Unsafe.InitBlock(ptr, 0, (uint)size);
+                uint* ptr = (uint*)bufferP;
+                for (int i = 0; i < (768 * 512); i++)
+                {
+                    *ptr = 0xFF000000;
+                    ptr++;
+                }
             }
 
             for (int sy = 0; sy < 3; sy++)
@@ -83,13 +88,13 @@ namespace TeheManX_Editor.Forms
                         Level.Layout[Level.Id, Level.BG, layoutIndex],
                         drawX, drawY,
                         layoutBMP.BackBufferStride,
-                        layoutBMP.BackBuffer,
+                        bufferP,
                         bmpWidth, bmpHeight
                     );
                 }
             }
 
-            layoutBMP.AddDirtyRect(new Int32Rect(0, 0, bmpWidth, bmpHeight));
+            layoutBMP.AddDirtyRect(new Int32Rect(0, 0, 768, 512));
             layoutBMP.Unlock();
         }
         public void DrawEnemies()
@@ -278,8 +283,6 @@ namespace TeheManX_Editor.Forms
             MainWindow.window.UpdateEnemyViewerCam();
             DrawLayout();
             UpdateEnemyLabelPositions();
-            sw.Stop();
-            System.Diagnostics.Debug.WriteLine($"Time: {sw.ElapsedMilliseconds} ms");
         }
         private void LayoutImage_PreviewMouseUp(object sender, MouseButtonEventArgs e)
         {
