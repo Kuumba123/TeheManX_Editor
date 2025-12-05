@@ -16,6 +16,10 @@ namespace TeheManX_Editor.Forms
     /// </summary>
     public partial class PaletteEditor : UserControl
     {
+        #region Fields
+        public static double scale = 1;
+        #endregion Fields
+
         #region Properties
         WriteableBitmap vramTiles = new WriteableBitmap(128, 512, 96, 96, PixelFormats.Bgra32, null);
         Rectangle selectSetRect = new Rectangle() { IsHitTestVisible = false, StrokeThickness = 2.5, StrokeDashArray = new DoubleCollection() { 2.2 }, CacheMode = null, Stroke = Brushes.PapayaWhip };

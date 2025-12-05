@@ -21,28 +21,34 @@ namespace TeheManX_Editor
         public bool MegaManXOpen { get; set; }
         public bool MegaManX2Open { get; set; }
         public bool MegaManX3Open { get; set; }
-    }
-    public class WindowLayout
-    {
-        public double Left { get; set; }
-        public double Top { get; set; }
-        public double Width { get; set; }
-        public double Height { get; set; }
-        public bool Max {  get; set; }
-        public int WindowState { get; set; }
-        public string Type { get; set; }
-        public object Child { get; set; }
-    }
-    class BranchLayout
-    {
-        public Type FirstItemType { get; set; }
-        public object FirstItem { get; set; }
-        public GridLength FirstItemLength { get; set; }
+        //Vram Tiles for 16x16 and Palette Tab
+        public double ScaleVram { get; set; }
+        public double ScaleVram2
+        {
+            get; set;
+        }
+        public class WindowLayout
+        {
+            public double Left { get; set; }
+            public double Top { get; set; }
+            public double Width { get; set; }
+            public double Height { get; set; }
+            public bool Max { get; set; }
+            public int WindowState { get; set; }
+            public string Type { get; set; }
+            public object Child { get; set; }
+        }
+        public class BranchLayout
+        {
+            public Type FirstItemType { get; set; }
+            public object FirstItem { get; set; }
+            public GridLength FirstItemLength { get; set; }
 
-        public string SecondItemType { get; set; }
-        public object SecondItem { get; set; }
-        public GridLength SecondItemLength { get; set; }
+            public string SecondItemType { get; set; }
+            public object SecondItem { get; set; }
+            public GridLength SecondItemLength { get; set; }
 
-        public int Orientation;
+            public int Orientation;
+        }
     }
 }

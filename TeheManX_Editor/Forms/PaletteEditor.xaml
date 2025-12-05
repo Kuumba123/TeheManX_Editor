@@ -13,7 +13,7 @@
         </Grid.ColumnDefinitions>
 
         <!--VRAM Tiles-->
-        <ScrollViewer>
+        <ScrollViewer VerticalAlignment="Top">
             <Image x:Name="vramTileImage" Width="256"/>
         </ScrollViewer>
         

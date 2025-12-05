@@ -9,6 +9,7 @@ using System.Text.Json.Serialization;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using static TeheManX_Editor.Layout;
 
 namespace TeheManX_Editor.Forms
 {
@@ -80,7 +81,16 @@ namespace TeheManX_Editor.Forms
                     ToolsWindow.mmxOpen = layout.MegaManXOpen;
                     ToolsWindow.mmx2Open = layout.MegaManX2Open;
                     ToolsWindow.mmx3Open = layout.MegaManX3Open;
-                    
+
+                    Tile16Editor.scale = layout.ScaleVram;
+                    if (Tile16Editor.scale < 1)
+                        Tile16Editor.scale = 1;
+                    PaletteEditor.scale = layout.ScaleVram;
+                    if (PaletteEditor.scale < 1)
+                        PaletteEditor.scale = 1;
+
+                    window.tile16E.vramTileImage.Width = Tile16Editor.scale * 128;
+                    window.paletteE.vramTileImage.Width = PaletteEditor.scale * 128;
                 }
                 LockWindows();
 
@@ -310,6 +320,24 @@ namespace TeheManX_Editor.Forms
             if (key == "Delete")
                 window.screenE.DeleteScreen();
         }
+        private void Tile16KeyCheck(string key)
+        {
+            if (Keyboard.IsKeyDown(Key.LeftShift))
+            {
+                if (key == "OemPlus")
+                {
+                    if (Tile16Editor.scale != Const.MaxVramScale)
+                        Tile16Editor.scale++;
+                    window.tile16E.vramTileImage.Width = Tile16Editor.scale * 128;
+                }
+                else if (key == "OemMinus")
+                {
+                    if (Tile16Editor.scale != 1)
+                        Tile16Editor.scale--;
+                    window.tile16E.vramTileImage.Width = Tile16Editor.scale * 128;
+                }
+            }
+        }
         private void PaletteKeyCheck(string key)
         {
             bool update = false;
@@ -318,10 +346,25 @@ namespace TeheManX_Editor.Forms
                 window.paletteE.palId--;
                 update = true;
             }
-            else if(key == "Down")
+            else if (key == "Down")
             {
                 window.paletteE.palId++;
                 update = true;
+            }
+            else if (Keyboard.IsKeyDown(Key.LeftShift))
+            {
+                if (key == "OemPlus")
+                {
+                    if (PaletteEditor.scale != Const.MaxVramScale)
+                        PaletteEditor.scale++;
+                    window.paletteE.vramTileImage.Width = PaletteEditor.scale * 128;
+                }
+                else if (key == "OemMinus")
+                {
+                    if (PaletteEditor.scale != 1)
+                        PaletteEditor.scale--;
+                    window.paletteE.vramTileImage.Width = PaletteEditor.scale * 128;
+                }
             }
 
             if (update)
@@ -505,6 +548,9 @@ namespace TeheManX_Editor.Forms
             layout.MegaManXOpen = ToolsWindow.mmxOpen;
             layout.MegaManX2Open = ToolsWindow.mmx2Open;
             layout.MegaManX3Open = ToolsWindow.mmx3Open;
+
+            layout.ScaleVram = Tile16Editor.scale;
+            layout.ScaleVram2 = PaletteEditor.scale;
 
             foreach (Window childWind in Application.Current.Windows)
             {
@@ -955,6 +1001,11 @@ namespace TeheManX_Editor.Forms
                         ScreenKeyCheck(key);
                         break;
                     }
+                case "tile16Tab":
+                    {
+                        Tile16KeyCheck(key);
+                        break;
+                    }
                 case "paletteTab":
                     {
                         PaletteKeyCheck(key);
@@ -963,11 +1014,6 @@ namespace TeheManX_Editor.Forms
                 case "enemyTab":
                     {
                         EnemyKeyCheck(key, nonNumInt);
-                        break;
-                    }
-                case "animeTab":
-                    {
-                        //AnimeKeyCheck(key, nonNumInt);
                         break;
                     }
             }

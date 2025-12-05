@@ -13,6 +13,10 @@ namespace TeheManX_Editor.Forms
     /// </summary>
     public partial class Tile16Editor : UserControl
     {
+        #region Fields
+        public static double scale = 1;
+        #endregion Fields
+
         #region Properties
         WriteableBitmap x16BMP = new WriteableBitmap(256, 256, 96, 96, PixelFormats.Bgra32, null);
         WriteableBitmap vramTiles = new WriteableBitmap(128, 512, 96, 96, PixelFormats.Bgra32, null);
