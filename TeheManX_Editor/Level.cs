@@ -154,7 +154,6 @@ namespace TeheManX_Editor
                 }
             }
         }
-
         public static unsafe void DrawScreen(int s, int stride, IntPtr ptr)
         {
             int id;
