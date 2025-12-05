@@ -1,4 +1,6 @@
-﻿namespace TeheManX_Editor
+﻿using static TeheManX_Editor.Const;
+
+namespace TeheManX_Editor
 {
     static class Const
     {
@@ -50,7 +52,7 @@
 
         public static int EnemyPointersOffset;
         public static int EnemyDataBank;
-        public static int EnemyBankAsmOffset; //for expansion
+        public static int[] EnemyBankAsmOffsets = new int[3]; //for expansion
 
         public static int MaxTotalCheckpoints;
         public static int CheckpointOffset;
@@ -146,8 +148,8 @@
             public static readonly int[] Tile16DataPointersOffset = { 0x30E71, 0x3109C };
             public static int TileCollisionDataPointersOffset = 0x30EE0;
 
-            public const int BankCount = 48;
-            internal class NA // North America Version
+            public const int BankCount = 48; //$80-AF
+            internal static class NA // North America Version
             {
                 public const int LoadTileSetInfoOffset = 0x3756F;
                 public const int CompressedTileInfoOffset = 0x376F7;
@@ -155,9 +157,9 @@
                 public const int CameraTriggersOffset = 0x364E2;
                 public const int CameraSettingsOffset = 0x36CD0;
                 public const int BackgroundTileInfoOffset = 0x321D5;
-                public const int EnemyBankAsmOffset = 0x5B93; //for expansion
+                public static readonly int[] EnemyBankAsmOffsets = { 0x5B93 , 0x5BDA, 0x5D4D }; //for expansion
             }
-            internal class JP // Japanese Version
+            internal static class JP // Japanese Version
             {
                 public const int LoadTileSetInfoOffset = 0x37572;
                 public const int CompressedTileInfoOffset = 0x376FA;
@@ -165,7 +167,7 @@
                 public const int CameraTriggersOffset = 0x364E5;
                 public const int CameraSettingsOffset = 0x36CD3;
                 public const int BackgroundTileInfoOffset = 0x321D8;
-                public const int EnemyBankAsmOffset = 0x5B91; //for expansion
+                public static readonly int[] EnemyBankAsmOffsets = { 0x5B91 , 0x5BD8, 0x5D4B }; //for expansion
             }
             public static readonly int[,] LayoutLength = new int[0x25, 2]
 {
@@ -321,7 +323,7 @@
             public const int LoadTileSetStageBase = 4;
 
             public const int EnemyDataBank = 0x29;
-            public const int EnemyBankAsmOffset = 0x5B97; //for expansion
+            public static readonly int[] EnemyBankAsmOffsets ={ 0x5B97 , 0x5BDE, 0x5D45}; //for expansion
 
             public const int MaxTotalCheckpoints = 64;
 
@@ -337,8 +339,8 @@
             public static readonly int[] Tile16DataPointersOffset = { 0x0309D5, 0x30C00 };
             public static int TileCollisionDataPointersOffset = 0x030A44;
 
-            public const int BankCount = 48;
-            internal class NA // North America Version
+            public const int BankCount = 48;//$80-AF
+            internal static class NA // North America Version
             {
                 public const int LoadTileSetInfoOffset = 0x37831;
                 public const int CompressedTileInfoOffset = 0x37A01;
@@ -346,7 +348,7 @@
                 public const int CheckpointOffset = 0x324C5;
                 public const int BackgroundTileInfoOffset = 0x31D6A;
             }
-            internal class JP // Japanese Version
+            internal static class JP // Japanese Version
             {
                 public const int LoadTileSetInfoOffset = 0x37832;
                 public const int CompressedTileInfoOffset = 0x37A02;
@@ -388,7 +390,7 @@
             };
             public static readonly int[,] Tile16Count = new int[0xD, 2]
             {
-                    {0x3A3, 0x3A3},
+                    {0x3A4, 0x3A4},
                     {0x3B3, 0x3B3},
                     {0x2F0, 0x2F0},
                     {0x2BA, 0x2BA},
@@ -437,7 +439,7 @@
 
             public const int EnemyPointersOffset = 0x1E4E4B;
             public const int EnemyDataBank = 0x3C;
-            public const int EnemyBankAsmOffset = 0x5D81; //for expansion
+            public static readonly int[] EnemyBankAsmOffsets = { 0x5D81, 0x5DC8, 0x5F2F }; //for expansion
 
             public const int MaxTotalCheckpoints = 53;
 
@@ -453,7 +455,7 @@
             public static readonly int[] Tile16DataPointersOffset = { 0x30B00, 0x30D2B };
             public static int TileCollisionDataPointersOffset = 0x30B6F;
 
-            public const int BankCount = 64;
+            public const int BankCount = 64; //0-3F
 
             public static readonly int[,] LayoutLength = new int[0x11, 2]
             {
@@ -589,7 +591,7 @@
                     CompressedTileInfoOffset = MegaManX.NA.CompressedTileInfoOffset;
                     CheckpointOffset = MegaManX.NA.CheckpointOffset;
                     BackgroundTileInfoOffset = MegaManX.NA.BackgroundTileInfoOffset;
-                    EnemyBankAsmOffset = MegaManX.NA.EnemyBankAsmOffset;
+                    EnemyBankAsmOffsets = MegaManX.NA.EnemyBankAsmOffsets;
                 }
                 else
                 {
@@ -597,7 +599,7 @@
                     CompressedTileInfoOffset = MegaManX.JP.CompressedTileInfoOffset;
                     CheckpointOffset = MegaManX.JP.CheckpointOffset;
                     BackgroundTileInfoOffset = MegaManX.JP.BackgroundTileInfoOffset;
-                    EnemyBankAsmOffset = MegaManX.JP.EnemyBankAsmOffset;
+                    EnemyBankAsmOffsets = MegaManX.JP.EnemyBankAsmOffsets;
                 }
             }
             else if (gameId == GameId.MegaManX2)
@@ -615,7 +617,7 @@
                 LoadTileSetStageBase = MegaManX2.LoadTileSetStageBase;
 
                 EnemyDataBank = MegaManX2.EnemyDataBank;
-                EnemyBankAsmOffset = MegaManX2.EnemyBankAsmOffset;
+                EnemyBankAsmOffsets = MegaManX2.EnemyBankAsmOffsets;
 
                 MaxTotalCheckpoints = MegaManX2.MaxTotalCheckpoints;
 
@@ -664,7 +666,7 @@
 
                 EnemyPointersOffset = MegaManX3.EnemyPointersOffset;
                 EnemyDataBank = MegaManX3.EnemyDataBank;
-                EnemyBankAsmOffset = MegaManX3.EnemyBankAsmOffset;
+                EnemyBankAsmOffsets = MegaManX3.EnemyBankAsmOffsets;
 
                 MaxTotalCheckpoints = MegaManX3.MaxTotalCheckpoints;
 
@@ -714,7 +716,20 @@
                     Tile16Count[i, 0] = ExpandMaxTiles16;
                     Tile16Count[i, 0] = ExpandMaxTiles16;
                 }
+
+                if (gameId == GameId.MegaManX)
+                    EnemyDataBank = MegaManX.BankCount;
+                else if (gameId == GameId.MegaManX2)
+                    EnemyDataBank = MegaManX2.BankCount;
+                else
+                    EnemyDataBank = MegaManX3.BankCount;
+
+                EnemyPointersOffset = (SNES.OffsetToCpu(EnemyPointersOffset) & 0x7FFF) + EnemyDataBank * 0x8000;
             }
+        }
+        public static void AssignExpand()
+        {
+
         }
     }
 }
