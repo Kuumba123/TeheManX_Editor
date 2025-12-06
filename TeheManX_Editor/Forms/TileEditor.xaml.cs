@@ -131,6 +131,7 @@ namespace TeheManX_Editor.Forms
 
             MainWindow.window.layoutE.DrawLayout();
             MainWindow.window.layoutE.DrawScreen();
+            MainWindow.window.enemyE.DrawLayout();
 
             MainWindow.window.screenE.DrawScreen();
             MainWindow.window.screenE.DrawTiles();

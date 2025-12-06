@@ -18,7 +18,7 @@
                 <RowDefinition/>
                 <RowDefinition Height="auto"/>
             </Grid.RowDefinitions>
-            <Grid x:Name="screenGrid" Grid.RowSpan="3">
+            <Grid x:Name="screenGrid" Grid.RowSpan="3" VerticalAlignment="Top">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition/>
                     <ColumnDefinition/>
@@ -54,7 +54,7 @@
             <!--32x32 Tile List-->
             <Border Grid.Column="1" Grid.Row="1" BorderBrush="White" BorderThickness="2" HorizontalAlignment="Left" Margin="0">
                 <ScrollViewer Grid.RowSpan="16" Grid.ColumnSpan="16" HorizontalAlignment="Left">
-                    <Grid x:Name="tileGrid">
+                    <Grid x:Name="tileGrid" VerticalAlignment="Top">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition/>
                             <ColumnDefinition/>
@@ -136,7 +136,7 @@
             <Grid.RowDefinitions>
                 <RowDefinition/>
             </Grid.RowDefinitions>
-            <Grid x:Name="screenGrid16">
+            <Grid x:Name="screenGrid16" VerticalAlignment="Top">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition/>
                     <ColumnDefinition/>

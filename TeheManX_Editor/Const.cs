@@ -11,7 +11,9 @@ namespace TeheManX_Editor
         };
         public const int EnemyOffset = 8; //For Enemy Labels
         public const int MaxUndo = 512;
-        public const double MaxVramScale = 4;
+        public const double MaxVramScale = 6;
+        public const double MaxScaleUI = 8;
+        public const double MaxEnemyScale = 8;
         public enum GameId
         {
             MegaManX,

@@ -4,8 +4,9 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TeheManX_Editor.Forms"
+        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         mc:Ignorable="d"
-        Title="TeheMan X Editor Settings" Height="350" Width="350"  ResizeMode="NoResize" WindowStartupLocation="CenterScreen" Closing="Window_Closing">
+        Title="TeheMan X Editor Settings" Height="360" Width="380"  ResizeMode="NoResize" WindowStartupLocation="CenterScreen" Closing="Window_Closing">
     <Window.Resources>
         <Style TargetType="CheckBox">
             <Setter Property="Foreground" Value="White"/>
@@ -40,11 +41,50 @@
                     <Label HorizontalAlignment="Center">Options</Label>
                 </StackPanel>
                 <CheckBox x:Name="saveOnTestCheck" Checked="saveOnTestCheck_Checked" Unchecked="saveOnTestCheck_Unchecked">Save on Test</CheckBox>
+                <CheckBox x:Name="dontUpdateCheck" Checked="dontUpdateCheck_Change" Unchecked="dontUpdateCheck_Change">Dont check for Updates</CheckBox>
+
+                <StackPanel Background="#191919">
+                    <Label HorizontalAlignment="Center">GUI Config</Label>
+                </StackPanel>
                 <StackPanel Orientation="Horizontal">
                     <local:NumInt FontSize="22" x:Name="displayInt" ValueChanged="displayInt_ValueChanged" FormatString="" ParsingNumberStyle="Integer" ShowButtonSpinner="False" Minimum="0" Maximum="9000" Height="30" Width="55"></local:NumInt>
                     <Label>Display Referance Width</Label>
                 </StackPanel>
-                <CheckBox x:Name="dontUpdateCheck" Checked="dontUpdateCheck_Change" Unchecked="dontUpdateCheck_Change">Dont check for Updates</CheckBox>
+                <CheckBox x:Name="fixedCheck" Checked="fixedCheck_CheckChange" Unchecked="fixedCheck_CheckChange">Fixed Scale</CheckBox>
+                <StackPanel Orientation="Horizontal">
+                    <xctk:DoubleUpDown x:Name="layoutDouble" Value="2" Increment="0.25" FormatString="F2" Minimum="1" Maximum="10" FontSize="18" AllowTextInput="False" ValueChanged="layoutDouble_ValueChanged"/>
+                    <Label>Layout Scale</Label>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <xctk:DoubleUpDown x:Name="layoutScreenDouble" Value="1" Increment="0.25" FormatString="F2" Minimum="1" Maximum="10" FontSize="18" AllowTextInput="False" ValueChanged="layoutScreenDouble_ValueChanged"/>
+                    <Label>Layout Screen Scale</Label>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <xctk:DoubleUpDown x:Name="screenDouble" Value="2" Increment="0.25" FormatString="F2" Minimum="1" Maximum="10" FontSize="18" AllowTextInput="False" ValueChanged="screenDouble_ValueChanged"/>
+                    <Label>Screen Scale</Label>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <xctk:DoubleUpDown x:Name="screenTilesDouble" Value="2" Increment="0.25" FormatString="F2" Minimum="1" Maximum="10" FontSize="18" AllowTextInput="False" ValueChanged="screenTilesDouble_ValueChanged"/>
+                    <Label>Screen Tiles Scale</Label>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <xctk:DoubleUpDown x:Name="tile32Double" Value="2" Increment="0.25" FormatString="F2" Minimum="1" Maximum="10" FontSize="18" AllowTextInput="False" ValueChanged="tile32Double_ValueChanged"/>
+                    <Label>Tiles in 32x32 Tab Scale</Label>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <xctk:DoubleUpDown x:Name="tile32Image16Double" Value="2" Increment="0.25" FormatString="F2" Minimum="1" Maximum="10" FontSize="18" AllowTextInput="False" ValueChanged="tile32Image16Double_ValueChanged"/>
+                    <Label>16x16 Tiles in 32x32 Tab Scale</Label>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <xctk:DoubleUpDown x:Name="tile16Double" Value="2" Increment="0.25" FormatString="F2" Minimum="1" Maximum="10" FontSize="18" AllowTextInput="False" ValueChanged="tile16Double_ValueChanged"/>
+                    <Label>Tiles in 16x16 Scale</Label>
+                </StackPanel>
+
+                <StackPanel Background="#191919">
+                    <Label HorizontalAlignment="Center">Enemy Tab Config</Label>
+                </StackPanel>
+                <CheckBox x:Name="enemyScaleCheck" Checked="enemyScaleCheckChange" Unchecked="enemyScaleCheckChange">Disable Auto Scale</CheckBox>
+                <CheckBox x:Name="enemyInvertSpeedCheck" Checked="enemyInvertSpeedCheckChange" Unchecked="enemyInvertSpeedCheckChange">Invert Speeds</CheckBox>
             </StackPanel>
         </Grid>
     </ScrollViewer>

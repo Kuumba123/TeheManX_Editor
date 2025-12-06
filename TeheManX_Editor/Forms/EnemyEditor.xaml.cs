@@ -17,6 +17,7 @@ namespace TeheManX_Editor.Forms
     {
         #region Fields
         static List<EnemyLabel> enemyLabels = new List<EnemyLabel>();
+        public static double scale = 1;
         #endregion Fields
 
         #region Properties

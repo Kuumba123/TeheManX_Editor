@@ -23,10 +23,9 @@ namespace TeheManX_Editor
         public bool MegaManX3Open { get; set; }
         //Vram Tiles for 16x16 and Palette Tab
         public double ScaleVram { get; set; }
-        public double ScaleVram2
-        {
-            get; set;
-        }
+        public double ScaleVram2 { get; set; }
+        //Enemy Viewer
+        public double ScaleEnemy { get; set; }
         public class WindowLayout
         {
             public double Left { get; set; }

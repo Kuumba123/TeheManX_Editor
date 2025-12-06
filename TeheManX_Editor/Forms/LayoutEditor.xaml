@@ -13,14 +13,13 @@
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="*"/>
+            <RowDefinition/>
         </Grid.RowDefinitions>
         <!--Layout Viewer & Cam Info-->
-        <Grid x:Name="layoutGrid" Grid.RowSpan="2">
+        <Grid x:Name="layoutGrid" VerticalAlignment="Top">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
@@ -28,7 +27,7 @@
                 <RowDefinition/>
                 <RowDefinition/>
             </Grid.RowDefinitions>
-            <Image x:Name="layoutImage" Grid.RowSpan="3" Grid.ColumnSpan="3" x:FieldModifier="public"  HorizontalAlignment="Left" VerticalAlignment="Top" MouseDown="layoutImage_MouseDown"></Image>
+            <Image x:Name="layoutImage" Grid.RowSpan="3" Grid.ColumnSpan="3" MouseDown="layoutImage_MouseDown"></Image>
         </Grid>
         <TextBlock x:Name="camLbl" IsHitTestVisible="False" Grid.Row="0" Foreground="White" FontFamily="Consolas" Margin="5,0,0,0" HorizontalAlignment="Left" FontSize="20"></TextBlock>
 

@@ -18,7 +18,7 @@
         </Grid.RowDefinitions>
         
         <!--16x16 Tiles-->
-        <Grid x:Name="x16grid" Grid.RowSpan="3">
+        <Grid x:Name="x16grid" Grid.RowSpan="3" VerticalAlignment="Top">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition/>
                 <ColumnDefinition/>

@@ -50,7 +50,6 @@ namespace TeheManX_Editor.Forms
                         Application.Current.Shutdown();
                     }
                 }
-                DefineSizing();
 
                 if (File.Exists("Layout.json"))
                 {
@@ -91,7 +90,14 @@ namespace TeheManX_Editor.Forms
 
                     window.tile16E.vramTileImage.Width = Tile16Editor.scale * 128;
                     window.paletteE.vramTileImage.Width = PaletteEditor.scale * 128;
+
+                    EnemyEditor.scale = layout.ScaleEnemy;
+                    if (EnemyEditor.scale < 1)
+                        EnemyEditor.scale = 1;
                 }
+
+                DefineSizing();
+
                 LockWindows();
 
                 string[] args = Environment.GetCommandLineArgs();
@@ -429,6 +435,23 @@ namespace TeheManX_Editor.Forms
                 window.enemyE.DrawEnemies();
                 UpdateEnemyViewerCam();
             }
+            else if (Keyboard.IsKeyDown(Key.LeftShift))
+            {
+                if (key == "OemPlus")
+                {
+                    if (EnemyEditor.scale != 8)
+                        EnemyEditor.scale++;
+                    window.enemyE.viewBox.Width = EnemyEditor.scale * 768;
+                    window.enemyE.viewBox.Height = EnemyEditor.scale * 512;
+                }
+                else if (key == "OemMinus")
+                {
+                    if (EnemyEditor.scale != 1)
+                        EnemyEditor.scale--;
+                    window.enemyE.viewBox.Width = EnemyEditor.scale * 768;
+                    window.enemyE.viewBox.Height = EnemyEditor.scale * 512;
+                }
+            }
         }
         private int GetHubIndex()
         {
@@ -561,6 +584,8 @@ namespace TeheManX_Editor.Forms
 
             layout.ScaleVram = Tile16Editor.scale;
             layout.ScaleVram2 = PaletteEditor.scale;
+
+            layout.ScaleEnemy = EnemyEditor.scale;
 
             foreach (Window childWind in Application.Current.Windows)
             {
@@ -783,16 +808,183 @@ namespace TeheManX_Editor.Forms
         }
         public void DefineSizing()
         {
-            int W;
-            if (settings.ReferanceWidth < 200)
-                W = (int)(40 * SystemParameters.PrimaryScreenWidth / 100);
+            if (!settings.UseFixedScale)
+            {
+                int W;
+                if (settings.ReferanceWidth < 200)
+                    W = (int)(40 * SystemParameters.PrimaryScreenWidth / 100);
+                else
+                    W = 40 * settings.ReferanceWidth / 100;
+
+                //Layout Tab
+                window.layoutE.layoutImage.Width = double.NaN;
+                window.layoutE.layoutImage.MaxWidth = double.PositiveInfinity;
+                window.layoutE.layoutImage.Height = double.NaN;
+                window.layoutE.layoutImage.MaxHeight = double.PositiveInfinity;
+                window.layoutE.layoutGrid.Width = double.NaN;
+                window.layoutE.layoutGrid.MaxWidth = double.PositiveInfinity;
+                window.layoutE.layoutGrid.Height = double.NaN;
+                window.layoutE.layoutGrid.MaxHeight = double.PositiveInfinity;
+                window.layoutE.selectImage.Width = double.NaN;
+                window.layoutE.selectImage.MaxWidth = W;
+                window.layoutE.selectImage.Height = double.NaN;
+                window.layoutE.selectImage.MaxHeight = double.PositiveInfinity;
+
+                //Screen Tab
+                window.screenE.screenImage.Width = double.NaN;
+                window.screenE.screenImage.MaxWidth = double.PositiveInfinity;
+                window.screenE.screenImage16.Width = double.NaN;
+                window.screenE.screenImage16.MaxWidth = double.PositiveInfinity;
+
+                window.screenE.screenGrid.Width = double.NaN;
+                window.screenE.screenGrid.MaxWidth = double.PositiveInfinity;
+                window.screenE.screenGrid16.Width = double.NaN;
+                window.screenE.screenGrid16.MaxWidth = double.PositiveInfinity;
+
+                window.screenE.screenGrid.Height = double.NaN;
+                window.screenE.screenGrid.MaxHeight = double.PositiveInfinity;
+                window.screenE.screenGrid16.Height = double.NaN;
+                window.screenE.screenGrid16.MaxHeight = double.PositiveInfinity;
+
+                window.screenE.screenImage.Height = double.NaN;
+                window.screenE.screenImage.MaxHeight = double.PositiveInfinity;
+                window.screenE.screenImage16.Height = double.NaN;
+                window.screenE.screenImage16.MaxHeight = double.PositiveInfinity;
+
+                window.screenE.tileImage.Width = double.NaN;
+                window.screenE.tileImage.MaxWidth = W;
+                window.screenE.tileImage16.Width = double.NaN;
+                window.screenE.tileImage16.MaxWidth = W;
+
+                window.screenE.tileImage.Height = double.NaN;
+                window.screenE.tileImage.MaxHeight = double.PositiveInfinity;
+                window.screenE.tileImage16.Height = double.NaN;
+                window.screenE.tileImage16.MaxHeight = double.PositiveInfinity;
+
+                window.screenE.tileGrid.Width = double.NaN;
+                window.screenE.tileGrid.MaxWidth = double.PositiveInfinity;
+                window.screenE.tileGrid.Height = double.NaN;
+                window.screenE.tileGrid.MaxHeight = double.PositiveInfinity;
+
+                //Tile 32x32 Tab
+                window.tile32E.tileImage.Width = double.NaN;
+                window.tile32E.tileImage.MaxWidth = double.PositiveInfinity;
+
+                window.tile32E.tileImage.Height = double.NaN;
+                window.tile32E.tileImage.MaxHeight = double.PositiveInfinity;
+
+                window.tile32E.tileGrid.Width = double.NaN;
+                window.tile32E.tileGrid.MaxWidth = double.PositiveInfinity;
+
+                window.tile32E.tileGrid.Height = double.NaN;
+                window.tile32E.tileGrid.MaxHeight = double.PositiveInfinity;
+
+                window.tile32E.x16Image.Width = double.NaN;
+                window.tile32E.x16Image.MaxWidth = W;
+
+                window.tile32E.x16Image.Height = double.NaN;
+                window.tile32E.x16Image.MaxHeight = double.PositiveInfinity;
+
+                window.tile32E.x16grid.Width = double.NaN;
+                window.tile32E.x16grid.MaxWidth = double.PositiveInfinity;
+
+                window.tile32E.x16grid.Height = double.NaN;
+                window.tile32E.x16grid.MaxHeight = double.PositiveInfinity;
+
+                window.tile32E.mainGrid.ColumnDefinitions[0].Width = new GridLength(1, GridUnitType.Star);
+
+                //Tile 16x16 Tab
+                window.tile16E.x16Image.Width = double.NaN;
+                window.tile16E.x16Image.MaxWidth = double.PositiveInfinity;
+                window.tile16E.x16Image.Height = double.NaN;
+                window.tile16E.x16Image.MaxHeight = double.PositiveInfinity;
+            }
             else
-                W = 40 * settings.ReferanceWidth / 100;
-            window.layoutE.selectImage.MaxWidth = W;
-            window.screenE.tileImage.MaxWidth = W;
-            window.screenE.tileImage16.MaxWidth = W;
-            window.tile32E.x16Image.MaxWidth = W;
-            window.enemyE.canvas.Width = window.enemyE.layoutBMP.PixelWidth;
+            {
+                double main = 768 * settings.LayoutScale;
+                double sub = 256 * settings.LayoutScreenScale;
+
+                //Layout Tab
+                window.layoutE.layoutImage.Width = main;
+                window.layoutE.layoutImage.MaxWidth = main;
+                window.layoutE.layoutImage.Height = main;
+                window.layoutE.layoutImage.MaxHeight = main;
+                window.layoutE.layoutGrid.Width = main;
+                window.layoutE.layoutGrid.Height = main;
+
+                window.layoutE.selectImage.Width = sub;
+                window.layoutE.selectImage.MaxWidth = sub;
+                window.layoutE.selectImage.Height = sub;
+                window.layoutE.selectImage.MaxHeight = sub;
+
+                //Screen Tab
+                main = 256 * settings.ScreenScale;
+                window.screenE.screenImage.Width = main;
+                window.screenE.screenImage.MaxWidth  = main;
+                window.screenE.screenImage.Height = main;
+                window.screenE.screenImage.MaxHeight = main;
+                window.screenE.screenImage16.Width = main;
+                window.screenE.screenImage16.MaxWidth = main;
+                window.screenE.screenImage16.Height = main;
+                window.screenE.screenImage16.MaxHeight = main;
+                window.screenE.screenGrid.Width = main;
+                window.screenE.screenGrid.Height = main;
+                window.screenE.screenGrid16.Width = main;
+                window.screenE.screenGrid16.Height = main;
+
+                main = 256 * settings.ScreenTilesScale;
+                window.screenE.tileImage.Width = main;
+                window.screenE.tileImage.MaxWidth = main;
+                window.screenE.tileGrid.Width = main;
+                window.screenE.tileImage.Height = 1024 * settings.ScreenTilesScale;
+                window.screenE.tileImage.MaxHeight = 1024 * settings.ScreenTilesScale;
+                window.screenE.tileGrid.Height = 1024 * settings.ScreenTilesScale;
+                window.screenE.tileImage16.Width = main;
+                window.screenE.tileImage16.MaxWidth = main;
+                window.screenE.tileImage16.Height = main;
+                window.screenE.tileImage16.MaxHeight = main;
+
+                //Tile 32x32 Tab
+                main = 256 * settings.Tile32Scale;
+                sub = 256 * settings.Tile32Image16Scale;
+                window.tile32E.tileImage.Width = main;
+                window.tile32E.tileImage.MaxWidth = main;
+                window.tile32E.tileImage.Height = 1024 * settings.Tile32Scale;
+                window.tile32E.tileImage.MaxHeight = 1024 * settings.Tile32Scale; ;
+                window.tile32E.x16Image.Width = sub;
+                window.tile32E.x16Image.MaxWidth = sub;
+                window.tile32E.x16Image.Height = sub;
+                window.tile32E.x16Image.MaxHeight = sub;
+
+                window.tile32E.tileGrid.Width = main;
+                window.tile32E.tileGrid.MaxWidth = main;
+                window.tile32E.tileGrid.Height = 1024 * settings.Tile32Scale;
+                window.tile32E.tileGrid.MaxHeight = 1024 * settings.Tile32Scale;
+
+                window.tile32E.x16grid.Width = sub;
+                window.tile32E.x16grid.Height = sub;
+
+                window.tile32E.mainGrid.ColumnDefinitions[0].Width = GridLength.Auto;
+
+                main = 256 * settings.Tile16Scale;
+                window.tile16E.x16Image.Width = main;
+                window.tile16E.x16Image.MaxWidth = main;
+                window.tile16E.x16Image.Height = main;
+                window.tile16E.x16Image.MaxHeight = main;
+
+                window.tile16E.x16grid.Width = main;
+                window.tile16E.x16grid.Height = main;
+            }
+            if (settings.EnemyFixedScale)
+            {
+                window.enemyE.viewBox.Width = 768 * EnemyEditor.scale;
+                window.enemyE.viewBox.Height = EnemyEditor.scale * 512;
+            }
+            else
+            {
+                window.enemyE.viewBox.Width = double.NaN;
+                window.enemyE.viewBox.Height = double.NaN;
+            }
         }
         #endregion Methods
 
