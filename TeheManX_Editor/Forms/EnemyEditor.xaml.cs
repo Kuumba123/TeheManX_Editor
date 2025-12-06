@@ -121,22 +121,22 @@ namespace TeheManX_Editor.Forms
                 enemyLabels[i].Tag = Level.Enemies[Level.Id][i];
                 enemyLabels[i].text.Text = Level.Enemies[Level.Id][i].Id.ToString("X");
                 enemyLabels[i].AssignTypeBorder(Level.Enemies[Level.Id][i].Type);
-                Canvas.SetLeft(enemyLabels[i], Level.Enemies[Level.Id][i].X - viewerX - Const.EnemyOffset);
-                Canvas.SetTop(enemyLabels[i], Level.Enemies[Level.Id][i].Y - viewerY - Const.EnemyOffset);
+                Canvas.SetLeft(enemyLabels[i], Level.Enemies[Level.Id][i].X - viewerX);
+                Canvas.SetTop(enemyLabels[i], Level.Enemies[Level.Id][i].Y - viewerY);
                 enemyLabels[i].Visibility = Visibility.Visible;
             }
         }
-        private void UpdateEnemyLabelPositions()
+        public void UpdateEnemyLabelPositions()
         {
             foreach (EnemyLabel lbl in enemyLabels)
             {
                 if (lbl.Visibility != Visibility.Visible)
-                    break; //if the label is not visable that means we are done re-positioning
+                    continue;
 
                 Enemy en = (Enemy)lbl.Tag; // the world-position data
 
-                double x = en.X - viewerX - Const.EnemyOffset;
-                double y = en.Y - viewerY - Const.EnemyOffset;
+                double x = en.X - viewerX;
+                double y = en.Y - viewerY;
 
                 Canvas.SetLeft(lbl, x);
                 Canvas.SetTop(lbl, y);
@@ -156,8 +156,8 @@ namespace TeheManX_Editor.Forms
         }
         private void UpdateEnemyCordLabel(int x, int y, byte col)
         {
-            MainWindow.window.enemyE.xInt.Value = x + viewerX + Const.EnemyOffset;
-            MainWindow.window.enemyE.yInt.Value = y + viewerY + Const.EnemyOffset;
+            MainWindow.window.enemyE.xInt.Value = x + viewerX;
+            MainWindow.window.enemyE.yInt.Value = y + viewerY;
             MainWindow.window.enemyE.columnInt.Value = col;
         }
         private bool ValidEnemyAdd()
@@ -231,10 +231,10 @@ namespace TeheManX_Editor.Forms
             double y = pos.Y - point.Y;
 
             //Border Checks
-            if (x < 0 - Const.EnemyOffset)
-                x = 0 - Const.EnemyOffset;
-            if (y < 0 - Const.EnemyOffset)
-                y = 0 - Const.EnemyOffset;
+            if (x < (0))
+                x = 0;
+            if (y < (0))
+                y = 0;
 
             Enemy en = (Enemy)((EnemyLabel)obj).Tag;
             en.Column = (byte)(short)(((viewerX + x) / 32));
@@ -242,8 +242,8 @@ namespace TeheManX_Editor.Forms
             Canvas.SetLeft(obj, x);
             Canvas.SetTop(obj, y);
             UpdateEnemyCordLabel((int)x, (int)y, en.Column);
-            en.X = (short)((short)(viewerX + x) + Const.EnemyOffset);
-            en.Y = (short)((short)(viewerY + y) + Const.EnemyOffset);
+            en.X = (short)((short)(viewerX + x));
+            en.Y = (short)((short)(viewerY + y));
 
             SNES.edit = true;
         }
@@ -252,6 +252,24 @@ namespace TeheManX_Editor.Forms
             obj = null;
             down = false;
             canvas.ReleaseMouseCapture();
+        }
+        private void canvas_MouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            if (MainWindow.settings.EnemyFixedScale && Keyboard.IsKeyDown(Key.LeftShift))
+            {
+                if (e.Delta > 0)
+                {
+                    if (scale != 8)
+                        scale++;
+                }
+                else
+                {
+                    if (scale != 1)
+                        scale--;
+                }
+                MainWindow.window.enemyE.viewBox.Width = scale * 768;
+                MainWindow.window.enemyE.viewBox.Height = scale * 512;
+            }
         }
         private void LayoutImage_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
@@ -336,8 +354,12 @@ namespace TeheManX_Editor.Forms
             if (control.Tag == null || e.NewValue == null || e.OldValue == null)
                 return;
             SNES.edit = true;
-            ((Enemy)((EnemyLabel)control.Tag).Tag).X = (short)(int)e.NewValue;
-            Canvas.SetLeft((UIElement)control.Tag, ((int)e.NewValue) - viewerX - Const.EnemyOffset);
+            short posX = (short)(int)e.NewValue;
+            Enemy en = ((Enemy)((EnemyLabel)control.Tag).Tag);
+            en.X = posX;
+            en.Column = (byte)((posX / 32));
+            MainWindow.window.enemyE.columnInt.Value = (int)en.Column;
+            Canvas.SetLeft((UIElement)control.Tag, ((int)e.NewValue) - viewerX);
         }
         private void yInt_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
@@ -345,7 +367,7 @@ namespace TeheManX_Editor.Forms
                 return;
             SNES.edit = true;
             ((Enemy)((EnemyLabel)control.Tag).Tag).Y = (short)(int)e.NewValue;
-            Canvas.SetTop((UIElement)control.Tag, ((int)e.NewValue) - viewerY - Const.EnemyOffset);
+            Canvas.SetTop((UIElement)control.Tag, ((int)e.NewValue) - viewerY);
         }
         private void AddEnemy_Click(object sender, RoutedEventArgs e)
         {

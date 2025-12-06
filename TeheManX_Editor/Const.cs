@@ -9,7 +9,6 @@ namespace TeheManX_Editor
         {
             "1.0"
         };
-        public const int EnemyOffset = 8; //For Enemy Labels
         public const int MaxUndo = 512;
         public const double MaxVramScale = 6;
         public const double MaxScaleUI = 8;

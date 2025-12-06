@@ -383,6 +383,13 @@ namespace TeheManX_Editor.Forms
         }
         private void EnemyKeyCheck(string key, bool notFocus)
         {
+            if (key == "Delete" && window.enemyE.control.Tag != null)
+            {
+                Level.Enemies[Level.Id].Remove((Enemy)((EnemyLabel)window.enemyE.control.Tag).Tag);
+                window.enemyE.DrawEnemies();
+                SNES.edit = true;
+                return;
+            }
             if (!notFocus)  //check if NumInt is focused
                 return;
             int speed;
@@ -405,7 +412,7 @@ namespace TeheManX_Editor.Forms
                 if (window.enemyE.viewerY < 0) 
                     window.enemyE.viewerY = 0;
                 window.enemyE.DrawLayout();
-                window.enemyE.DrawEnemies();
+                window.enemyE.UpdateEnemyLabelPositions();
                 UpdateEnemyViewerCam();
             }
             else if (key == "S")
@@ -414,7 +421,7 @@ namespace TeheManX_Editor.Forms
                 if (window.enemyE.viewerY > 0x1FFF)
                     window.enemyE.viewerY = 0x1FFF;
                 window.enemyE.DrawLayout();
-                window.enemyE.DrawEnemies();
+                window.enemyE.UpdateEnemyLabelPositions();
                 UpdateEnemyViewerCam();
             }
             else if (key == "D")
@@ -423,7 +430,7 @@ namespace TeheManX_Editor.Forms
                 if (window.enemyE.viewerX > 0x1FFF)
                     window.enemyE.viewerX = 0x1FFF;
                 window.enemyE.DrawLayout();
-                window.enemyE.DrawEnemies();
+                window.enemyE.UpdateEnemyLabelPositions();
                 UpdateEnemyViewerCam();
             }
             else if (key == "A")
@@ -432,7 +439,7 @@ namespace TeheManX_Editor.Forms
                 if (window.enemyE.viewerX < 0)
                     window.enemyE.viewerX = 0;
                 window.enemyE.DrawLayout();
-                window.enemyE.DrawEnemies();
+                window.enemyE.UpdateEnemyLabelPositions();
                 UpdateEnemyViewerCam();
             }
             else if (Keyboard.IsKeyDown(Key.LeftShift))
