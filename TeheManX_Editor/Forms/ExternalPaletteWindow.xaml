@@ -40,7 +40,7 @@
 
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch" Grid.Column="1" Grid.Row="1">
             <TextBlock Margin="5" FontSize="18">Palette</TextBlock>
-            <local:NumInt x:Name="palIdInt" Increment="2" Minimum="0" Maximum="#FFFF" Value="0" FontSize="17" Width="70" ValueChanged="palId_ValueChanged"></local:NumInt>
+            <local:NumInt x:Name="palIdInt" Increment="2" Minimum="0" Maximum="#1FE" Value="0" FontSize="17" Width="70" ValueChanged="palId_ValueChanged"></local:NumInt>
             <TextBlock Margin="5" FontSize="18">Group</TextBlock>
             <local:NumInt x:Name="groupInt" Increment="2" Minimum="0" Value="0" FontSize="17" Width="50" ValueChanged="groupInt_ValueChanged"></local:NumInt>
         </StackPanel>

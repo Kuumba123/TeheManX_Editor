@@ -16,7 +16,7 @@
             <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
         <Button Click="palBtn_Click">Load Palette</Button>
-        <local:NumInt Grid.Column="1" FontSize="18" Minimum="0" Maximum="#FFFF" Increment="2" x:Name="paletteInt" Width="85" Value="#0"></local:NumInt>
+        <local:NumInt Grid.Column="1" FontSize="18" Minimum="0" Maximum="#1FE" Increment="2" x:Name="paletteInt" Width="85" Value="#0"></local:NumInt>
 
         <Button Click="tileBtn_Click" Grid.Row="1">Load Tiles</Button>
         <local:NumInt Grid.Row="1" Grid.Column="1" FontSize="18" Minimum="0" Maximum="#FF" x:Name="tilesInt" Width="85" Value="#0"></local:NumInt>
