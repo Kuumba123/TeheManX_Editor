@@ -395,15 +395,15 @@ namespace TeheManX_Editor
                     {0x3B3, 0x3B3},
                     {0x2F0, 0x2F0},
                     {0x2BA, 0x2BA},
-                    {0x2F3, 0x2F3},
+                    {0x2F4, 0x2F4},
                     {0x28C, 0x28C},
-                    {0x2B5, 0x2B5},
+                    {0x2B6, 0x2B6},
                     {0x31A, 0x31A},
                     {0x2BE, 0x2BE},
                     {0x113, 0x113},
-                    {0xC7,  0xC7 },
                     {0xCE,  0xCE },
-                    {0x13B, 0x13B}
+                    {0xCE,  0xCE },
+                    {0x13C, 0x13C}
             };
 
             public static readonly int[] EnemiesLength =
