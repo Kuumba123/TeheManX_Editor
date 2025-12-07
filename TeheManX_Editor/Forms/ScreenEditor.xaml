@@ -108,7 +108,7 @@
 
             <StackPanel Grid.Column="1" Grid.Row="2">
                 <WrapPanel Orientation="Horizontal">
-                    <local:NumInt Margin="3,0,0,0" Width="69" Height="40" Value="1" FontSize="33" Maximum="239" MinHeight="0" Focusable="False" x:Name="screenInt" Minimum="0" AllowTextInput="False" ValueChanged="screenInt_ValueChanged"/>
+                    <local:NumInt Margin="3,0,0,0" Width="69" Height="40" Value="1" FontSize="33" Maximum="239" MinHeight="0" Focusable="False" x:Name="screenInt" Minimum="0" ValueChanged="screenInt_ValueChanged"/>
                     <!--Grid Buttons-->
                     <StackPanel Orientation="Horizontal">
                         <Button Margin="5" Padding="10" Click="ScreenGridBtn_Click">Show Screen Grid</Button>
