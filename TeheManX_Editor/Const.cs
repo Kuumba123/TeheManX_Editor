@@ -500,19 +500,19 @@ namespace TeheManX_Editor
             };
             public static readonly int[,] Tile16Count = new int[0x11, 2]
             {
-                    {0x3FF, 0x3FF},
+                    {0x400, 0x400},
                     {0x400, 0x400},
                     {0x2F9, 0x2F9},
                     {0x34B, 0x34B},
                     {0x35A, 0x35A},
                     {0x24E, 0x24E},
                     {0x3FC, 0x3FC},
-                    {0x3B0, 0x3B0},
+                    {0x3C0, 0x3C0},
                     {0x333, 0x333},
                     {0x283, 0x283},
-                    {0x2DF, 0x2DF},
+                    {0x2E4, 0x2E4},
                     {0x293, 0x293},
-                    {0x1F4, 0x1F4},
+                    {0x1FA, 0x1FA},
                     {0x1B7, 0x1B7},
                     {0x293, 0x293},
                     {0x2F9, 0x2F9},
