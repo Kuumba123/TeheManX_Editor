@@ -245,7 +245,6 @@ namespace TeheManX_Editor
                     if (Const.Id == Const.GameId.MegaManX3 && i == 0xE) id = 0x10; //special case for MMX3 rekt version of dophler 2
                     else if (Const.Id == Const.GameId.MegaManX3 && i > 0xE) id = (i - 0xF) + 0xE; //Buffalo or Beetle
                     else id = i;
-                    int layoutLength = 0;
                     int infoOffset = SNES.CpuToOffset(BinaryPrimitives.ReadInt32LittleEndian(SNES.rom.AsSpan(Const.LayoutPointersOffset[l] + id * 3)));
 
                     Array.Clear(temp, 0, temp.Length);
@@ -260,13 +259,11 @@ namespace TeheManX_Editor
                     temp[2] = SNES.rom[infoOffset + 2]; //screen count (not needed for layout but is nice to know)
                     Const.ScreenCount[i, l] = temp[2];
                     infoOffset += 3;
-                    layoutLength += 3;
 
                     while (true)
                     {
                         controlB = SNES.rom[infoOffset];
                         infoOffset++;
-                        layoutLength++;
 
                         if (controlB == 0xFF)
                             break;
@@ -276,7 +273,6 @@ namespace TeheManX_Editor
 
                         controlB = SNES.rom[infoOffset];
                         infoOffset++;
-                        layoutLength++;
 
                         //Write Loop
                         while (count != 0)
