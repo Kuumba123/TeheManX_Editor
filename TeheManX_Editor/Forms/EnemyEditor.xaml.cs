@@ -253,24 +253,6 @@ namespace TeheManX_Editor.Forms
             down = false;
             canvas.ReleaseMouseCapture();
         }
-        private void canvas_MouseWheel(object sender, MouseWheelEventArgs e)
-        {
-            if (MainWindow.settings.EnemyFixedScale && Keyboard.IsKeyDown(Key.LeftShift))
-            {
-                if (e.Delta > 0)
-                {
-                    if (scale != 8)
-                        scale++;
-                }
-                else
-                {
-                    if (scale != 1)
-                        scale--;
-                }
-                MainWindow.window.enemyE.viewBox.Width = scale * 768;
-                MainWindow.window.enemyE.viewBox.Height = scale * 512;
-            }
-        }
         private void LayoutImage_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
             // Ignore if not middle mouse button
