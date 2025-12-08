@@ -510,7 +510,7 @@ namespace TeheManX_Editor
                 {
                     if (column != sorted[i + 1].Column)
                     {
-                        bw.Write((ushort)(sorted[i].X | 0x8000)); // Set high byte to mark end of data
+                        bw.Write((ushort)(sorted[i].X | 0x8000)); // Set high byte to mark end of column
                         column = sorted[i + 1].Column;
                         bw.Write(column); // Write new column byte
                     }
@@ -521,6 +521,28 @@ namespace TeheManX_Editor
             bw.Close();
 
             return ms.ToArray();
+        }
+        private static int GetEnemyDataLength(List<Enemy> enemyList)
+        {
+            int length = 1;
+
+            List<Enemy> sorted = enemyList.OrderBy(e => e.Column).ToList();
+
+            byte column = sorted[0].Column;
+
+            for (int i = 0; i < sorted.Count; i++)
+            {
+                length += 1 + 2 + 1 + 1 + 2;
+
+                if (i == (sorted.Count - 1)) // Last Enemy
+                    length++;
+                else
+                {
+                    if (column != sorted[i + 1].Column)
+                        length++;
+                }
+            }
+            return length;
         }
         public static bool SaveEnemyData()
         {
@@ -539,33 +561,51 @@ namespace TeheManX_Editor
 
             if (!SNES.expanded) // Normal Export
             {
+                int totalSize = 0;
+                int allowedSize = (Const.Id == Const.GameId.MegaManX) ? Const.TotalEnemyDataLength + Const.MegaManX.ExtraTotalEnemyDataLength : Const.TotalEnemyDataLength;
+
+                //Size Check in case enemy data is too long
+                for (int id = 0; id < totalStages; id++)
+                {
+                    totalSize += CreateEnemyData(Enemies[id]).Length;
+
+                    if (totalSize > allowedSize)
+                    {
+                        MessageBox.Show($"Enemy Data is too large to be saved to the game ({totalSize:X} vs {Const.TotalEnemyDataLength:X}).", "ERROR");
+                        return false;
+                    }
+                }
+
+
                 ushort[] pointerData = new ushort[totalStages];
 
                 int dumpOffset = Const.EnemyPointersOffset + totalStages * 2;
+                int dumpAmount = 0;
 
                 if (Const.Id != Const.GameId.MegaManX3)
                     dumpOffset += 6; //X1 & X2 have 3 dummy entries for some reason...
                 else
                     dumpOffset += 2; //X3 has 1 dummy entry...
 
-                    int totalSize = 0;
+                bool extraData = false;
 
                 for (int id = 0; id < totalStages; id++)
                 {
                     byte[] data = CreateEnemyData(Enemies[id]);
-                    totalSize += data.Length;
 
-                    if (totalSize > Const.TotalEnemyDataLength)
+                    if (Const.Id == Const.GameId.MegaManX && !extraData && (dumpAmount + data.Length) > Const.MegaManX.TotalEnemyDataLength)
                     {
-                        MessageBox.Show($"Enemy Data is too large to be saved to the game ({totalSize:X} vs {Const.TotalEnemyDataLength:X}).", "ERROR");
-                        return false;
+                        extraData = true;
+                        dumpOffset = Const.MegaManX.ExtraTotalEnemyDataOffset;
                     }
+
                     //copy actual enemy data and save location
                     Array.Copy(data, 0, SNES.rom, dumpOffset, data.Length);
                     pointerData[id] = (ushort)(SNES.OffsetToCpu(dumpOffset) & 0xFFFF);
 
                     //Increament Offset
                     dumpOffset += data.Length;
+                    dumpAmount += data.Length;
                 }
                 //Now Write 16-bit Pointers
                 Buffer.BlockCopy(pointerData, 0, SNES.rom, Const.EnemyPointersOffset, totalStages * 2);
@@ -578,7 +618,7 @@ namespace TeheManX_Editor
 
                     // Get offset from ROM
                     int offset = SNES.CpuToOffset(
-                        BinaryPrimitives.ReadInt32LittleEndian(SNES.rom.AsSpan(Const.EnemyPointersOffset + (id * 2))),
+                        BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(Const.EnemyPointersOffset + (id * 2))),
                         Const.EnemyDataBank
                     );
 

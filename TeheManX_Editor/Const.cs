@@ -139,6 +139,8 @@ namespace TeheManX_Editor
             public const int EnemyPointersOffset = 0x0282C2;
             public const int EnemyDataBank = 0x85;
             public const int TotalEnemyDataLength = 0x22B2; //does NOT include unused space
+            public const int ExtraTotalEnemyDataLength = 0x37E;
+            public const int ExtraTotalEnemyDataOffset = 0x2B383;
 
             public const int TotalLayoutDataLength = 0x1000; //uses unused space
 
@@ -414,7 +416,7 @@ namespace TeheManX_Editor
 
             public const int EnemyPointersOffset = 0x1E4E4B;
             public const int EnemyDataBank = 0x3C;
-            public const int TotalEnemyDataLength = 0x3013; //uses unused space
+            public const int TotalEnemyDataLength = 0x3195; //uses unused space
             public static readonly int[] EnemyBankAsmOffsets = { 0x5D81, 0x5DC8, 0x5F2F }; //for expansion
 
             public const int TotalLayoutDataLength = 0x800; //uses unused space
