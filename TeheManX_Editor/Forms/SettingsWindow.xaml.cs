@@ -53,8 +53,8 @@ namespace TeheManX_Editor.Forms
         {
             using(var fd = new System.Windows.Forms.OpenFileDialog())
             {
-                fd.Filter = "EXE |*.exe";
-                fd.Title = "Select Emulator EXE";
+                fd.Filter = "Executable or Batch File|*.exe;*.bat;*.cmd";
+                fd.Title = "Select Emulator EXE or Batch File";
                 if(fd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                 {
                     MainWindow.settings.EmuPath = fd.FileName;

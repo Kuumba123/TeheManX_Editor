@@ -525,6 +525,40 @@ namespace TeheManX_Editor.Forms
                 }
             }
         }
+        private void TestGame()
+        {
+            if (emu != null && !emu.HasExited)
+            {
+                emu.Kill();
+                emu.Dispose();
+            }
+
+            ProcessStartInfo psi;
+
+            if (settings.EmuPath.EndsWith(".bat", StringComparison.OrdinalIgnoreCase) ||
+                settings.EmuPath.EndsWith(".cmd", StringComparison.OrdinalIgnoreCase))
+            {
+                psi = new ProcessStartInfo
+                {
+                    FileName = "cmd.exe",
+                    Arguments = $"/c \"\"{settings.EmuPath}\" \"{SNES.savePath}\"\"",
+                    UseShellExecute = false,
+                    WorkingDirectory = Path.GetDirectoryName(settings.EmuPath)
+                };
+            }
+            else
+            {
+                // EXE
+                psi = new ProcessStartInfo
+                {
+                    FileName = settings.EmuPath,
+                    Arguments = $"\"{SNES.savePath}\"",
+                    UseShellExecute = false
+                };
+            }
+
+            emu = Process.Start(psi);
+        }
         private void ProcessUndo()
         {
             if (undos.Count != 0)
@@ -1141,14 +1175,7 @@ namespace TeheManX_Editor.Forms
                     }
                     try
                     {
-                        if (emu == null)
-                            emu = Process.Start(settings.EmuPath, "\"" + SNES.savePath + "\"");
-                        else
-                        {
-                            if (!emu.HasExited)
-                                emu.Kill();
-                            emu.Start();
-                        }
+                        TestGame();
                     }
                     catch (System.ComponentModel.Win32Exception)
                     {
@@ -1306,14 +1333,7 @@ namespace TeheManX_Editor.Forms
             }
             try
             {
-                if (emu == null)
-                    emu = Process.Start(settings.EmuPath, "\"" + SNES.savePath + "\"");
-                else
-                {
-                    if (!emu.HasExited)
-                        emu.Kill();
-                    emu.Start();
-                }
+                TestGame();
             }
             catch (System.ComponentModel.Win32Exception)
             {
@@ -1344,6 +1364,12 @@ namespace TeheManX_Editor.Forms
             if (SNES.rom == null)
                 return;
 
+            if (window.screenE.mode16)
+            {
+                MessageBox.Show("You must exit 16x16 Mode before you can switch stages!");
+                return;
+            }
+
             // Create a new context menu
             ContextMenu menu = new ContextMenu();
 
@@ -1354,11 +1380,6 @@ namespace TeheManX_Editor.Forms
                 item.Uid = i.ToString();
                 item.Click += (s, args) =>
                 {
-                    if (window.screenE.mode16)
-                    {
-                        MessageBox.Show("You must exit 16x16 Mode before you can switch stages!");
-                        return;
-                    }
                     Level.Id = int.Parse(((MenuItem)s).Uid);
                     //Re-Update
                     undos.Clear();
