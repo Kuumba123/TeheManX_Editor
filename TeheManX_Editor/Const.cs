@@ -54,6 +54,9 @@ namespace TeheManX_Editor
         public static int EnemyPointersOffset;
         public static int EnemyDataBank;
         public static int[] EnemyBankAsmOffsets = new int[3]; //for expansion
+        public static int TotalEnemyDataLength;
+
+        public static int TotalLayoutDataLength;
 
         public static int MaxTotalCheckpoints;
         public static int CheckpointOffset;
@@ -71,7 +74,6 @@ namespace TeheManX_Editor
         public static int[,] ScreenCount = new int[MaxLevels, 2];
         public static int[,] Tile32Count;
         public static int[,] Tile16Count;
-        public static int[] EnemiesLength;
 
         public static byte[] VRAM_B = {
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -136,6 +138,9 @@ namespace TeheManX_Editor
 
             public const int EnemyPointersOffset = 0x0282C2;
             public const int EnemyDataBank = 0x85;
+            public const int TotalEnemyDataLength = 0x22B2; //does NOT include unused space
+
+            public const int TotalLayoutDataLength = 0x1000; //uses unused space
 
             public const int MaxTotalCheckpoints = 44;
 
@@ -290,23 +295,6 @@ namespace TeheManX_Editor
                     {0x6F,  0x6F },
                     {0xA8,  0xA8 }
             };
-
-            public static readonly int[] EnemiesLength = 
-            {
-                0x2C8,
-                0x211,
-                0x250,
-                0x4B3,
-                0x2EA,
-                0x32C,
-                0x2E2,
-                0x260,
-                0x2D2,
-                0x37F,
-                0x254,
-                0x2B2,
-                0x27
-            };
         }
         public static class MegaManX2
         {
@@ -324,7 +312,10 @@ namespace TeheManX_Editor
             public const int LoadTileSetStageBase = 4;
 
             public const int EnemyDataBank = 0x29;
-            public static readonly int[] EnemyBankAsmOffsets ={ 0x5B97 , 0x5BDE, 0x5D45}; //for expansion
+            public const int TotalEnemyDataLength = 0x2C07; //uses unused space
+            public static readonly int[] EnemyBankAsmOffsets = { 0x5B97 , 0x5BDE, 0x5D45}; //for expansion
+
+            public const int TotalLayoutDataLength = 0x800; //uses unused space
 
             public const int MaxTotalCheckpoints = 64;
 
@@ -405,23 +396,6 @@ namespace TeheManX_Editor
                     {0xCE,  0xCE },
                     {0x13C, 0x13C}
             };
-
-            public static readonly int[] EnemiesLength =
-            {
-                0x235,
-                0x4A7,
-                0x338,
-                0x489,
-                0x310,
-                0x382,
-                0x3B6,
-                0x3DA,
-                0x45C,
-                0x303,
-                0x212,
-                0x30F,
-                0xBD
-            };
         }
         public static class MegaManX3
         {
@@ -440,7 +414,10 @@ namespace TeheManX_Editor
 
             public const int EnemyPointersOffset = 0x1E4E4B;
             public const int EnemyDataBank = 0x3C;
+            public const int TotalEnemyDataLength = 0x3013; //uses unused space
             public static readonly int[] EnemyBankAsmOffsets = { 0x5D81, 0x5DC8, 0x5F2F }; //for expansion
+
+            public const int TotalLayoutDataLength = 0x800; //uses unused space
 
             public const int MaxTotalCheckpoints = 53;
 
@@ -518,25 +495,6 @@ namespace TeheManX_Editor
                     {0x2F9, 0x2F9},
                     {0x34B, 0x34B}
             };
-
-            public static readonly int[] EnemiesLength =
-            {
-                0x2F1,
-                0x3B4,
-                0x3A7,
-                0x3D9,
-                0x3DA,
-                0x455,
-                0x3C9,
-                0x405,
-                0x33B,
-                0x22B,
-                0x3CB,
-                0x2BA,
-                0x274,
-                0xE6,
-                0x2AC
-            };
             internal class NA
             {
                 public const int LoadTileSetInfoOffset = 0x373C3;
@@ -572,6 +530,8 @@ namespace TeheManX_Editor
 
                 EnemyPointersOffset = MegaManX.EnemyPointersOffset;
                 EnemyDataBank = MegaManX.EnemyDataBank;
+                TotalEnemyDataLength = MegaManX.TotalEnemyDataLength;
+                TotalLayoutDataLength = MegaManX.TotalLayoutDataLength;
 
                 MaxTotalCheckpoints = MegaManX.MaxTotalCheckpoints;
 
@@ -584,7 +544,6 @@ namespace TeheManX_Editor
                 LayoutLength = MegaManX.LayoutLength;
                 Tile32Count = MegaManX.Tile32Count;
                 Tile16Count = MegaManX.Tile16Count;
-                EnemiesLength = MegaManX.EnemiesLength;
 
                 if (gameVersion == GameVersion.NA)
                 {
@@ -619,6 +578,8 @@ namespace TeheManX_Editor
 
                 EnemyDataBank = MegaManX2.EnemyDataBank;
                 EnemyBankAsmOffsets = MegaManX2.EnemyBankAsmOffsets;
+                TotalEnemyDataLength = MegaManX2.TotalEnemyDataLength;
+                TotalLayoutDataLength = MegaManX2.TotalLayoutDataLength;
 
                 MaxTotalCheckpoints = MegaManX2.MaxTotalCheckpoints;
 
@@ -631,7 +592,6 @@ namespace TeheManX_Editor
                 LayoutLength = MegaManX2.LayoutLength;
                 Tile32Count = MegaManX2.Tile32Count;
                 Tile16Count = MegaManX2.Tile16Count;
-                EnemiesLength = MegaManX2.EnemiesLength;
 
                 if (gameVersion == GameVersion.NA)
                 {
@@ -668,6 +628,8 @@ namespace TeheManX_Editor
                 EnemyPointersOffset = MegaManX3.EnemyPointersOffset;
                 EnemyDataBank = MegaManX3.EnemyDataBank;
                 EnemyBankAsmOffsets = MegaManX3.EnemyBankAsmOffsets;
+                TotalEnemyDataLength = MegaManX3.TotalEnemyDataLength;
+                TotalLayoutDataLength = MegaManX3.TotalLayoutDataLength;
 
                 MaxTotalCheckpoints = MegaManX3.MaxTotalCheckpoints;
 
@@ -680,7 +642,6 @@ namespace TeheManX_Editor
                 LayoutLength = MegaManX3.LayoutLength;
                 Tile32Count = MegaManX3.Tile32Count;
                 Tile16Count = MegaManX3.Tile16Count;
-                EnemiesLength = MegaManX3.EnemiesLength;
 
                 if (gameVersion == GameVersion.NA)
                 {

@@ -484,73 +484,106 @@ namespace TeheManX_Editor
                 Application.Current.Shutdown();
             }
         }
-        public static bool SaveEnemyData()
+        private static byte[] CreateEnemyData(List<Enemy> enemyList)
         {
-            for (int id = 0; id < Const.PlayableLevelsCount; id++)
+            MemoryStream ms = new MemoryStream(0x660);
+            BinaryWriter bw = new BinaryWriter(ms);
+
+            List<Enemy> sorted = enemyList.OrderBy(e => e.Column).ToList();
+
+            byte column = sorted[0].Column;
+            bw.Write(column); // Write initial column byte
+
+            for (int i = 0; i < sorted.Count; i++)
             {
-                if (Const.Id == Const.GameId.MegaManX3 && id > 0xE) break; //Buffalo or Beetle
+                bw.Write(sorted[i].Type);
+                bw.Write(sorted[i].Y);
+                bw.Write(sorted[i].Id);
+                bw.Write(sorted[i].SubId);
 
-                List<Enemy> sorted = Enemies[id].OrderBy(e => e.Column).ToList();
-
-                MemoryStream ms = new MemoryStream(0x660);
-                BinaryWriter bw = new BinaryWriter(ms);
-
-                // Stupid bug in enemy dumping code requires at least 1 enemy
-                if (sorted.Count == 0)
+                if (i == (sorted.Count - 1)) // Last Enemy
                 {
-                    MessageBox.Show(
-                        $"Enemy Data for Stage {id:X2} needs atleast 1 enemy because of a bug in the game's enemy dumping code.","ERROR");
-                    return false;
+                    bw.Write((ushort)(sorted[i].X | 0x8000)); // Set high byte to mark end of data
+                    bw.Write(column); // Write final column byte
                 }
-
-                byte column = sorted[0].Column;
-                bw.Write(column); // Write initial column byte
-
-                for (int i = 0; i < sorted.Count; i++)
+                else
                 {
-                    bw.Write(sorted[i].Type);
-                    bw.Write(sorted[i].Y);
-                    bw.Write(sorted[i].Id);
-                    bw.Write(sorted[i].SubId);
-
-                    if (i == (sorted.Count - 1)) // Last Enemy
+                    if (column != sorted[i + 1].Column)
                     {
                         bw.Write((ushort)(sorted[i].X | 0x8000)); // Set high byte to mark end of data
-                        bw.Write(column); // Write final column byte
+                        column = sorted[i + 1].Column;
+                        bw.Write(column); // Write new column byte
                     }
                     else
-                    {
-                        if (column != sorted[i + 1].Column)
-                        {
-                            bw.Write((ushort)(sorted[i].X | 0x8000)); // Set high byte to mark end of data
-                            column = sorted[i + 1].Column;
-                            bw.Write(column); // Write new column byte
-                        }
-                        else
-                            bw.Write(sorted[i].X);
-                    }
+                        bw.Write(sorted[i].X);
                 }
+            }
+            bw.Close();
 
-                // Final size check
-                if (ms.Length > Const.EnemiesLength[id] && !SNES.expanded)
+            return ms.ToArray();
+        }
+        public static bool SaveEnemyData()
+        {
+            int totalStages = (Const.Id == Const.GameId.MegaManX3) ? 0xF : Const.PlayableLevelsCount;
+
+            //1st Check if All Stages have enemies
+            for (int id = 0; id < totalStages; id++)
+            {
+                if (Enemies[id].Count == 0)
                 {
                     MessageBox.Show(
-                        $"Enemy Data for Stage {id:X2} too large ({ms.Length:X}). Max {Const.EnemiesLength[id]:X}",
-                        "ERROR"
-                    );
+                        $"Enemy Data for Stage {id:X2} needs atleast 1 enemy because of a bug in the game's enemy dumping code.", "ERROR");
                     return false;
                 }
+            }
 
-                // Get offset from ROM
-                int offset = SNES.CpuToOffset(
-                    BinaryPrimitives.ReadInt32LittleEndian(SNES.rom.AsSpan(Const.EnemyPointersOffset + (id * 2))),
-                    Const.EnemyDataBank
-                );
+            if (!SNES.expanded) // Normal Export
+            {
+                ushort[] pointerData = new ushort[totalStages];
 
-                Array.Copy(ms.ToArray(), 0, SNES.rom, offset, ms.Length);
+                int dumpOffset = Const.EnemyPointersOffset + totalStages * 2;
 
-                bw.Close();
-                ms.Close();
+                if (Const.Id != Const.GameId.MegaManX3)
+                    dumpOffset += 6; //X1 & X2 have 3 dummy entries for some reason...
+                else
+                    dumpOffset += 2; //X3 has 1 dummy entry...
+
+                    int totalSize = 0;
+
+                for (int id = 0; id < totalStages; id++)
+                {
+                    byte[] data = CreateEnemyData(Enemies[id]);
+                    totalSize += data.Length;
+
+                    if (totalSize > Const.TotalEnemyDataLength)
+                    {
+                        MessageBox.Show($"Enemy Data is too large to be saved to the game ({totalSize:X} vs {Const.TotalEnemyDataLength:X}).", "ERROR");
+                        return false;
+                    }
+                    //copy actual enemy data and save location
+                    Array.Copy(data, 0, SNES.rom, dumpOffset, data.Length);
+                    pointerData[id] = (ushort)(SNES.OffsetToCpu(dumpOffset) & 0xFFFF);
+
+                    //Increament Offset
+                    dumpOffset += data.Length;
+                }
+                //Now Write 16-bit Pointers
+                Buffer.BlockCopy(pointerData, 0, SNES.rom, Const.EnemyPointersOffset, totalStages * 2);
+            }
+            else // Expanded Export
+            {
+                for (int id = 0; id < totalStages; id++)
+                {
+                    byte[] data = CreateEnemyData(Enemies[id]);
+
+                    // Get offset from ROM
+                    int offset = SNES.CpuToOffset(
+                        BinaryPrimitives.ReadInt32LittleEndian(SNES.rom.AsSpan(Const.EnemyPointersOffset + (id * 2))),
+                        Const.EnemyDataBank
+                    );
+
+                    Array.Copy(data, 0, SNES.rom, offset, data.Length);
+                }
             }
 
             return true;
