@@ -29,7 +29,7 @@ namespace TeheManX_Editor
         /*Expansion Constants*/
         public static readonly int[] ExpandMaxScreens = { 0x43, 0x21 };     //for MMX1 only
         public static readonly int[] ExpandMaxScreens2 = { 0x3F, 0x21 };    //for MMX2 & MMX3
-        public static readonly int[] ExpandMaxTiles32 = { 0x540, 0x300 };
+        public static readonly int[] ExpandMaxTiles32 = { 0x600, 0x300 };
         public static int ExpandMaxTiles16 = 0x600; //shared between both layers
         public static int ExpandLayoutLength = 0x300; //for both layers
 
@@ -336,7 +336,7 @@ namespace TeheManX_Editor
             public static readonly int[] Tile16DataPointersOffset = { 0x0309D5, 0x30C00 };
             public static int TileCollisionDataPointersOffset = 0x030A44;
 
-            public const int BankCount = 48;//$80-AF
+            public const int BankCount = 48;//$00-2F
             internal static class NA // North America Version
             {
                 public const int LoadTileSetInfoOffset = 0x37831;
@@ -440,6 +440,8 @@ namespace TeheManX_Editor
             public static int TileCollisionDataPointersOffset = 0x30B6F;
 
             public const int BankCount = 64; //0-3F
+
+            public static readonly int[] FreeBanks = { 0x14, 0x16, 0x17, 0x18, 0x19, 0x34, 0x38, 0x3D }; //Needed for 16x16 Tile Data
 
             public static readonly int[,] LayoutLength = new int[0x11, 2]
             {
