@@ -1094,9 +1094,27 @@ namespace TeheManX_Editor.Forms
 
                 while (true)
                 {
-                    if (Keyboard.FocusedElement.GetType() != typeof(Xceed.Wpf.Toolkit.WatermarkTextBox))
+                    Type dataType = Keyboard.FocusedElement.GetType();
+                    if (dataType != typeof(Xceed.Wpf.Toolkit.WatermarkTextBox) && dataType != typeof(TextBox))
                         break;
-                    ((Xceed.Wpf.Toolkit.WatermarkTextBox)Keyboard.FocusedElement).MoveFocus(tRequest);
+                    ((FrameworkElement)Keyboard.FocusedElement).MoveFocus(tRequest);
+                }
+            }
+            else
+            {
+                TextBox textBox = Keyboard.FocusedElement as TextBox;
+                if (textBox != null)
+                {
+                    TraversalRequest tRequest = new TraversalRequest(FocusNavigationDirection.Next);
+                    textBox.MoveFocus(tRequest);
+
+                    while (true)
+                    {
+                        Type dataType = Keyboard.FocusedElement.GetType();
+                        if (dataType != typeof(Xceed.Wpf.Toolkit.WatermarkTextBox) && dataType != typeof(TextBox))
+                            break;
+                        ((FrameworkElement)Keyboard.FocusedElement).MoveFocus(tRequest);
+                    }
                 }
             }
         }
@@ -1215,6 +1233,32 @@ namespace TeheManX_Editor.Forms
                     this.hub.SelectedIndex = GetActualIndex(hubIndex + 1);
                     window.Focus();
                 }
+                return;
+            }
+            else if (key == "PageUp" && SNES.rom != null && this.hub.Items.Count > 1)
+            {
+                int hubIndex = GetHubIndex();
+                if (hubIndex == 0)
+                {
+                    this.hub.SelectedIndex = GetActualIndex(this.hub.Items.Count - 1);
+                    window.Focus();
+                    return;
+                }
+                this.hub.SelectedIndex = GetActualIndex(hubIndex - 1);
+                window.Focus();
+                return;
+            }
+            else if (key == "Next" && SNES.rom != null && this.hub.Items.Count > 1)
+            {
+                int hubIndex = GetHubIndex();
+                if (hubIndex == this.hub.Items.Count - 1)
+                {
+                    this.hub.SelectedIndex = GetActualIndex(0);
+                    window.Focus();
+                    return;
+                }
+                this.hub.SelectedIndex = GetActualIndex(hubIndex + 1);
+                window.Focus();
                 return;
             }
             if (SNES.rom == null)
