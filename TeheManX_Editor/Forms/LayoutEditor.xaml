@@ -42,7 +42,7 @@
                 <Image x:Name="selectImage" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Top" MaxWidth="768" SnapsToDevicePixels="True"/>
             </Border>
             <WrapPanel Orientation="Horizontal">
-                <local:NumInt FontFamily="Consolas" Value="2" AutoMoveFocus="True" ParsingNumberStyle="HexNumber" FormatString="X" Width="69" Height="40" FontSize="33" Maximum="239" MinHeight="0" Focusable="False" ValueChanged="IntegerUpDown_ValueChanged" x:Name="screenInt" Minimum="0"/>
+                <local:NumInt FontFamily="Consolas" Value="2" ParsingNumberStyle="HexNumber" FormatString="X" Width="69" Height="40" FontSize="33" Maximum="239" MinHeight="0" Focusable="False" ValueChanged="IntegerUpDown_ValueChanged" x:Name="screenInt" Minimum="0"/>
 
                 <StackPanel Orientation="Horizontal">
                     <Button x:Name="gridBtn" Margin="8,5,2,5" Padding="8" Click="gridBtn_Click">Show Grid Lines</Button>
