@@ -33,7 +33,7 @@
             <Setter Property="AutoSelectBehavior" Value="Never"/>
         </Style>
     </UserControl.Resources>
-    <Grid>
+    <Grid Background="Black">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="auto"/>
         </Grid.ColumnDefinitions>

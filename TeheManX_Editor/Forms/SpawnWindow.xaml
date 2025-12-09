@@ -24,7 +24,7 @@
             <Setter Property="AutoSelectBehavior" Value="Never"/>
         </Style>
     </UserControl.Resources>
-    <Grid>
+    <Grid Background="Black">
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>
             <RowDefinition/>
