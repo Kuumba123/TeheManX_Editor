@@ -57,6 +57,7 @@ namespace TeheManX_Editor
         public static int TotalEnemyDataLength;
 
         public static int TotalLayoutDataLength;
+        public static int LayoutDataOffset;
 
         public static int MaxTotalCheckpoints;
         public static int CheckpointOffset;
@@ -143,6 +144,7 @@ namespace TeheManX_Editor
             public const int ExtraTotalEnemyDataOffset = 0x2B383;
 
             public const int TotalLayoutDataLength = 0x1000; //uses unused space
+            public const int LayoutDataOffset = 0x090000;
 
             public const int MaxTotalCheckpoints = 44;
 
@@ -318,6 +320,7 @@ namespace TeheManX_Editor
             public static readonly int[] EnemyBankAsmOffsets = { 0x5B97 , 0x5BDE, 0x5D45}; //for expansion
 
             public const int TotalLayoutDataLength = 0x800; //uses unused space
+            public const int LayoutDataOffset = 0x90000;
 
             public const int MaxTotalCheckpoints = 64;
 
@@ -420,6 +423,7 @@ namespace TeheManX_Editor
             public static readonly int[] EnemyBankAsmOffsets = { 0x5D81, 0x5DC8, 0x5F2F }; //for expansion
 
             public const int TotalLayoutDataLength = 0x800; //uses unused space
+            public const int LayoutDataOffset = 0x1AF800;
 
             public const int MaxTotalCheckpoints = 53;
 
@@ -534,6 +538,7 @@ namespace TeheManX_Editor
                 EnemyDataBank = MegaManX.EnemyDataBank;
                 TotalEnemyDataLength = MegaManX.TotalEnemyDataLength;
                 TotalLayoutDataLength = MegaManX.TotalLayoutDataLength;
+                LayoutDataOffset = MegaManX.LayoutDataOffset;
 
                 MaxTotalCheckpoints = MegaManX.MaxTotalCheckpoints;
 
@@ -582,6 +587,7 @@ namespace TeheManX_Editor
                 EnemyBankAsmOffsets = MegaManX2.EnemyBankAsmOffsets;
                 TotalEnemyDataLength = MegaManX2.TotalEnemyDataLength;
                 TotalLayoutDataLength = MegaManX2.TotalLayoutDataLength;
+                LayoutDataOffset = MegaManX2.LayoutDataOffset;
 
                 MaxTotalCheckpoints = MegaManX2.MaxTotalCheckpoints;
 
@@ -632,6 +638,7 @@ namespace TeheManX_Editor
                 EnemyBankAsmOffsets = MegaManX3.EnemyBankAsmOffsets;
                 TotalEnemyDataLength = MegaManX3.TotalEnemyDataLength;
                 TotalLayoutDataLength = MegaManX3.TotalLayoutDataLength;
+                LayoutDataOffset = MegaManX3.LayoutDataOffset;
 
                 MaxTotalCheckpoints = MegaManX3.MaxTotalCheckpoints;
 
@@ -666,16 +673,12 @@ namespace TeheManX_Editor
         }
         public static void AssignExpand()
         {
-            LayoutLength = (int[,])LayoutLength.Clone();
             ScreenCount = (int[,])ScreenCount.Clone();
             Tile32Count = (int[,])Tile32Count.Clone();
             Tile16Count = (int[,])Tile32Count.Clone();
 
             for (int i = 0; i < PlayableLevelsCount; i++)
             {
-                LayoutLength[i, 0] = ExpandLayoutLength;
-                LayoutLength[i, 1] = ExpandLayoutLength;
-
                 if (Id == GameId.MegaManX)
                     ScreenCount[i, 0] = ExpandMaxScreens[0];
                 else

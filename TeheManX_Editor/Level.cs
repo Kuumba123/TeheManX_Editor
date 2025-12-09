@@ -337,10 +337,62 @@ namespace TeheManX_Editor
         {
             GetLayoutDimensions(layout, out byte width, out byte height);
 
-            var compressed = new List<byte>(0x100);
+            List<byte> compressed = new List<byte>(0x100);
             compressed.Add(width);
             compressed.Add(height);
             compressed.Add(screenCount);
+
+            int stride = 32;
+            List<byte> activeArea = new List<byte>(width * height);
+            for (int y = 0; y < height; y++)
+                for (int x = 0; x < width; x++)
+                    activeArea.Add(layout[y * stride + x]);
+
+            var data = activeArea.ToArray();
+            int total = data.Length;
+            int i = 0;
+
+            while (i < total)
+            {
+                byte start = data[i];
+                int repeatCount = 1;
+                int incCount = 1;
+
+                // Measure repeat runs
+                while (i + repeatCount < total &&
+                       data[i + repeatCount] == start &&
+                       repeatCount < 0x7E)
+                    repeatCount++;
+
+                // Measure increment runs
+                while (i + incCount < total &&
+                       data[i + incCount] == (byte)(data[i + incCount - 1] + 1) &&
+                       incCount < 0x7F)
+                    incCount++;
+
+                // Prefer repeat when tied
+                bool useRepeat = repeatCount >= incCount;
+                int runLength = useRepeat ? repeatCount : incCount;
+
+                byte control = (byte)runLength;
+                if (useRepeat)
+                    control |= 0x80;
+
+                compressed.Add(control);
+                compressed.Add(start);
+
+                i += runLength;
+            }
+
+            compressed.Add(0xFF);
+            return compressed.ToArray();
+        }
+        private static int GetCompressedLayoutLength(byte[] layout)
+        {
+            GetLayoutDimensions(layout, out byte width, out byte height);
+
+            // Initial header: width, height, screenCount
+            int size = 3;
 
             int stride = 32;
             List<byte> activeArea = new List<byte>(width * height);
@@ -374,47 +426,185 @@ namespace TeheManX_Editor
                 bool useRepeat = repeatCount >= incCount;
                 int runLength = useRepeat ? repeatCount : incCount;
 
-                byte control = (byte)runLength;
-                if (useRepeat)
-                    control |= 0x80;
-
-                compressed.Add(control);
-                compressed.Add(start);
+                // The compressor writes:
+                //   control byte + start byte
+                size += 2;
 
                 i += runLength;
             }
 
-            compressed.Add(0xFF);
-            return compressed.ToArray();
+            // Terminator byte
+            size += 1;
+
+            return size;
         }
         public static bool SaveLayouts()
         {
             byte[] layout = new byte[0x400];
-            for (int l = 0; l < 2; l++)
+
+            //Before Attempting to export the Layouts we do Length Checks
+            int totalSize = 0;
+            int allowedSize = Const.TotalLayoutDataLength;
+
+            if (Const.Id != Const.GameId.MegaManX) //Size Check for MegaMan X2 & X3
             {
-                for (int i = 0; i < Const.LevelsCount; i++)
+                for (int l = 0; l < 2; l++)
                 {
-                    for (int d = 0; d < 0x400; d++)
-                        layout[d] = Layout[i, l, d];
-
-                    if (Const.LayoutLength[i, l] == 0) break;
-
-                    byte[] compressedLayout = CompressLayout(layout, (byte)Const.ScreenCount[i, l]);
-
-                    if (compressedLayout.Length > Const.LayoutLength[i, l])
+                    for (int i = 0; i < Const.PlayableLevelsCount; i++)
                     {
-                        MessageBox.Show($"The Layout for Stage {i:X2} Layer {l + 1} is too large ({compressedLayout.Length:X} bytes). The max length is {Const.LayoutLength[i, l]:X} bytes!","ERROR");
-                        return false;
+                        for (int d = 0; d < 0x400; d++)
+                            layout[d] = Layout[i, l, d];
+                        int length = GetCompressedLayoutLength(layout);
+
+                        if (SNES.expanded && length > Const.ExpandLayoutLength)
+                        {
+                            MessageBox.Show($"The Layout for Stage {i:X2} Layer {l + 1} is too large ({length:X} bytes). The max length is {Const.ExpandLayoutLength:X} bytes!", "ERROR");
+                            return false;
+                        }
+
+                        totalSize += length;
                     }
-                    //Save Layout to Rom
-                    int id;
-                    if (Const.Id == Const.GameId.MegaManX3 && i == 0xE) id = 0x10; //special case for MMX3 rekt version of dophler 2
-                    else if (Const.Id == Const.GameId.MegaManX3 && i > 0xE) id = (i - 0xF) + 0xE; //Buffalo or Beetle
-                    else id = i;
-                    int offset = SNES.CpuToOffset(BinaryPrimitives.ReadInt32LittleEndian(SNES.rom.AsSpan(Const.LayoutPointersOffset[l] + id * 3)));
-                    Array.Copy(compressedLayout, 0, SNES.rom, offset, compressedLayout.Length);
                 }
             }
+            else //Size Check for MegaMan X1
+            {
+                for (int l = 0; l < 2; l++)
+                {
+                    for (int i = 0; i < Const.LevelsCount; i++)
+                    {
+                        if (SNES.expanded && (i == 0xD || (i > 0xE && i <= 0x1A) || (i > 0x1B && i <= 0x22))) //Duped Layouts
+                            continue;
+
+                        for (int d = 0; d < 0x400; d++)
+                            layout[d] = Layout[i, l, d];
+                        int length = GetCompressedLayoutLength(layout);
+
+                        if (i < Const.PlayableLevelsCount && SNES.expanded && length > Const.ExpandLayoutLength)
+                        {
+                            MessageBox.Show($"The Layout for Stage {i:X2} Layer {l + 1} is too large ({length:X} bytes). The max length is {Const.ExpandLayoutLength:X} bytes!", "ERROR");
+                            return false;
+                        }
+
+                        if (i < Const.PlayableLevelsCount || !SNES.expanded)
+                            totalSize += length;
+                    }
+                }
+            }
+
+            if ((totalSize > allowedSize && Const.Id != Const.GameId.MegaManX && !SNES.expanded) || (totalSize > allowedSize && Const.Id == Const.GameId.MegaManX))
+            {
+                MessageBox.Show($"Layout Data is too large to be saved to the game ({totalSize:X} vs {allowedSize:X}).", "ERROR");
+                return false;
+            }
+
+            /*
+             *  Size Check is Done!
+             *  Now it is time to export the Layout Data
+             *  
+             *  1. Check the expand flag and dump the layouts (for X1 dont dump the non playable stages) .
+             *  2. If the expand option is not enabled or the game is X1 attempt to dump the layouts semi normally.
+             */
+
+            if (SNES.expanded)
+            {
+                for (int l = 0; l < 2; l++)
+                {
+                    for (int i = 0; i < Const.PlayableLevelsCount; i++)
+                    {
+                        for (int d = 0; d < 0x400; d++)
+                            layout[d] = Layout[i, l, d];
+
+                        byte[] compressedLayout = CompressLayout(layout, (byte)Const.ScreenCount[i, l]);
+
+                        //Save Layout to Rom
+                        int id;
+                        if (Const.Id == Const.GameId.MegaManX3 && i == 0xE) id = 0x10; //special case for MMX3 rekt version of dophler 2
+                        else if (Const.Id == Const.GameId.MegaManX3 && i > 0xE) id = (i - 0xF) + 0xE; //Buffalo or Beetle
+                        else id = i;
+                        int offset = SNES.CpuToOffset(BinaryPrimitives.ReadInt32LittleEndian(SNES.rom.AsSpan(Const.LayoutPointersOffset[l] + id * 3)));
+                        Array.Copy(compressedLayout, 0, SNES.rom, offset, compressedLayout.Length);
+                    }
+                }
+            }
+
+            if (!SNES.expanded || Const.Id == Const.GameId.MegaManX)
+            {
+                int dumpOffset = Const.LayoutDataOffset;
+
+                for (int l = 0; l < 2; l++)
+                {
+                    byte[] pointerData = new byte[Const.LevelsCount * 3];
+
+                    int startIndex;
+
+                    if ((Const.Id != Const.GameId.MegaManX) || !SNES.expanded)
+                        startIndex = 0;
+                    else
+                        startIndex = 0xD;
+
+                    for (int i = startIndex; i < Const.LevelsCount; i++)
+                    {
+                        for (int d = 0; d < 0x400; d++)
+                            layout[d] = Layout[i, l, d];
+
+                        int dumpAddr = SNES.OffsetToCpu(dumpOffset);
+
+                        if (Const.Id == Const.GameId.MegaManX)
+                        {
+                            //Check if layout should be skipped
+                            if ((i == 0xD && !SNES.expanded) || (i > 0xE && i <= 0x1A) || (i > 0x1B && i <= 0x22))
+                                continue;
+
+                            dumpAddr |= 0x800000;
+
+                            //Determine witch layouts are shared and export them
+                            if (i == 4 || (SNES.expanded && i == 0xD))
+                            {
+                                if (SNES.expanded) //direct to expanded Stage 4 if expansion is enabled
+                                    dumpAddr = BinaryPrimitives.ReadInt32LittleEndian(SNES.rom.AsSpan(Const.LayoutPointersOffset[l] + 4 * 3));
+
+                                BinaryPrimitives.WriteUInt16LittleEndian(pointerData.AsSpan(4 * 3), (ushort)(dumpAddr & 0xFFFF));
+                                pointerData[4 * 3 + 2] = (byte)((dumpAddr >> 16) & 0xFF);
+
+                                BinaryPrimitives.WriteUInt16LittleEndian(pointerData.AsSpan(0xD * 3), (ushort)(dumpAddr & 0xFFFF));
+                                pointerData[0xD * 3 + 2] = (byte)((dumpAddr >> 16) & 0xFF);
+                            }
+                            else if (i == 0xE)
+                            {
+                                for (int c = 0; c < 13; c++)
+                                {
+                                    BinaryPrimitives.WriteUInt16LittleEndian(pointerData.AsSpan((c + 0xE) * 3), (ushort)(dumpAddr & 0xFFFF));
+                                    pointerData[(c + 0xE) * 3 + 2] = (byte)((dumpAddr >> 16) & 0xFF);
+                                }
+                            }
+                            else if (i == 0x1B)
+                            {
+                                for (int c = 0; c < 8; c++)
+                                {
+                                    BinaryPrimitives.WriteUInt16LittleEndian(pointerData.AsSpan((c + 0x1B) * 3), (ushort)(dumpAddr & 0xFFFF));
+                                    pointerData[(c + 0x1B) * 3 + 2 + startIndex * 3] = (byte)((dumpAddr >> 16) & 0xFF);
+                                }
+                            }
+                        }
+
+                        byte[] compressedLayout = CompressLayout(layout, (byte)Const.ScreenCount[i, l]);
+
+                        int id;
+                        if (Const.Id == Const.GameId.MegaManX3 && i == 0xE) id = 0x10; //special case for MMX3 rekt version of dophler 2
+                        else if (Const.Id == Const.GameId.MegaManX3 && i > 0xE) id = (i - 0xF) + 0xE; //Buffalo or Beetle
+                        else id = i;
+
+                        Array.Copy(compressedLayout, 0, SNES.rom, dumpOffset, compressedLayout.Length);
+                        BinaryPrimitives.WriteUInt16LittleEndian(pointerData.AsSpan(id * 3), (ushort)(dumpAddr & 0xFFFF));
+                        pointerData[id * 3 + 2] = (byte)((dumpAddr >> 16) & 0xFF);
+
+                        dumpOffset += compressedLayout.Length;
+                    }
+
+                    Array.Copy(pointerData, startIndex * 3, SNES.rom, Const.LayoutPointersOffset[l], pointerData.Length - (startIndex * 3));
+                }
+            }
+
             return true;
         }
         private static void LoadEnemyData()
@@ -566,16 +756,13 @@ namespace TeheManX_Editor
 
                 //Size Check in case enemy data is too long
                 for (int id = 0; id < totalStages; id++)
-                {
                     totalSize += CreateEnemyData(Enemies[id]).Length;
 
-                    if (totalSize > allowedSize)
-                    {
-                        MessageBox.Show($"Enemy Data is too large to be saved to the game ({totalSize:X} vs {Const.TotalEnemyDataLength:X}).", "ERROR");
-                        return false;
-                    }
+                if (totalSize > allowedSize)
+                {
+                    MessageBox.Show($"Enemy Data is too large to be saved to the game ({totalSize:X} vs allowed size of {allowedSize:X}).", "ERROR");
+                    return false;
                 }
-
 
                 ushort[] pointerData = new ushort[totalStages];
 
