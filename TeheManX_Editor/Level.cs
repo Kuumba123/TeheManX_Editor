@@ -620,12 +620,11 @@ namespace TeheManX_Editor
             int stage = 0;
             try
             {
-                for (int i = 0; i < Const.PlayableLevelsCount; i++)
-                {
-                    if (Const.Id == Const.GameId.MegaManX3 && i > 0xE) break; // Buffalo or Beetle
+                int totalStages = (Const.Id == Const.GameId.MegaManX3) ? 0xF : Const.PlayableLevelsCount;
 
+                for (int i = 0; i < totalStages; i++)
+                {
                     stage = i;
-                    Enemies[i].Clear();
                     //Get Address of Enemy Data
                     int addr = SNES.CpuToOffset(BinaryPrimitives.ReadInt32LittleEndian(SNES.rom.AsSpan(Const.EnemyPointersOffset + (i * 2))) , Const.EnemyDataBank);
                     //Get Spawn Cam Byte
