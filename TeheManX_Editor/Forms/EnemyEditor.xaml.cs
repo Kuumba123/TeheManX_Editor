@@ -156,7 +156,7 @@ namespace TeheManX_Editor.Forms
             MainWindow.window.enemyE.columnInt.IsEnabled = false;
             //MainWindow.window.enemyE.nameLbl.Content = "";
         }
-        private void UpdateEnemyCordLabel(int x, int y, byte col)
+        private void UpdateEnemyCordLabel(short x, short y, byte col)
         {
             MainWindow.window.enemyE.xInt.Value = x + viewerX;
             MainWindow.window.enemyE.yInt.Value = y + viewerY;
@@ -224,28 +224,52 @@ namespace TeheManX_Editor.Forms
         private void canvas_PreviewMouseMove(object sender, MouseEventArgs e)
         {
             if (!down) return;
-
-
-            //Move Enemy
             if (obj == null) return;
+
             var pos = e.GetPosition(sender as IInputElement);
+
             double x = pos.X - point.X;
             double y = pos.Y - point.Y;
 
-            //Border Checks
-            if (x < (0))
-                x = 0;
-            if (y < (0))
-                y = 0;
+            // Border checks
+            if (x < 0) x = 0;
+            if (y < 0) y = 0;
 
             Enemy en = (Enemy)((EnemyLabel)obj).Tag;
-            en.Column = (byte)(short)(((viewerX + x) / 32));
 
+            short pastLocationX = en.X;
+            short pastLocationY = en.Y;
+
+            // Calculate world-based position
+            short locationX = (short)(viewerX + x);
+            short locationY = (short)(viewerY + y);
+
+            // Snap to 16-pixel grid when holding SHIFT
+            if (Keyboard.IsKeyDown(Key.LeftShift))
+            {
+                locationX = (short)(locationX & 0xFFF0); // snap X to multiple of 16
+                locationY = (short)(locationY & 0xFFF0); // snap Y to multiple of 16
+
+                // IMPORTANT:
+                // Also snap the visible label position so it moves visibly by 16px
+                x = locationX - viewerX;
+                y = locationY - viewerY;
+            }
+
+            // No change → no work
+            if (pastLocationX == locationX && pastLocationY == locationY)
+                return;
+
+            en.Column = (byte)(locationX / 32);
+
+            en.X = locationX;
+            en.Y = locationY;
+
+            UpdateEnemyCordLabel(locationX, locationY, en.Column);
+
+            // Move the label on the canvas
             Canvas.SetLeft(obj, x);
             Canvas.SetTop(obj, y);
-            UpdateEnemyCordLabel((int)x, (int)y, en.Column);
-            en.X = (short)((short)(viewerX + x));
-            en.Y = (short)((short)(viewerY + y));
 
             SNES.edit = true;
         }
