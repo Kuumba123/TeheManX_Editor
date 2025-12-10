@@ -128,12 +128,14 @@ namespace TeheManX_Editor.Forms
         }
         public void UpdateEnemyLabelPositions()
         {
-            foreach (EnemyLabel lbl in enemyLabels)
+            for (int i = 0; i < enemyLabels.Count; i++)
             {
+                EnemyLabel lbl = enemyLabels[i];
+
                 if (lbl.Visibility != Visibility.Visible)
                     continue;
 
-                Enemy en = (Enemy)lbl.Tag; // the world-position data
+                Enemy en = (Enemy)lbl.Tag;
 
                 double x = en.X - viewerX;
                 double y = en.Y - viewerY;
@@ -329,7 +331,7 @@ namespace TeheManX_Editor.Forms
             if (control.Tag == null || e.NewValue == null || e.OldValue == null)
                 return;
             SNES.edit = true;
-            ((Enemy)((EnemyLabel)control.Tag).Tag).Column = (byte)((int)e.NewValue / 32);
+            ((Enemy)((EnemyLabel)control.Tag).Tag).Column = (byte)((int)e.NewValue);
         }
         private void xInt_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
