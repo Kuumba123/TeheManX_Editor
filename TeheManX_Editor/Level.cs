@@ -756,7 +756,7 @@ namespace TeheManX_Editor
 
                 //Size Check in case enemy data is too long
                 for (int id = 0; id < totalStages; id++)
-                    totalSize += CreateEnemyData(Enemies[id]).Length;
+                    totalSize += GetEnemyDataLength(Enemies[id]);
 
                 if (totalSize > allowedSize)
                 {
