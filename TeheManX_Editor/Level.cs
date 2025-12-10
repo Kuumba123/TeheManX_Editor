@@ -722,14 +722,21 @@ namespace TeheManX_Editor
 
             for (int i = 0; i < sorted.Count; i++)
             {
-                length += 1 + 2 + 1 + 1 + 2;
+                length += 5;
 
                 if (i == (sorted.Count - 1)) // Last Enemy
+                {
+                    length += 2;
                     length++;
+                }
                 else
                 {
                     if (column != sorted[i + 1].Column)
+                    {
+                        column = sorted[i + 1].Column;
                         length++;
+                    }
+                    length += 2;
                 }
             }
             return length;
