@@ -551,11 +551,12 @@ namespace TeheManX_Editor
 
                         if (Const.Id == Const.GameId.MegaManX)
                         {
+                            dumpAddr |= 0x800000;
+
                             //Check if layout should be skipped
                             if ((i == 0xD && !SNES.expanded) || (i > 0xE && i <= 0x1A) || (i > 0x1B && i <= 0x22))
                                 continue;
 
-                            dumpAddr |= 0x800000;
 
                             //Determine witch layouts are shared and export them
                             if (i == 4 || (SNES.expanded && i == 0xD))
@@ -582,7 +583,7 @@ namespace TeheManX_Editor
                                 for (int c = 0; c < 8; c++)
                                 {
                                     BinaryPrimitives.WriteUInt16LittleEndian(pointerData.AsSpan((c + 0x1B) * 3), (ushort)(dumpAddr & 0xFFFF));
-                                    pointerData[(c + 0x1B) * 3 + 2 + startIndex * 3] = (byte)((dumpAddr >> 16) & 0xFF);
+                                    pointerData[(c + 0x1B) * 3 + 2] = (byte)((dumpAddr >> 16) & 0xFF);
                                 }
                             }
                         }
@@ -601,7 +602,7 @@ namespace TeheManX_Editor
                         dumpOffset += compressedLayout.Length;
                     }
 
-                    Array.Copy(pointerData, startIndex * 3, SNES.rom, Const.LayoutPointersOffset[l], pointerData.Length - (startIndex * 3));
+                    Array.Copy(pointerData, startIndex * 3, SNES.rom, Const.LayoutPointersOffset[l] + startIndex * 3, pointerData.Length - (startIndex * 3));
                 }
             }
 
