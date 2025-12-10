@@ -389,12 +389,6 @@ namespace TeheManX_Editor.Forms
                     return;
                 }
 
-                if (Const.Id == Const.GameId.MegaManX3) //temporarly disable
-                {
-                    MessageBox.Show("MegaMan X3 expansion is not suppported");
-                    return ;
-                }
-
                 SNES.rom[0x7FD7] = 0xC;
                 Array.Resize(ref SNES.rom, 0x400000);
                 Array.Copy(Encoding.ASCII.GetBytes("POGYOU"), 0, SNES.rom, 0x3FFFF0, 6);
@@ -422,12 +416,12 @@ namespace TeheManX_Editor.Forms
                 int dumpAddr = 0;
 
                 {
-                    int writeBase = (SNES.OffsetToCpu(Const.EnemyPointersOffset) & 0x7FFF) + bankCount * 0x8000;
+                    int pointerBase = (SNES.OffsetToCpu(Const.EnemyPointersOffset) & 0x7FFF) + bankCount * 0x8000;
                     int startWrite;
 
                     //for X1 actual enemy data should be at end of bank other games should have it at start
                     if (Const.Id == Const.GameId.MegaManX)
-                        startWrite = writeBase;
+                        startWrite = pointerBase;
                     else
                         startWrite = bankCount * 0x8000;
 
@@ -436,8 +430,13 @@ namespace TeheManX_Editor.Forms
                     {
                         if (Const.Id == Const.GameId.MegaManX3 && i > 0xE) break;
 
-                        int writeOffset = writeBase + i * 2;
-                        dumpAddr = SNES.OffsetToCpu(i * 0xCC * 8 + 1 * i + startWrite + Const.PlayableLevelsCount * 2);
+                        int writeOffset = pointerBase + i * 2;
+
+                        if (Const.Id == Const.GameId.MegaManX3 && i >= 0xC)
+                            dumpAddr = pointerBase + (Const.MegaManX3.LevelsCount - 2) * 2 + (i - 0xC) * 0xCC + 1 * (i - 0xC);
+                        else
+                            dumpAddr = SNES.OffsetToCpu(i * 0xCC * 8 + 1 * i + startWrite + Const.PlayableLevelsCount * 2);
+
                         BinaryPrimitives.WriteUInt16LittleEndian(SNES.rom.AsSpan(writeOffset), (ushort)(dumpAddr & 0xFFFF));
                     }
                     //Update Enemy Pointer
@@ -450,96 +449,92 @@ namespace TeheManX_Editor.Forms
                 SNES.rom[Const.EnemyBankAsmOffsets[1]] = oraBank;
                 SNES.rom[Const.EnemyBankAsmOffsets[2]] = oraBank;
 
-                //Increament Dump Offset to Next Bank Unconditionally
-                dumpOffset += 0x8000 - (dumpOffset % 0x8000);
 
-                //Dump Layout,Screen,32x32,16x16
-                if (Const.Id != Const.GameId.MegaManX3)
+                //Set Dump Offset for Start of 16x16 Tile Data & Layout Data
+                if (Const.Id == Const.GameId.MegaManX3)
+                    dumpOffset = Const.MegaManX3.FreeBanks[0] * 0x8000;
+                else
+                    dumpOffset += 0x8000 - (dumpOffset % 0x8000); //Increament Dump Offset to Next Bank Unconditionally
+
+                //Dump 16x16 Tile Data and the Layout Data 1st!
+
+                List<byte[]> tileData16 = new List<byte[]>();
+                List<byte[]> screenData = new List<byte[]>();
+                List<byte[]> screenData2 = new List<byte[]>();
+                List<byte[]> tile32Data = new List<byte[]>();
+                List<byte[]> tile32Data2 = new List<byte[]>();
+                List<byte[]> tileCollision = new List<byte[]>();
+
+                for (int i = 0; i < Const.PlayableLevelsCount; i++)
                 {
-                    /*Put 16x16 Tile Data at the start*/
-                    for (int i = 0; i < Const.PlayableLevelsCount; i++)
+                    tileData16.Add(new byte[Const.Tile16Count[i, 0] * 8]);
+                    screenData.Add(new byte[Const.ScreenCount[i, 0] * 0x80]);
+                    screenData2.Add(new byte[Const.ScreenCount[i, 1] * 0x80]);
+                    tile32Data.Add(new byte[Const.Tile32Count[i, 0] * 8]);
+                    tile32Data2.Add(new byte[Const.Tile32Count[i, 1] * 8]);
+                    tileCollision.Add(new byte[Const.Tile16Count[i, 0]]);
+
+                    int id;
+                    if (Const.Id == Const.GameId.MegaManX3 && i == 0xE) id = 0x10; //special case for MMX3 rekt version of dophler 2
+                    else if (Const.Id == Const.GameId.MegaManX3 && i > 0xE) id = (i - 0xF) + 0xE; //Buffalo or Beetle
+                    else id = i;
+
+                    Array.Copy(SNES.rom, SNES.CpuToOffset(BitConverter.ToInt32(SNES.rom, Const.Tile16DataPointersOffset[0] + id * 3)), tileData16[i], 0, Const.Tile16Count[i, 0] * 8);
+                    Array.Copy(SNES.rom, SNES.CpuToOffset(BitConverter.ToInt32(SNES.rom, Const.ScreenDataPointersOffset[0] + id * 3)), screenData[i], 0, Const.ScreenCount[i, 0] * 0x80);
+                    Array.Copy(SNES.rom, SNES.CpuToOffset(BitConverter.ToInt32(SNES.rom, Const.ScreenDataPointersOffset[1] + id * 3)), screenData2[i], 0, Const.ScreenCount[i, 1] * 0x80);
+                    Array.Copy(SNES.rom, SNES.CpuToOffset(BitConverter.ToInt32(SNES.rom, Const.Tile32DataPointersOffset[0] + id * 3)), tile32Data[i], 0, Const.Tile32Count[i, 0] * 8);
+                    Array.Copy(SNES.rom, SNES.CpuToOffset(BitConverter.ToInt32(SNES.rom, Const.Tile32DataPointersOffset[1] + id * 3)), tile32Data2[i], 0, Const.Tile32Count[i, 1] * 8);
+                    Array.Copy(SNES.rom, SNES.CpuToOffset(BitConverter.ToInt32(SNES.rom, Const.TileCollisionDataPointersOffset + id * 3)), tileCollision[i], 0, Const.Tile16Count[i, 0]);
+                }
+
+
+                for (int i = 0; i < Const.PlayableLevelsCount; i++)
+                {
+                    if (Const.Id == Const.GameId.MegaManX3 && i > 0xE) //Buffalo or Beetle
                     {
+                        int dumpId = (i - 0xF) + 0xE;
+                        int readId = (i - 0xF) + 2;
+
+                        //Assign Buffalo/Beetle Alternative stage to use the same 16x16 Tile Data as the orignal
+                        int pointer24 = BinaryPrimitives.ReadInt32LittleEndian(SNES.rom.AsSpan(Const.Tile16DataPointersOffset[0] + readId * 3));
+                        BinaryPrimitives.WriteUInt16LittleEndian(SNES.rom.AsSpan(Const.Tile16DataPointersOffset[0] + dumpId * 3), (ushort)(pointer24 & 0xFFFF));
+                        SNES.rom[Const.Tile16DataPointersOffset[0] + dumpId * 3 + 2] = (byte)(pointer24 >> 16);
+
+                        pointer24 = BinaryPrimitives.ReadInt32LittleEndian(SNES.rom.AsSpan(Const.Tile16DataPointersOffset[1] + readId * 3));
+                        BinaryPrimitives.WriteUInt16LittleEndian(SNES.rom.AsSpan(Const.Tile16DataPointersOffset[1] + dumpId * 3), (ushort)(pointer24 & 0xFFFF));
+                        SNES.rom[Const.Tile16DataPointersOffset[1] + dumpId * 3 + 2] = (byte)(pointer24 >> 16);
+
+                        dumpAddr = SNES.OffsetToCpu(dumpOffset);
+
+                        BinaryPrimitives.WriteUInt16LittleEndian(SNES.rom.AsSpan(Const.LayoutPointersOffset[0] + dumpId * 3), (ushort)(dumpAddr & 0xFFFF));
+                        SNES.rom[Const.LayoutPointersOffset[0] + dumpId * 3 + 2] = (byte)(dumpAddr >> 16);
+
+                        dumpOffset += Const.ExpandLayoutLength;
+                        dumpAddr += Const.ExpandLayoutLength;
+
+                        BinaryPrimitives.WriteUInt16LittleEndian(SNES.rom.AsSpan(Const.LayoutPointersOffset[1] + dumpId * 3), (ushort)(dumpAddr & 0xFFFF));
+                        SNES.rom[Const.LayoutPointersOffset[1] + dumpId * 3 + 2] = (byte)(dumpAddr >> 16);
+
+                        dumpOffset += Const.ExpandLayoutLength;
+                        dumpAddr += Const.ExpandLayoutLength;
+                    }
+                    else
+                    {
+                        int id = i;
+
                         //Dump Existing 16x16 Tile Data
-                        Array.Copy(SNES.rom, SNES.CpuToOffset(BitConverter.ToInt32(SNES.rom, Const.Tile16DataPointersOffset[0] + i * 3)), SNES.rom, dumpOffset, Const.Tile16Count[i, 0] * 8);
+                        Array.Copy(tileData16[i], 0, SNES.rom, dumpOffset, Const.Tile16Count[i, 0] * 8);
                         dumpAddr = SNES.OffsetToCpu(dumpOffset) | addrMask;
-                        BinaryPrimitives.WriteUInt16LittleEndian(SNES.rom.AsSpan(Const.Tile16DataPointersOffset[0] + i * 3), (ushort)(dumpAddr & 0xFFFF));
-                        SNES.rom[Const.Tile16DataPointersOffset[0] + i * 3 + 2] = (byte)((dumpAddr >> 16) & 0xFF);
-                        BinaryPrimitives.WriteUInt16LittleEndian(SNES.rom.AsSpan(Const.Tile16DataPointersOffset[1] + i * 3), (ushort)(dumpAddr & 0xFFFF));
-                        SNES.rom[Const.Tile16DataPointersOffset[1] + i * 3 + 2] = (byte)((dumpAddr >> 16) & 0xFF);
+
+                        BinaryPrimitives.WriteUInt16LittleEndian(SNES.rom.AsSpan(Const.Tile16DataPointersOffset[0] + id * 3), (ushort)(dumpAddr & 0xFFFF));
+                        SNES.rom[Const.Tile16DataPointersOffset[0] + id * 3 + 2] = (byte)((dumpAddr >> 16) & 0xFF);
+                        BinaryPrimitives.WriteUInt16LittleEndian(SNES.rom.AsSpan(Const.Tile16DataPointersOffset[1] + id * 3), (ushort)(dumpAddr & 0xFFFF));
+                        SNES.rom[Const.Tile16DataPointersOffset[1] + id * 3 + 2] = (byte)((dumpAddr >> 16) & 0xFF);
 
                         //Increament Dump Offset
                         dumpOffset += Const.ExpandMaxTiles16 * 8;
 
-                        //Increament Dump Offset to Next Bank
-                        if ((i & 1) != 0 && (dumpOffset % 0x8000) != 0)
-                            dumpOffset += 0x8000 - (dumpOffset % 0x8000);
-                    }
-
-                    for (int i = 0; i < Const.PlayableLevelsCount; i++)
-                    {
-                        int id;
-                        if (Const.Id == Const.GameId.MegaManX3 && i == 0xE) id = 0x10; //special case for MMX3 rekt version of dophler 2
-                        else if (Const.Id == Const.GameId.MegaManX3 && i > 0xE) id = (i - 0xF) + 0xE; //Buffalo or Beetle
-                        else id = i;
-
-                        //Dump Existing Screen Data
-                        Array.Copy(SNES.rom, SNES.CpuToOffset(BitConverter.ToInt32(SNES.rom, Const.ScreenDataPointersOffset[0] + id * 3)), SNES.rom, dumpOffset, Const.ScreenCount[i, 0] * 0x80);
-                        //Update Pointer
-                        dumpAddr = SNES.OffsetToCpu(dumpOffset) | addrMask;
-                        BinaryPrimitives.WriteUInt16LittleEndian(SNES.rom.AsSpan(Const.ScreenDataPointersOffset[0] + id * 3), (ushort)(dumpAddr & 0xFFFF));
-                        SNES.rom[Const.ScreenDataPointersOffset[0] + id * 3 + 2] = (byte)((dumpAddr >> 16) & 0xFF);
-
-
-                        //Increament Dump Offset
-                        {
-                            int maxScreens;
-                            if (Const.Id == Const.GameId.MegaManX)
-                                maxScreens = Const.ExpandMaxScreens[0];
-                            else
-                                maxScreens = Const.ExpandMaxScreens2[0];
-                            dumpOffset += maxScreens * 0x80;
-                        }
-
-                        //Dump Existing Screen Data (Layer 2)
-                        Array.Copy(SNES.rom, SNES.CpuToOffset(BitConverter.ToInt32(SNES.rom, Const.ScreenDataPointersOffset[1] + id * 3)), SNES.rom, dumpOffset, Const.ScreenCount[i, 1] * 0x80);
-                        //Update Pointer
-                        dumpAddr = SNES.OffsetToCpu(dumpOffset) | addrMask;
-                        BinaryPrimitives.WriteUInt16LittleEndian(SNES.rom.AsSpan(Const.ScreenDataPointersOffset[1] + id * 3), (ushort)(dumpAddr & 0xFFFF));
-                        SNES.rom[Const.ScreenDataPointersOffset[1] + id * 3 + 2] = (byte)((dumpAddr >> 16) & 0xFF);
-
-
-                        //Increament Dump Offset
-                        dumpOffset += Const.ExpandMaxScreens[1] * 0x80;
-
-                        //Dump Existing 32x32 Tile Data
-                        Array.Copy(SNES.rom, SNES.CpuToOffset(BitConverter.ToInt32(SNES.rom, Const.Tile32DataPointersOffset[0] + id * 3)), SNES.rom, dumpOffset, Const.Tile32Count[i, 0] * 8);
-                        //Update Pointer
-                        dumpAddr = SNES.OffsetToCpu(dumpOffset) | addrMask;
-                        BinaryPrimitives.WriteUInt16LittleEndian(SNES.rom.AsSpan(Const.Tile32DataPointersOffset[0] + id * 3), (ushort)(dumpAddr & 0xFFFF));
-                        SNES.rom[Const.Tile32DataPointersOffset[0] + id * 3 + 2] = (byte)((dumpAddr >> 16) & 0xFF);
-
-                        //Increament Dump Offset
-                        dumpOffset += Const.ExpandMaxTiles32[0] * 8;
-
-                        //Dump Existing 32x32 Tile Data (Layer 2)
-                        Array.Copy(SNES.rom, SNES.CpuToOffset(BitConverter.ToInt32(SNES.rom, Const.Tile32DataPointersOffset[1] + id * 3)), SNES.rom, dumpOffset, Const.Tile32Count[i, 1] * 8);
-                        dumpAddr = SNES.OffsetToCpu(dumpOffset) | addrMask;
-                        BinaryPrimitives.WriteUInt16LittleEndian(SNES.rom.AsSpan(Const.Tile32DataPointersOffset[1] + id * 3), (ushort)(dumpAddr & 0xFFFF));
-                        SNES.rom[Const.Tile32DataPointersOffset[1] + id * 3 + 2] = (byte)((dumpAddr >> 16) & 0xFF);
-
-                        //Increament Dump Offset
-                        dumpOffset += Const.ExpandMaxTiles32[1] * 8;
-
-                        //Dump Existing 16x16 Tile Collision Data
-                        Array.Copy(SNES.rom, SNES.CpuToOffset(BitConverter.ToInt32(SNES.rom, Const.TileCollisionDataPointersOffset + id * 3)), SNES.rom, dumpOffset, Const.Tile16Count[i, 0]);
-                        dumpAddr = SNES.OffsetToCpu(dumpOffset) | addrMask;
-                        BinaryPrimitives.WriteUInt16LittleEndian(SNES.rom.AsSpan(Const.TileCollisionDataPointersOffset + id * 3), (ushort)(dumpAddr & 0xFFFF));
-                        SNES.rom[Const.TileCollisionDataPointersOffset + id * 3 + 2] = (byte)((dumpAddr >> 16) & 0xFF);
-
-                        //Increament Dump Offset
-                        dumpOffset += Const.ExpandMaxTiles16;
-
-                        //Update Compressed Layout Data Pointer
+                        //Assign Layouts the New Pointers (Layer 1)
                         dumpAddr = SNES.OffsetToCpu(dumpOffset) | addrMask;
                         BinaryPrimitives.WriteUInt16LittleEndian(SNES.rom.AsSpan(Const.LayoutPointersOffset[0] + id * 3), (ushort)(dumpAddr & 0xFFFF));
                         SNES.rom[Const.LayoutPointersOffset[0] + id * 3 + 2] = (byte)((dumpAddr >> 16) & 0xFF);
@@ -547,7 +542,7 @@ namespace TeheManX_Editor.Forms
                         //Increament Dump Offset
                         dumpOffset += Const.ExpandLayoutLength;
 
-                        //Update Compressed Layout 2 Data Pointer
+                        //Layer 2
                         dumpAddr = SNES.OffsetToCpu(dumpOffset) | addrMask;
                         BinaryPrimitives.WriteUInt16LittleEndian(SNES.rom.AsSpan(Const.LayoutPointersOffset[1] + id * 3), (ushort)(dumpAddr & 0xFFFF));
                         SNES.rom[Const.LayoutPointersOffset[1] + id * 3 + 2] = (byte)((dumpAddr >> 16) & 0xFF);
@@ -555,20 +550,101 @@ namespace TeheManX_Editor.Forms
                         //Increament Dump Offset
                         dumpOffset += Const.ExpandLayoutLength;
 
-                        //Increament Dump Offset to Next Bank
-                        if ((dumpOffset % 0x8000) != 0)
-                            dumpOffset += 0x8000 - (dumpOffset % 0x8000);
-
-                        //Increament Dump Offset to Next Bank
-                        if ((dumpOffset % 0x8000) != 0)
-                            dumpOffset += 0x8000 - (dumpOffset % 0x8000);
+                        if (Const.Id == Const.GameId.MegaManX3)
+                        {
+                            if ((i & 1) != 0)
+                                dumpOffset = Const.MegaManX3.FreeBanks[(i + 1) / 2] * 0x8000;
+                        }
+                        else
+                        {
+                            //Increament Dump Offset to Next Bank
+                            if ((i & 1) != 0 && (dumpOffset % 0x8000) != 0)
+                                dumpOffset += 0x8000 - (dumpOffset % 0x8000);
+                        }
                     }
                 }
-                else //Expand Code for MegaMan X3
-                {
+                /*End of Loop*/
+            
 
+                //Then Dump the rest of the Data
+                if (Const.Id == Const.GameId.MegaManX3)
+                    dumpOffset = (Const.MegaManX3.BankCount + 1) * 0x8000;
+                else // MegaMan X1 & X2
+                {
+                    //Just in case we are not at the start of a bank
+                    if ((dumpOffset % 0x8000) != 0)
+                        dumpOffset += 0x8000 - (dumpOffset % 0x8000);
                 }
 
+                for (int i = 0; i < Const.PlayableLevelsCount; i++)
+                {
+                    int id;
+                    if (Const.Id == Const.GameId.MegaManX3 && i == 0xE) id = 0x10; //special case for MMX3 rekt version of dophler 2
+                    else if (Const.Id == Const.GameId.MegaManX3 && i > 0xE) id = (i - 0xF) + 0xE; //Buffalo or Beetle
+                    else id = i;
+
+                    //Dump Existing Screen Data
+                    Array.Copy(screenData[i] , 0, SNES.rom, dumpOffset, Const.ScreenCount[i, 0] * 0x80);
+                    //Update Pointer
+                    dumpAddr = SNES.OffsetToCpu(dumpOffset) | addrMask;
+                    BinaryPrimitives.WriteUInt16LittleEndian(SNES.rom.AsSpan(Const.ScreenDataPointersOffset[0] + id * 3), (ushort)(dumpAddr & 0xFFFF));
+                    SNES.rom[Const.ScreenDataPointersOffset[0] + id * 3 + 2] = (byte)((dumpAddr >> 16) & 0xFF);
+
+
+                    //Increament Dump Offset
+                    {
+                        int maxScreens;
+                        if (Const.Id == Const.GameId.MegaManX)
+                            maxScreens = Const.ExpandMaxScreens[0];
+                        else
+                            maxScreens = Const.ExpandMaxScreens2[0];
+                        dumpOffset += maxScreens * 0x80;
+                    }
+
+                    //Dump Existing Screen Data (Layer 2)
+                    Array.Copy(screenData2[i], 0, SNES.rom, dumpOffset, Const.ScreenCount[i, 1] * 0x80);
+                    //Update Pointer
+                    dumpAddr = SNES.OffsetToCpu(dumpOffset) | addrMask;
+                    BinaryPrimitives.WriteUInt16LittleEndian(SNES.rom.AsSpan(Const.ScreenDataPointersOffset[1] + id * 3), (ushort)(dumpAddr & 0xFFFF));
+                    SNES.rom[Const.ScreenDataPointersOffset[1] + id * 3 + 2] = (byte)((dumpAddr >> 16) & 0xFF);
+
+
+                    //Increament Dump Offset
+                    dumpOffset += Const.ExpandMaxScreens[1] * 0x80;
+
+                    //Dump Existing 32x32 Tile Data
+                    Array.Copy(tile32Data[i], 0, SNES.rom, dumpOffset, Const.Tile32Count[i, 0] * 8);
+                    //Update Pointer
+                    dumpAddr = SNES.OffsetToCpu(dumpOffset) | addrMask;
+                    BinaryPrimitives.WriteUInt16LittleEndian(SNES.rom.AsSpan(Const.Tile32DataPointersOffset[0] + id * 3), (ushort)(dumpAddr & 0xFFFF));
+                    SNES.rom[Const.Tile32DataPointersOffset[0] + id * 3 + 2] = (byte)((dumpAddr >> 16) & 0xFF);
+
+                    //Increament Dump Offset
+                    dumpOffset += Const.ExpandMaxTiles32[0] * 8;
+
+                    //Dump Existing 32x32 Tile Data (Layer 2)
+                    Array.Copy(tile32Data2[i], 0, SNES.rom, dumpOffset, Const.Tile32Count[i, 1] * 8);
+                    dumpAddr = SNES.OffsetToCpu(dumpOffset) | addrMask;
+                    BinaryPrimitives.WriteUInt16LittleEndian(SNES.rom.AsSpan(Const.Tile32DataPointersOffset[1] + id * 3), (ushort)(dumpAddr & 0xFFFF));
+                    SNES.rom[Const.Tile32DataPointersOffset[1] + id * 3 + 2] = (byte)((dumpAddr >> 16) & 0xFF);
+
+                    //Increament Dump Offset
+                    dumpOffset += Const.ExpandMaxTiles32[1] * 8;
+
+                    //Dump Existing 16x16 Tile Collision Data
+                    Array.Copy(tileCollision[i], 0, SNES.rom, dumpOffset, Const.Tile16Count[i, 0]);
+                    dumpAddr = SNES.OffsetToCpu(dumpOffset) | addrMask;
+                    BinaryPrimitives.WriteUInt16LittleEndian(SNES.rom.AsSpan(Const.TileCollisionDataPointersOffset + id * 3), (ushort)(dumpAddr & 0xFFFF));
+                    SNES.rom[Const.TileCollisionDataPointersOffset + id * 3 + 2] = (byte)((dumpAddr >> 16) & 0xFF);
+
+                    //Increament Dump Offset
+                    dumpOffset += Const.ExpandMaxTiles16;
+
+                    //Increament Dump Offset to Next Bank
+                    if ((dumpOffset % 0x8000) != 0)
+                        dumpOffset += 0x8000 - (dumpOffset % 0x8000);
+                }
+                /*End of Loop*/
 
                 //Done
                 SNES.edit = true;
