@@ -70,7 +70,6 @@ namespace TeheManX_Editor.Forms
                     ptr++;
                 }
             }
-            System.Diagnostics.Stopwatch sw = System.Diagnostics.Stopwatch.StartNew();
 
             for (int sy = 0; sy < 3; sy++)
             {
@@ -120,8 +119,6 @@ namespace TeheManX_Editor.Forms
 
             layoutBMP.AddDirtyRect(new Int32Rect(0, 0, 768, 512));
             layoutBMP.Unlock();
-            sw.Stop();
-            MessageBox.Show($"Time Took {sw.ElapsedTicks} ms");
         }
         public void DrawEnemies()
         {
