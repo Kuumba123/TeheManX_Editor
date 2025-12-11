@@ -70,6 +70,7 @@ namespace TeheManX_Editor.Forms
                     ptr++;
                 }
             }
+            System.Diagnostics.Stopwatch sw = System.Diagnostics.Stopwatch.StartNew();
 
             for (int sy = 0; sy < 3; sy++)
             {
@@ -87,18 +88,40 @@ namespace TeheManX_Editor.Forms
                     int drawX = sx * 256 - offX;
                     int drawY = sy * 256 - offY;
 
-                    Level.DrawScreen_Clamped(
-                        Level.Layout[Level.Id, Level.BG, layoutIndex],
-                        drawX, drawY,
-                        layoutBMP.BackBufferStride,
-                        bufferP,
-                        bmpWidth, bmpHeight
-                    );
+                    bool fullyInside =
+                        drawX >= 0 &&
+                        drawY >= 0 &&
+                        (drawX + 256) <= bmpWidth &&
+                        (drawY + 256) <= bmpHeight;
+
+                    if (fullyInside)
+                    {
+                        // non-clamped version (no bmpWidth/bmpHeight args)
+                        Level.DrawScreen(
+                            Level.Layout[Level.Id, Level.BG, layoutIndex],
+                            drawX, drawY,
+                            stride,
+                            bufferP
+                        );
+                    }
+                    else
+                    {
+                        // partially outside - use clamped version
+                        Level.DrawScreen_Clamped(
+                            Level.Layout[Level.Id, Level.BG, layoutIndex],
+                            drawX, drawY,
+                            stride,
+                            bufferP,
+                            bmpWidth, bmpHeight
+                        );
+                    }
                 }
             }
 
             layoutBMP.AddDirtyRect(new Int32Rect(0, 0, 768, 512));
             layoutBMP.Unlock();
+            sw.Stop();
+            MessageBox.Show($"Time Took {sw.ElapsedTicks} ms");
         }
         public void DrawEnemies()
         {
