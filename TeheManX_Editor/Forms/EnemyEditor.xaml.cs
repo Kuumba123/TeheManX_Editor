@@ -136,7 +136,7 @@ namespace TeheManX_Editor.Forms
                 Rectangle r = new Rectangle()
                 {
                     IsHitTestVisible = false,
-                    StrokeThickness = 2,
+                    StrokeThickness = 1,
                     Stroke = Brushes.Green,
                     Fill = new SolidColorBrush(Color.FromArgb(96, 0xAD, 0xD8, 0xE6))
                 };
@@ -254,7 +254,6 @@ namespace TeheManX_Editor.Forms
 
             if (e.ChangedButton == MouseButton.Left)
             {
-                SNES.edit = true;
 
                 if (!down)
                 {
@@ -286,9 +285,48 @@ namespace TeheManX_Editor.Forms
                 //TODO: show pop up message box with info about the enemy
             }
         }
+        private void canvas_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if ((bool)MainWindow.window.camE.triggerCheck.IsChecked)
+            {
+                point = e.GetPosition(MainWindow.window.enemyE.canvas);
+                down = true;
+                MainWindow.window.enemyE.canvas.CaptureMouse();
+            }
+        }
         private void canvas_PreviewMouseMove(object sender, MouseEventArgs e)
         {
             if (!down) return;
+
+            if ((bool)MainWindow.window.camE.triggerCheck.IsChecked) //Select Trigger Size
+            {
+                Point mousePos = e.GetPosition(canvas);
+                if (point.X < mousePos.X)
+                {
+                    Canvas.SetLeft(selectRect, point.X);
+                    selectRect.Width = mousePos.X - point.X;
+                }
+                else
+                {
+                    Canvas.SetLeft(selectRect, mousePos.X);
+                    selectRect.Width = point.X - mousePos.X;
+                }
+
+                if (point.Y < mousePos.Y)
+                {
+                    Canvas.SetTop(selectRect, point.Y);
+                    selectRect.Height = mousePos.Y - point.Y;
+                }
+                else
+                {
+                    Canvas.SetTop(selectRect, mousePos.Y);
+                    selectRect.Height = point.Y - mousePos.Y;
+                }
+                selectRect.Visibility = Visibility.Visible;
+                return;
+            }
+
+            //Move Enemy
             if (obj == null) return;
 
             var pos = e.GetPosition(sender as IInputElement);
@@ -321,7 +359,7 @@ namespace TeheManX_Editor.Forms
                 y = locationY - viewerY;
             }
 
-            // No change → no work
+            // No change no work
             if (pastLocationX == locationX && pastLocationY == locationY)
                 return;
 
@@ -340,8 +378,52 @@ namespace TeheManX_Editor.Forms
         }
         private void canvas_PreviewMouseUp(object sender, MouseButtonEventArgs e)
         {
-            obj = null;
+            if (e.ChangedButton == MouseButton.Right)
+                return;
             down = false;
+            if ((bool)MainWindow.window.camE.triggerCheck.IsChecked)
+            {
+                if (Level.Id >= Const.PlayableLevelsCount || (Const.Id == Const.GameId.MegaManX3 && Level.Id > 0xE))
+                    goto End;
+
+                selectRect.Visibility = Visibility.Collapsed;
+                int index = Level.Id;
+
+                int leftSide = ((int)(Canvas.GetLeft(selectRect) + viewerX));
+                int rightSide = ((int)(Canvas.GetLeft(selectRect) + selectRect.Width + viewerX));
+                int topSide = (int)(Canvas.GetTop(selectRect) + viewerY);
+                int bottomSide = (int)(Canvas.GetTop(selectRect) + selectRect.Height + viewerY);
+
+                if (leftSide < 0)
+                    leftSide = 0;
+                if (rightSide > 0xFFFF)
+                    rightSide = 0xFFFF;
+                if (topSide < 0)
+                    topSide = 0;
+                if (bottomSide > 0xFFFF)
+                    bottomSide = 0xFFFF;
+
+                int listOffset = BitConverter.ToUInt16(SNES.rom, Const.CameraTriggersOffset + Level.Id * 2);
+                int offset = SNES.CpuToOffset(BitConverter.ToUInt16(SNES.rom, SNES.CpuToOffset(listOffset + (int)MainWindow.window.camE.triggerInt.Value * 2, Const.CameraSettingsBank)), Const.CameraSettingsBank);
+
+                BinaryPrimitives.WriteUInt16LittleEndian(SNES.rom.AsSpan(offset), (ushort)rightSide);
+                MainWindow.window.camE.rightInt.Value = rightSide;
+
+                BinaryPrimitives.WriteUInt16LittleEndian(SNES.rom.AsSpan(offset + 2), (ushort)leftSide);
+                MainWindow.window.camE.leftInt.Value = leftSide;
+
+                BinaryPrimitives.WriteUInt16LittleEndian(SNES.rom.AsSpan(offset + 4), (ushort)bottomSide);
+                MainWindow.window.camE.bottomInt.Value = bottomSide;
+
+                BinaryPrimitives.WriteUInt16LittleEndian(SNES.rom.AsSpan(offset + 6), (ushort)topSide);
+                MainWindow.window.camE.topInt.Value = topSide;
+
+                SNES.edit = true;
+                MainWindow.window.enemyE.UpdateEnemyLabelPositions();
+            }
+            else
+                obj = null;
+        End:
             canvas.ReleaseMouseCapture();
         }
         private void LayoutImage_PreviewMouseDown(object sender, MouseButtonEventArgs e)

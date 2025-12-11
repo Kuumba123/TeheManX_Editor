@@ -100,7 +100,6 @@
             </Border>
             <StackPanel Orientation="Horizontal">
                 <CheckBox Foreground="White" x:Name="triggerCheck" FontSize="18" VerticalContentAlignment="Center">Trigger Select</CheckBox>
-                <Button Width="25" Height="25" Padding="0" Margin="8,1,0,0" VerticalContentAlignment="Top" VerticalAlignment="Top" Click="UpdateTrigger_Click">🔄</Button>
             </StackPanel>
         </StackPanel>
     </Grid>

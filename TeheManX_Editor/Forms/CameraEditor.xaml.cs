@@ -195,8 +195,9 @@ namespace TeheManX_Editor.Forms
 
             if (value == (ushort)(int)e.NewValue) return;
 
-            BinaryPrimitives.WriteUInt16LittleEndian(SNES.rom.AsSpan(offset), value);
+            BinaryPrimitives.WriteUInt16LittleEndian(SNES.rom.AsSpan(offset), (ushort)(int)e.NewValue);
             SNES.edit = true;
+            MainWindow.window.enemyE.UpdateEnemyLabelPositions();
         }
         private void borderSettingInt_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
@@ -248,10 +249,6 @@ namespace TeheManX_Editor.Forms
 
             BinaryPrimitives.WriteUInt16LittleEndian(SNES.rom.AsSpan(offset + 0), (ushort)wram);
             SNES.edit = true;
-        }
-        private void UpdateTrigger_Click(object sender, RoutedEventArgs e)
-        {
-            //MainWindow.window.enemyE.UpdateTriggers();
         }
         #endregion Events
     }
