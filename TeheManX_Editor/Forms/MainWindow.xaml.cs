@@ -150,11 +150,11 @@ namespace TeheManX_Editor.Forms
             window.tile16E.AssignLimits();
             window.paletteE.AssignLimits();
             window.enemyE.DrawLayout();
+            window.camE.AssignTriggerLimits();
             window.enemyE.DrawEnemies();
             UpdateViewrCam();
             UpdateEnemyViewerCam();
             window.spawnE.SetSpawnSettings();
-            window.camE.AssignTriggerLimits();
             tileE.AssignLimits();
             UpdateWindowTitle();
 

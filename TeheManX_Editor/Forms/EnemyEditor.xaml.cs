@@ -7,6 +7,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Shapes;
 
 namespace TeheManX_Editor.Forms
 {
@@ -16,6 +17,7 @@ namespace TeheManX_Editor.Forms
     public partial class EnemyEditor : UserControl
     {
         #region Fields
+        static List<Rectangle> triggerRects = new List<Rectangle>();
         static List<EnemyLabel> enemyLabels = new List<EnemyLabel>();
         public static double scale = 1;
         #endregion Fields
@@ -102,10 +104,13 @@ namespace TeheManX_Editor.Forms
         {
             DisableSelect();
 
-            foreach (var r in enemyLabels)
-                r.Visibility = Visibility.Collapsed;
+            for (int i = 0; i < enemyLabels.Count; i++)
+                enemyLabels[i].Visibility = Visibility.Collapsed;
 
-            if (Level.Id >= Const.PlayableLevelsCount)
+            for (int i = 0; i < triggerRects.Count; i++)
+                triggerRects[i].Visibility = Visibility.Collapsed;
+
+            if (Level.Id >= Const.PlayableLevelsCount || (Const.Id == Const.GameId.MegaManX3 && Level.Id > 0xE))
                 return;
 
             while (enemyLabels.Count < Level.Enemies[Level.Id].Count)
@@ -125,6 +130,42 @@ namespace TeheManX_Editor.Forms
                 Canvas.SetTop(enemyLabels[i], Level.Enemies[Level.Id][i].Y - viewerY);
                 enemyLabels[i].Visibility = Visibility.Visible;
             }
+
+            while (triggerRects.Count < (MainWindow.window.camE.triggerInt.Maximum + 1)) //Add to Canvas
+            {
+                Rectangle r = new Rectangle()
+                {
+                    IsHitTestVisible = false,
+                    StrokeThickness = 2,
+                    Stroke = Brushes.Green,
+                    Fill = new SolidColorBrush(Color.FromArgb(96, 0xAD, 0xD8, 0xE6))
+                };
+                triggerRects.Add(r);
+                MainWindow.window.enemyE.canvas.Children.Add(r);
+            }
+
+            int listOffset = BitConverter.ToUInt16(SNES.rom, Const.CameraTriggersOffset + Level.Id * 2);
+
+            for (int i = 0; i < (MainWindow.window.camE.triggerInt.Maximum + 1); i++)
+            {
+                int offset = SNES.CpuToOffset(BitConverter.ToUInt16(SNES.rom, SNES.CpuToOffset(listOffset + i * 2, Const.CameraSettingsBank)), Const.CameraSettingsBank);
+
+                int rightSide = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset));
+                int leftSide = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + 2));
+                int bottomSide = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + 4));
+                int topSide = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + 6));
+
+                int width = rightSide - leftSide;
+                int height = bottomSide - topSide;
+
+                triggerRects[i].Width = width;
+                triggerRects[i].Height = height;
+
+                Canvas.SetLeft(triggerRects[i], leftSide - viewerX);
+                Canvas.SetTop(triggerRects[i], topSide - viewerY);
+
+                triggerRects[i].Visibility = Visibility.Visible;
+            }
         }
         public void UpdateEnemyLabelPositions()
         {
@@ -142,6 +183,30 @@ namespace TeheManX_Editor.Forms
 
                 Canvas.SetLeft(lbl, x);
                 Canvas.SetTop(lbl, y);
+            }
+
+            if (Level.Id >= Const.PlayableLevelsCount || (Const.Id == Const.GameId.MegaManX3 && Level.Id > 0xE))
+                return;
+
+            int listOffset = BitConverter.ToUInt16(SNES.rom, Const.CameraTriggersOffset + Level.Id * 2);
+
+            for (int i = 0; i < (MainWindow.window.camE.triggerInt.Maximum + 1); i++)
+            {
+                int offset = SNES.CpuToOffset(BitConverter.ToUInt16(SNES.rom, SNES.CpuToOffset(listOffset + i * 2, Const.CameraSettingsBank)), Const.CameraSettingsBank);
+
+                int rightSide = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset));
+                int leftSide = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + 2));
+                int bottomSide = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + 4));
+                int topSide = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + 6));
+
+                int width = rightSide - leftSide;
+                int height = bottomSide - topSide;
+
+                triggerRects[i].Width = width;
+                triggerRects[i].Height = height;
+
+                Canvas.SetLeft(triggerRects[i], leftSide - viewerX);
+                Canvas.SetTop(triggerRects[i], topSide - viewerY);
             }
         }
         private void DisableSelect() //Disable editing Enemy Properties
