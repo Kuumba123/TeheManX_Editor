@@ -164,6 +164,9 @@ namespace TeheManX_Editor.Forms
                 MainWindow.window.enemyE.canvas.Children.Add(r);
             }
 
+            if (!MainWindow.window.camE.triggersEnabled)
+                return;
+
             int listOffset = BitConverter.ToUInt16(SNES.rom, Const.CameraTriggersOffset + Level.Id * 2);
 
             for (int i = 0; i < (MainWindow.window.camE.triggerInt.Maximum + 1); i++)
@@ -177,6 +180,9 @@ namespace TeheManX_Editor.Forms
 
                 int width = rightSide - leftSide;
                 int height = bottomSide - topSide;
+
+                if (width < 1) width = 1;
+                if (height < 1) height = 1;
 
                 triggerRects[i].Width = width;
                 triggerRects[i].Height = height;
@@ -205,7 +211,7 @@ namespace TeheManX_Editor.Forms
                 Canvas.SetTop(lbl, y);
             }
 
-            if (Level.Id >= Const.PlayableLevelsCount || (Const.Id == Const.GameId.MegaManX3 && Level.Id > 0xE))
+            if (!MainWindow.window.camE.triggersEnabled)
                 return;
 
             int listOffset = BitConverter.ToUInt16(SNES.rom, Const.CameraTriggersOffset + Level.Id * 2);
@@ -221,6 +227,9 @@ namespace TeheManX_Editor.Forms
 
                 int width = rightSide - leftSide;
                 int height = bottomSide - topSide;
+
+                if (width < 1) width = 1;
+                if (height < 1) height = 1;
 
                 triggerRects[i].Width = width;
                 triggerRects[i].Height = height;
@@ -307,7 +316,7 @@ namespace TeheManX_Editor.Forms
         }
         private void canvas_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            if ((bool)MainWindow.window.camE.triggerCheck.IsChecked)
+            if ((bool)MainWindow.window.camE.triggerCheck.IsChecked && MainWindow.window.camE.triggersEnabled)
             {
                 point = e.GetPosition(MainWindow.window.enemyE.canvas);
                 down = true;
@@ -318,7 +327,7 @@ namespace TeheManX_Editor.Forms
         {
             if (!down) return;
 
-            if ((bool)MainWindow.window.camE.triggerCheck.IsChecked) //Select Trigger Size
+            if ((bool)MainWindow.window.camE.triggerCheck.IsChecked && MainWindow.window.camE.triggersEnabled) //Select Trigger Size
             {
                 Point mousePos = e.GetPosition(canvas);
                 if (point.X < mousePos.X)
