@@ -13,6 +13,7 @@ namespace TeheManX_Editor.Forms
     {
         #region Properties
         List<NumInt> borderInts = new List<NumInt>();
+        public bool triggersEnabled;
         #endregion Properties
 
         #region Fields
@@ -80,8 +81,9 @@ namespace TeheManX_Editor.Forms
         }
         public void AssignTriggerLimits()
         {
-            if (Level.Id >= Const.PlayableLevelsCount || (Const.Id == Const.GameId.MegaManX3 && Level.Id > 0xE))
+            if (Level.Id >= Const.PlayableLevelsCount || (Const.Id == Const.GameId.MegaManX3 && Level.Id > 0xE) || BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(Const.CameraTriggersOffset + Level.Id * 2)) == 0)
             {
+                triggersEnabled = false;
                 MainWindow.window.camE.triggerInt.IsEnabled = false;
                 for (int i = 0; i < 4; i++)
                     MainWindow.window.camE.borderInts[i].IsEnabled = false;
@@ -96,27 +98,53 @@ namespace TeheManX_Editor.Forms
             int maxTriggers = 0;
             int maxLevels = (Const.Id == Const.GameId.MegaManX3) ? 0xF : Const.PlayableLevelsCount;
 
-            if (Level.Id != (maxLevels - 1))
-            {
-                //get the start of the next level's camera triggers list
-                int nextOffset = BitConverter.ToUInt16(SNES.rom, Const.CameraTriggersOffset + (Level.Id + 1) * 2);
-                int currentOffset = BitConverter.ToUInt16(SNES.rom, Const.CameraTriggersOffset + Level.Id * 2);
+            ushort[] offsetList = new ushort[maxLevels];
+            for (int i = 0; i < maxLevels; i++)
+                offsetList[i] = BitConverter.ToUInt16(SNES.rom, Const.CameraTriggersOffset + i * 2);
 
-                ushort[] offsetList = new ushort[maxLevels];
-                for (int i = 0; i < maxLevels; i++)
-                    offsetList[i] = BitConverter.ToUInt16(SNES.rom, Const.CameraTriggersOffset + i * 2);
-                Array.Sort(offsetList);
-                nextOffset = offsetList[Array.IndexOf(offsetList, (ushort)currentOffset) + 1];
-                maxTriggers = ((nextOffset - currentOffset) / 2) - 1;
-            }
-            else
+            int maxIndex = 0;
+            for (int i = 0; i < offsetList.Length; i++)
             {
-                //use the first levels offsets to determine the last level's max checkpoints
-                int firstOffset = BitConverter.ToUInt16(SNES.rom, Const.CameraTriggersOffset + 0 * 2) + Const.CameraTriggersOffset;
-                int firstDataOffset = BitConverter.ToUInt16(SNES.rom, firstOffset);
-                ushort lastOffset = BitConverter.ToUInt16(SNES.rom, Level.Id * 2 + Const.CameraTriggersOffset);
-                maxTriggers = ((firstDataOffset - lastOffset) / 2) - 1;
+                if (offsetList[i] > offsetList[maxIndex])
+                    maxIndex = i;
             }
+
+            int tempOffset = Const.CameraTriggersOffset + maxLevels * 2;
+            int endOffset = SNES.CpuToOffset(offsetList[maxIndex], Const.CameraSettingsBank);
+
+            int lowestPointer = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(tempOffset));
+
+            while (tempOffset != endOffset)
+            {
+                int addr = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(tempOffset));
+
+                if (addr < lowestPointer)
+                    lowestPointer = addr;
+                tempOffset += 2;
+            }
+
+            int introFirstOffset = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(Const.CameraTriggersOffset)); //just for X2...
+            ushort currentOffset = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(Const.CameraTriggersOffset + Level.Id * 2));
+            int currentIndex = Array.IndexOf(offsetList, currentOffset);
+
+            if (Level.Id == 0xC && Const.Id == Const.GameId.MegaManX2 && BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(SNES.CpuToOffset(introFirstOffset, Const.CameraSettingsBank))) == currentOffset)
+            {
+                triggersEnabled = false;
+                MainWindow.window.camE.triggerInt.IsEnabled = false;
+                for (int i = 0; i < 4; i++)
+                    MainWindow.window.camE.borderInts[i].IsEnabled = false;
+                MainWindow.window.camE.rightInt.IsEnabled = false;
+                MainWindow.window.camE.leftInt.IsEnabled = false;
+                MainWindow.window.camE.bottomInt.IsEnabled = false;
+                MainWindow.window.camE.topInt.IsEnabled = false;
+                return;
+            }
+            else if (currentIndex == maxIndex)
+                maxTriggers = ((lowestPointer - currentOffset) / 2) - 1;
+            else
+                maxTriggers = ((offsetList[currentIndex + 1] - currentOffset) / 2) - 1;
+
+            
             if (MainWindow.window.camE.triggerInt.Value > maxTriggers)
                 MainWindow.window.camE.triggerInt.Value = maxTriggers;
             MainWindow.window.camE.triggerInt.Maximum = maxTriggers;
@@ -127,6 +155,7 @@ namespace TeheManX_Editor.Forms
         }
         private void SetTriggerIntValues(int offset)
         {
+            triggersEnabled = true;
             MainWindow.window.camE.triggerInt.IsEnabled = true;
 
             for (int i = 0; i < 4; i++)
