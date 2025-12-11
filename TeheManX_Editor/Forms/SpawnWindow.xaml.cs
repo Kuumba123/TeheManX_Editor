@@ -24,7 +24,7 @@ namespace TeheManX_Editor.Forms
         {
             if (Level.Id >= Const.PlayableLevelsCount || (Const.Id == Const.GameId.MegaManX3 && Level.Id > 0xE))
             {
-                spawnInt.IsEnabled = false;
+                MainWindow.window.spawnE.spawnInt.IsEnabled = false;
                 objectTileInt.IsEnabled = false;
                 backgroundTileInt.IsEnabled = false;
                 backgroundPalInt.IsEnabled = false;
@@ -50,7 +50,6 @@ namespace TeheManX_Editor.Forms
             {
                 //calculate the max amount of checkpoints for the level
                 int maxCheckpoints = 0;
-                int checkpointSize = (Const.Id == Const.GameId.MegaManX) ? 0x1D : 0x1F;
 
                 int maxLevels;
                 if (Const.Id == Const.GameId.MegaManX3) maxLevels = 0xF;
@@ -119,7 +118,7 @@ namespace TeheManX_Editor.Forms
                 collisionInt.IsEnabled = true;
 
                 int listOffset = BitConverter.ToUInt16(SNES.rom, Const.CheckpointOffset + Level.Id * 2) + Const.CheckpointOffset;
-                int offset = BitConverter.ToUInt16(SNES.rom, listOffset + (int)spawnInt.Value * 2) + Const.CheckpointOffset;
+                int offset = BitConverter.ToUInt16(SNES.rom, listOffset + (int)MainWindow.window.spawnE.spawnInt.Value * 2) + Const.CheckpointOffset;
                 SetIntValues(offset);
             }
         }
@@ -170,7 +169,7 @@ namespace TeheManX_Editor.Forms
             if (e.NewValue == null || SNES.rom == null || Level.Id >= Const.PlayableLevelsCount)
                 return;
             int listOffset = BitConverter.ToUInt16(SNES.rom, Const.CheckpointOffset + Level.Id * 2) + Const.CheckpointOffset;
-            int offset = BitConverter.ToUInt16(SNES.rom, listOffset + (int)spawnInt.Value * 2) + Const.CheckpointOffset;
+            int offset = BitConverter.ToUInt16(SNES.rom, listOffset + (int)MainWindow.window.spawnE.spawnInt.Value * 2) + Const.CheckpointOffset;
             byte value = (byte)(int)e.NewValue;
             if (value == SNES.rom[offset])
                 return;
@@ -182,7 +181,7 @@ namespace TeheManX_Editor.Forms
             if (e.NewValue == null || SNES.rom == null || Level.Id >= Const.PlayableLevelsCount)
                 return;
             int listOffset = BitConverter.ToUInt16(SNES.rom, Const.CheckpointOffset + Level.Id * 2) + Const.CheckpointOffset;
-            int offset = BitConverter.ToUInt16(SNES.rom, listOffset + (int)spawnInt.Value * 2) + Const.CheckpointOffset;
+            int offset = BitConverter.ToUInt16(SNES.rom, listOffset + (int)MainWindow.window.spawnE.spawnInt.Value * 2) + Const.CheckpointOffset;
             byte value = (byte)(int)e.NewValue;
             if (value == SNES.rom[offset + 1])
                 return;
@@ -194,7 +193,7 @@ namespace TeheManX_Editor.Forms
             if (e.NewValue == null || SNES.rom == null || Level.Id >= Const.PlayableLevelsCount)
                 return;
             int listOffset = BitConverter.ToUInt16(SNES.rom, Const.CheckpointOffset + Level.Id * 2) + Const.CheckpointOffset;
-            int offset = BitConverter.ToUInt16(SNES.rom, listOffset + (int)spawnInt.Value * 2) + Const.CheckpointOffset;
+            int offset = BitConverter.ToUInt16(SNES.rom, listOffset + (int)MainWindow.window.spawnE.spawnInt.Value * 2) + Const.CheckpointOffset;
             byte value = (byte)(int)e.NewValue;
             if (value== SNES.rom[offset + 2])
                 return;
@@ -206,7 +205,7 @@ namespace TeheManX_Editor.Forms
             if (e.NewValue == null || SNES.rom == null || Level.Id >= Const.PlayableLevelsCount)
                 return;
             int listOffset = BitConverter.ToUInt16(SNES.rom, Const.CheckpointOffset + Level.Id * 2) + Const.CheckpointOffset;
-            int offset = BitConverter.ToUInt16(SNES.rom, listOffset + (int)spawnInt.Value * 2) + Const.CheckpointOffset;
+            int offset = BitConverter.ToUInt16(SNES.rom, listOffset + (int)MainWindow.window.spawnE.spawnInt.Value * 2) + Const.CheckpointOffset;
 
             if ((byte)(int)e.NewValue == SNES.rom[offset + 3])
                 return;
@@ -218,7 +217,7 @@ namespace TeheManX_Editor.Forms
             if (e.NewValue == null || SNES.rom == null || Level.Id >= Const.PlayableLevelsCount)
                 return;
             int listOffset = BitConverter.ToUInt16(SNES.rom, Const.CheckpointOffset + Level.Id * 2) + Const.CheckpointOffset;
-            int offset = BitConverter.ToUInt16(SNES.rom, listOffset + (int)spawnInt.Value * 2) + Const.CheckpointOffset;
+            int offset = BitConverter.ToUInt16(SNES.rom, listOffset + (int)MainWindow.window.spawnE.spawnInt.Value * 2) + Const.CheckpointOffset;
 
             if (Const.Id != Const.GameId.MegaManX) offset++;
             ushort value = (ushort)(int)e.NewValue;
@@ -232,7 +231,7 @@ namespace TeheManX_Editor.Forms
             if (e.NewValue == null || SNES.rom == null || Level.Id >= Const.PlayableLevelsCount)
                 return;
             int listOffset = BitConverter.ToUInt16(SNES.rom, Const.CheckpointOffset + Level.Id * 2) + Const.CheckpointOffset;
-            int offset = BitConverter.ToUInt16(SNES.rom, listOffset + (int)spawnInt.Value * 2) + Const.CheckpointOffset;
+            int offset = BitConverter.ToUInt16(SNES.rom, listOffset + (int)MainWindow.window.spawnE.spawnInt.Value * 2) + Const.CheckpointOffset;
 
             if (Const.Id != Const.GameId.MegaManX) offset++;
             ushort value = (ushort)(int)e.NewValue;
@@ -246,7 +245,7 @@ namespace TeheManX_Editor.Forms
             if (e.NewValue == null || SNES.rom == null || Level.Id >= Const.PlayableLevelsCount)
                 return;
             int listOffset = BitConverter.ToUInt16(SNES.rom, Const.CheckpointOffset + Level.Id * 2) + Const.CheckpointOffset;
-            int offset = BitConverter.ToUInt16(SNES.rom, listOffset + (int)spawnInt.Value * 2) + Const.CheckpointOffset;
+            int offset = BitConverter.ToUInt16(SNES.rom, listOffset + (int)MainWindow.window.spawnE.spawnInt.Value * 2) + Const.CheckpointOffset;
 
             if (Const.Id != Const.GameId.MegaManX) offset++;
             ushort value = (ushort)(int)e.NewValue;
@@ -260,7 +259,7 @@ namespace TeheManX_Editor.Forms
             if (e.NewValue == null || SNES.rom == null || Level.Id >= Const.PlayableLevelsCount)
                 return;
             int listOffset = BitConverter.ToUInt16(SNES.rom, Const.CheckpointOffset + Level.Id * 2) + Const.CheckpointOffset;
-            int offset = BitConverter.ToUInt16(SNES.rom, listOffset + (int)spawnInt.Value * 2) + Const.CheckpointOffset;
+            int offset = BitConverter.ToUInt16(SNES.rom, listOffset + (int)MainWindow.window.spawnE.spawnInt.Value * 2) + Const.CheckpointOffset;
 
             if (Const.Id != Const.GameId.MegaManX) offset++;
             ushort value = (ushort)(int)e.NewValue;
@@ -274,7 +273,7 @@ namespace TeheManX_Editor.Forms
             if (e.NewValue == null || SNES.rom == null || Level.Id >= Const.PlayableLevelsCount)
                 return;
             int listOffset = BitConverter.ToUInt16(SNES.rom, Const.CheckpointOffset + Level.Id * 2) + Const.CheckpointOffset;
-            int offset = BitConverter.ToUInt16(SNES.rom, listOffset + (int)spawnInt.Value * 2) + Const.CheckpointOffset;
+            int offset = BitConverter.ToUInt16(SNES.rom, listOffset + (int)MainWindow.window.spawnE.spawnInt.Value * 2) + Const.CheckpointOffset;
 
             if (Const.Id != Const.GameId.MegaManX) offset++;
             ushort value = (ushort)(int)e.NewValue;
@@ -288,7 +287,7 @@ namespace TeheManX_Editor.Forms
             if (e.NewValue == null || SNES.rom == null || Level.Id >= Const.PlayableLevelsCount)
                 return;
             int listOffset = BitConverter.ToUInt16(SNES.rom, Const.CheckpointOffset + Level.Id * 2) + Const.CheckpointOffset;
-            int offset = BitConverter.ToUInt16(SNES.rom, listOffset + (int)spawnInt.Value * 2) + Const.CheckpointOffset;
+            int offset = BitConverter.ToUInt16(SNES.rom, listOffset + (int)MainWindow.window.spawnE.spawnInt.Value * 2) + Const.CheckpointOffset;
 
             if (Const.Id != Const.GameId.MegaManX) offset++;
             ushort value = (ushort)(int)e.NewValue;
@@ -302,7 +301,7 @@ namespace TeheManX_Editor.Forms
             if (e.NewValue == null || SNES.rom == null || Level.Id >= Const.PlayableLevelsCount)
                 return;
             int listOffset = BitConverter.ToUInt16(SNES.rom, Const.CheckpointOffset + Level.Id * 2) + Const.CheckpointOffset;
-            int offset = BitConverter.ToUInt16(SNES.rom, listOffset + (int)spawnInt.Value * 2) + Const.CheckpointOffset;
+            int offset = BitConverter.ToUInt16(SNES.rom, listOffset + (int)MainWindow.window.spawnE.spawnInt.Value * 2) + Const.CheckpointOffset;
 
             if (Const.Id != Const.GameId.MegaManX) offset++;
             ushort value = (ushort)(int)e.NewValue;
@@ -316,7 +315,7 @@ namespace TeheManX_Editor.Forms
             if (e.NewValue == null || SNES.rom == null || Level.Id >= Const.PlayableLevelsCount)
                 return;
             int listOffset = BitConverter.ToUInt16(SNES.rom, Const.CheckpointOffset + Level.Id * 2) + Const.CheckpointOffset;
-            int offset = BitConverter.ToUInt16(SNES.rom, listOffset + (int)spawnInt.Value * 2) + Const.CheckpointOffset;
+            int offset = BitConverter.ToUInt16(SNES.rom, listOffset + (int)MainWindow.window.spawnE.spawnInt.Value * 2) + Const.CheckpointOffset;
 
             if (Const.Id != Const.GameId.MegaManX) offset++;
             ushort value = (ushort)(int)e.NewValue;
@@ -330,7 +329,7 @@ namespace TeheManX_Editor.Forms
             if (e.NewValue == null || SNES.rom == null || Level.Id >= Const.PlayableLevelsCount)
                 return;
             int listOffset = BitConverter.ToUInt16(SNES.rom, Const.CheckpointOffset + Level.Id * 2) + Const.CheckpointOffset;
-            int offset = BitConverter.ToUInt16(SNES.rom, listOffset + (int)spawnInt.Value * 2) + Const.CheckpointOffset;
+            int offset = BitConverter.ToUInt16(SNES.rom, listOffset + (int)MainWindow.window.spawnE.spawnInt.Value * 2) + Const.CheckpointOffset;
 
             if (Const.Id != Const.GameId.MegaManX) offset++;
             ushort value = (ushort)(int)e.NewValue;
@@ -344,7 +343,7 @@ namespace TeheManX_Editor.Forms
             if (e.NewValue == null || SNES.rom == null || Level.Id >= Const.PlayableLevelsCount)
                 return;
             int listOffset = BitConverter.ToUInt16(SNES.rom, Const.CheckpointOffset + Level.Id * 2) + Const.CheckpointOffset;
-            int offset = BitConverter.ToUInt16(SNES.rom, listOffset + (int)spawnInt.Value * 2) + Const.CheckpointOffset;
+            int offset = BitConverter.ToUInt16(SNES.rom, listOffset + (int)MainWindow.window.spawnE.spawnInt.Value * 2) + Const.CheckpointOffset;
 
             if (Const.Id != Const.GameId.MegaManX) offset++;
             ushort value = (ushort)(int)e.NewValue;
@@ -358,7 +357,7 @@ namespace TeheManX_Editor.Forms
             if (e.NewValue == null || SNES.rom == null || Level.Id >= Const.PlayableLevelsCount)
                 return;
             int listOffset = BitConverter.ToUInt16(SNES.rom, Const.CheckpointOffset + Level.Id * 2) + Const.CheckpointOffset;
-            int offset = BitConverter.ToUInt16(SNES.rom, listOffset + (int)spawnInt.Value * 2) + Const.CheckpointOffset;
+            int offset = BitConverter.ToUInt16(SNES.rom, listOffset + (int)MainWindow.window.spawnE.spawnInt.Value * 2) + Const.CheckpointOffset;
 
             if (Const.Id != Const.GameId.MegaManX) offset++;
             ushort value = (ushort)(int)e.NewValue;
@@ -372,7 +371,7 @@ namespace TeheManX_Editor.Forms
             if (e.NewValue == null || SNES.rom == null || Level.Id >= Const.PlayableLevelsCount)
                 return;
             int listOffset = BitConverter.ToUInt16(SNES.rom, Const.CheckpointOffset + Level.Id * 2) + Const.CheckpointOffset;
-            int offset = BitConverter.ToUInt16(SNES.rom, listOffset + (int)spawnInt.Value * 2) + Const.CheckpointOffset;
+            int offset = BitConverter.ToUInt16(SNES.rom, listOffset + (int)MainWindow.window.spawnE.spawnInt.Value * 2) + Const.CheckpointOffset;
 
             if (Const.Id != Const.GameId.MegaManX) offset++;
             ushort value = (ushort)(int)e.NewValue;
@@ -386,7 +385,7 @@ namespace TeheManX_Editor.Forms
             if (e.NewValue == null || SNES.rom == null || Level.Id >= Const.PlayableLevelsCount)
                 return;
             int listOffset = BitConverter.ToUInt16(SNES.rom, Const.CheckpointOffset + Level.Id * 2) + Const.CheckpointOffset;
-            int offset = BitConverter.ToUInt16(SNES.rom, listOffset + (int)spawnInt.Value * 2) + Const.CheckpointOffset;
+            int offset = BitConverter.ToUInt16(SNES.rom, listOffset + (int)MainWindow.window.spawnE.spawnInt.Value * 2) + Const.CheckpointOffset;
 
             if ((byte)(int)e.NewValue == SNES.rom[offset + 0x1C])
                 return;
@@ -398,7 +397,7 @@ namespace TeheManX_Editor.Forms
             if (e.NewValue == null || SNES.rom == null || Level.Id >= Const.PlayableLevelsCount)
                 return;
             int listOffset = BitConverter.ToUInt16(SNES.rom, Const.CheckpointOffset + Level.Id * 2) + Const.CheckpointOffset;
-            int offset = BitConverter.ToUInt16(SNES.rom, listOffset + (int)spawnInt.Value * 2) + Const.CheckpointOffset;
+            int offset = BitConverter.ToUInt16(SNES.rom, listOffset + (int)MainWindow.window.spawnE.spawnInt.Value * 2) + Const.CheckpointOffset;
 
             if (Const.Id != Const.GameId.MegaManX)
                 offset += 0x1E;
@@ -416,7 +415,7 @@ namespace TeheManX_Editor.Forms
             if (e.NewValue == null || SNES.rom == null || Level.Id >= Const.PlayableLevelsCount)
                 return;
             int listOffset = BitConverter.ToUInt16(SNES.rom, Const.CheckpointOffset + Level.Id * 2) + Const.CheckpointOffset;
-            int offset = BitConverter.ToUInt16(SNES.rom, listOffset + (int)spawnInt.Value * 2) + Const.CheckpointOffset;
+            int offset = BitConverter.ToUInt16(SNES.rom, listOffset + (int)MainWindow.window.spawnE.spawnInt.Value * 2) + Const.CheckpointOffset;
 
             if (Const.Id != Const.GameId.MegaManX)
                 offset += 0x1D;
@@ -570,9 +569,9 @@ namespace TeheManX_Editor.Forms
                     checkpointPointersStartOffset += checkpointData[s].Count * 2;
                 }
                 SNES.edit = true;
-                spawnInt.Maximum = (int)numInt.Value - 1;
-                if (spawnInt.Value > spawnInt.Maximum)
-                    spawnInt.Value = spawnInt.Maximum;
+                MainWindow.window.spawnE.spawnInt.Maximum = (int)numInt.Value - 1;
+                if (MainWindow.window.spawnE.spawnInt.Value > spawnInt.Maximum)
+                    MainWindow.window.spawnE.spawnInt.Value = spawnInt.Maximum;
                 MessageBox.Show("Checkpoint configuration updated successfully!");
                 window.Close();
             };

@@ -63,6 +63,16 @@ namespace TeheManX_Editor
         public static int CheckpointOffset;
         public static int[] MaxCheckpoints = new int[MaxLevels];
 
+        public static int CameraTriggersOffset;
+        public static int CameraSettingsOffset;
+        public static int CameraSettingsBank;
+        public static int MaxTotalCameraSettings;
+
+        public static ushort CameraBorderLeftWRAM;
+        public static ushort CameraBorderRightWRAM;
+        public static ushort CameraBorderTopWRAM;
+        public static ushort CameraBorderBottomWRAM;
+
         public static int BackgroundTileInfoOffset;
 
         public static int[] LayoutPointersOffset = new int[2]; //Layout Pointers Offset to compressed data
@@ -151,6 +161,11 @@ namespace TeheManX_Editor
             public const int MaxTotalCameraSettings = 0x46; //ID Used in Storm Eagle Stage
             public const int CameraSettingsBank = 0x86;
             public const int CameraTriggersLength = 0x7EE; //size includes all the pointers
+
+            public const ushort CameraBorderLeftWRAM = 0x1E5E;
+            public static ushort CameraBorderRightWRAM = 0x1E60;
+            public static ushort CameraBorderTopWRAM = 0x1E68;
+            public static ushort CameraBorderBottomWRAM = 0x1E6E;
 
             public static readonly int[] LayoutPointersOffset = { 0x30D24, 0x30F4F }; //Layout Pointers Offset to compressed data
             public static readonly int[] ScreenDataPointersOffset = { 0x30D93, 0x30FBE };
@@ -329,6 +344,11 @@ namespace TeheManX_Editor
             public const int CameraSettingsBank = 0x2;
             public const int CameraTriggersOffset = 0x16BE9;
             public const int CameraSettingsOffset = 0x17AE4;
+
+            public const ushort CameraBorderLeftWRAM = 0x1E6E;
+            public static ushort CameraBorderRightWRAM = 0x1E70;
+            public static ushort CameraBorderTopWRAM = 0x1E78;
+            public static ushort CameraBorderBottomWRAM = 0x1E7E;
 
             public static readonly int[] LayoutPointersOffset = { 0x030888, 0x30AB3 };
             public static readonly int[] ScreenDataPointersOffset = { 0x0308F7, 0x30B22 };
@@ -543,6 +563,13 @@ namespace TeheManX_Editor
                 LayoutDataOffset = MegaManX.LayoutDataOffset;
 
                 MaxTotalCheckpoints = MegaManX.MaxTotalCheckpoints;
+                CameraSettingsBank = MegaManX.CameraSettingsBank;
+                MaxTotalCameraSettings = MegaManX.MaxTotalCameraSettings;
+
+                CameraBorderLeftWRAM = MegaManX.CameraBorderLeftWRAM;
+                CameraBorderRightWRAM = MegaManX.CameraBorderRightWRAM;
+                CameraBorderTopWRAM = MegaManX.CameraBorderTopWRAM;
+                CameraBorderBottomWRAM = MegaManX.CameraBorderTopWRAM;
 
                 LayoutPointersOffset = MegaManX.LayoutPointersOffset;
                 ScreenDataPointersOffset = MegaManX.ScreenDataPointersOffset;
@@ -561,6 +588,8 @@ namespace TeheManX_Editor
                     CheckpointOffset = MegaManX.NA.CheckpointOffset;
                     BackgroundTileInfoOffset = MegaManX.NA.BackgroundTileInfoOffset;
                     EnemyBankAsmOffsets = MegaManX.NA.EnemyBankAsmOffsets;
+                    CameraTriggersOffset = MegaManX.NA.CameraTriggersOffset;
+                    CameraSettingsOffset = MegaManX.NA.CameraSettingsOffset;
                 }
                 else
                 {
@@ -569,6 +598,8 @@ namespace TeheManX_Editor
                     CheckpointOffset = MegaManX.JP.CheckpointOffset;
                     BackgroundTileInfoOffset = MegaManX.JP.BackgroundTileInfoOffset;
                     EnemyBankAsmOffsets = MegaManX.JP.EnemyBankAsmOffsets;
+                    CameraTriggersOffset = MegaManX.JP.CameraTriggersOffset;
+                    CameraSettingsOffset = MegaManX.JP.CameraSettingsOffset;
                 }
             }
             else if (gameId == GameId.MegaManX2)
@@ -592,6 +623,16 @@ namespace TeheManX_Editor
                 LayoutDataOffset = MegaManX2.LayoutDataOffset;
 
                 MaxTotalCheckpoints = MegaManX2.MaxTotalCheckpoints;
+                CameraSettingsBank = MegaManX2.CameraSettingsBank;
+                MaxTotalCameraSettings = MegaManX2.MaxTotalCameraSettings;
+
+                CameraBorderLeftWRAM = MegaManX2.CameraBorderLeftWRAM;
+                CameraBorderRightWRAM = MegaManX2.CameraBorderRightWRAM;
+                CameraBorderTopWRAM = MegaManX2.CameraBorderTopWRAM;
+                CameraBorderBottomWRAM = MegaManX2.CameraBorderTopWRAM;
+
+                CameraTriggersOffset = MegaManX2.CameraTriggersOffset;
+                CameraSettingsOffset = MegaManX2.CameraSettingsOffset;
 
                 LayoutPointersOffset = MegaManX2.LayoutPointersOffset;
                 ScreenDataPointersOffset = MegaManX2.ScreenDataPointersOffset;
@@ -643,6 +684,16 @@ namespace TeheManX_Editor
                 LayoutDataOffset = MegaManX3.LayoutDataOffset;
 
                 MaxTotalCheckpoints = MegaManX3.MaxTotalCheckpoints;
+                CameraSettingsBank = MegaManX3.CameraSettingsBank;
+
+                CameraTriggersOffset = MegaManX3.CameraTriggersOffset;
+                CameraSettingsOffset = MegaManX3.CameraSettingsOffset;
+                MaxTotalCameraSettings = MegaManX3.MaxTotalCameraSettings;
+
+                CameraBorderLeftWRAM = MegaManX2.CameraBorderLeftWRAM;
+                CameraBorderRightWRAM = MegaManX2.CameraBorderRightWRAM;
+                CameraBorderTopWRAM = MegaManX2.CameraBorderTopWRAM;
+                CameraBorderBottomWRAM = MegaManX2.CameraBorderTopWRAM;
 
                 LayoutPointersOffset = MegaManX3.LayoutPointersOffset;
                 ScreenDataPointersOffset = MegaManX3.ScreenDataPointersOffset;

@@ -127,6 +127,7 @@ namespace TeheManX_Editor.Forms
                     //Setup Editor
                     Level.AssignPallete();
                     Level.LoadLevelTiles();
+                    window.camE.AssignBorderSettingsLimits();
                     Update();
                     UnlockWindows();
                 }
@@ -152,7 +153,8 @@ namespace TeheManX_Editor.Forms
             window.enemyE.DrawEnemies();
             UpdateViewrCam();
             UpdateEnemyViewerCam();
-            spawnE.SetSpawnSettings();
+            window.spawnE.SetSpawnSettings();
+            window.camE.AssignTriggerLimits();
             tileE.AssignLimits();
             UpdateWindowTitle();
 
@@ -520,6 +522,7 @@ namespace TeheManX_Editor.Forms
                     Level.Id = 0;
                     Level.AssignPallete();
                     Level.LoadLevelTiles();
+                    window.camE.AssignBorderSettingsLimits();
                     Update();
                     UnlockWindows();
                 }
