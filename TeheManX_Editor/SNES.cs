@@ -60,8 +60,8 @@ namespace TeheManX_Editor
         }
         public static int CpuToOffset(int cpu , int bank)
         {
-            cpu &= 0xFFFF;
-            return cpu - 0x8000 + ((bank & 0x7F) * 0x8000);
+            cpu &= 0x7FFF;
+            return cpu + ((bank & 0x7F) * 0x8000);
         }
         public static int OffsetToCpu(int offset)
         {
