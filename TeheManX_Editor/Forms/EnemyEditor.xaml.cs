@@ -250,12 +250,6 @@ namespace TeheManX_Editor.Forms
             MainWindow.window.enemyE.columnInt.IsEnabled = false;
             //MainWindow.window.enemyE.nameLbl.Content = "";
         }
-        private void UpdateEnemyCordLabel(short x, short y, byte col)
-        {
-            MainWindow.window.enemyE.xInt.Value = x + viewerX;
-            MainWindow.window.enemyE.yInt.Value = y + viewerY;
-            MainWindow.window.enemyE.columnInt.Value = col;
-        }
         private bool ValidEnemyAdd()
         {
            if (Level.Id >= Const.PlayableLevelsCount || (Const.Id == Const.GameId.MegaManX3 && Level.Id > 0xE))
@@ -276,42 +270,40 @@ namespace TeheManX_Editor.Forms
         private void Label_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
             MainWindow.window.enemyE.control.Tag = sender;
-            byte type = ((Enemy)((EnemyLabel)control.Tag).Tag).Type;
-            byte id = ((Enemy)((EnemyLabel)control.Tag).Tag).Id;
-            byte var = ((Enemy)((EnemyLabel)control.Tag).Tag).SubId;
-            byte colmn = ((Enemy)((EnemyLabel)control.Tag).Tag).Column;
+            EnemyLabel label = sender as EnemyLabel;
+            Enemy en = (Enemy)label.Tag;
 
             if (e.ChangedButton == MouseButton.Left)
             {
-
+                // Selection logic
                 if (!down)
                 {
+                    MainWindow.window.enemyE.columnInt.Value = en.Column;
+                    MainWindow.window.enemyE.idInt.Value = en.Id;
+                    MainWindow.window.enemyE.varInt.Value = en.SubId;
+                    MainWindow.window.enemyE.typeInt.Value = en.Type;
+                    MainWindow.window.enemyE.xInt.Value = en.X;
+                    MainWindow.window.enemyE.yInt.Value = en.Y;
 
-                    //Set Select Enemy
-                    MainWindow.window.enemyE.columnInt.Value = colmn;
-                    MainWindow.window.enemyE.idInt.Value = id;
-                    MainWindow.window.enemyE.varInt.Value = var;
-                    MainWindow.window.enemyE.typeInt.Value = type;
-                    //Enable
-                    MainWindow.window.enemyE.idInt.IsEnabled = true;
-                    MainWindow.window.enemyE.varInt.IsEnabled = true;
-                    MainWindow.window.enemyE.typeInt.IsEnabled = true;
-                    MainWindow.window.enemyE.xInt.IsEnabled = true;
-                    MainWindow.window.enemyE.yInt.IsEnabled = true;
+                    MainWindow.window.enemyE.idInt.IsEnabled =
+                    MainWindow.window.enemyE.varInt.IsEnabled =
+                    MainWindow.window.enemyE.typeInt.IsEnabled =
+                    MainWindow.window.enemyE.xInt.IsEnabled =
+                    MainWindow.window.enemyE.yInt.IsEnabled =
                     MainWindow.window.enemyE.columnInt.IsEnabled = true;
-
-                    //UpdateEnemyName(type, id);
                 }
+
                 down = true;
                 obj = sender as UIElement;
-                point = e.GetPosition(MainWindow.window.enemyE.canvas);
-                point.X -= Canvas.GetLeft(obj);
-                point.Y -= Canvas.GetTop(obj);
+
+                Point mouseCanvas = e.GetPosition(canvas);
+                Point objCanvas = obj.TransformToAncestor(canvas).Transform(new Point(0, 0));
+
+                double left = Canvas.GetLeft(obj);
+                double top = Canvas.GetTop(obj);
+
+                point = new Point(mouseCanvas.X - objCanvas.X, mouseCanvas.Y - objCanvas.Y);
                 MainWindow.window.enemyE.canvas.CaptureMouse();
-            }
-            else
-            {
-                //TODO: show pop up message box with info about the enemy
             }
         }
         private void canvas_MouseDown(object sender, MouseButtonEventArgs e)
@@ -358,7 +350,7 @@ namespace TeheManX_Editor.Forms
             //Move Enemy
             if (obj == null) return;
 
-            var pos = e.GetPosition(sender as IInputElement);
+            var pos = e.GetPosition(canvas);
 
             double x = pos.X - point.X;
             double y = pos.Y - point.Y;
@@ -382,8 +374,7 @@ namespace TeheManX_Editor.Forms
                 locationX = (short)(locationX & 0xFFF0); // snap X to multiple of 16
                 locationY = (short)(locationY & 0xFFF0); // snap Y to multiple of 16
 
-                // IMPORTANT:
-                // Also snap the visible label position so it moves visibly by 16px
+                // snap the visible label position so it moves visibly by 16px
                 x = locationX - viewerX;
                 y = locationY - viewerY;
             }
@@ -397,7 +388,9 @@ namespace TeheManX_Editor.Forms
             en.X = locationX;
             en.Y = locationY;
 
-            UpdateEnemyCordLabel(locationX, locationY, en.Column);
+            MainWindow.window.enemyE.xInt.Value = locationX;
+            MainWindow.window.enemyE.yInt.Value = locationY;
+            MainWindow.window.enemyE.columnInt.Value = en.Column;
 
             // Move the label on the canvas
             Canvas.SetLeft(obj, x);
@@ -407,9 +400,9 @@ namespace TeheManX_Editor.Forms
         }
         private void canvas_PreviewMouseUp(object sender, MouseButtonEventArgs e)
         {
+            down = false;
             if (e.ChangedButton == MouseButton.Right)
                 return;
-            down = false;
             if ((bool)MainWindow.window.camE.triggerCheck.IsChecked)
             {
                 if (Level.Id >= Const.PlayableLevelsCount || (Const.Id == Const.GameId.MegaManX3 && Level.Id > 0xE))
