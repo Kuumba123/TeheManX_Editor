@@ -17,6 +17,8 @@ namespace TeheManX_Editor
         public static byte[] Tiles = new byte[0x8000]; //Includes Filler Tiles
         public static byte[,,] Layout = new byte[Const.MaxLevels, 2, 0x400];
         public static Color[,] Palette = new Color[8, 16]; //Converted to 24-bit Color
+        public static int PaletteId;
+        public static int PaletteColorAddress;
         public static List<Enemy>[] Enemies = new List<Enemy>[Const.MaxLevels];
         #endregion Fields
 
@@ -831,13 +833,15 @@ namespace TeheManX_Editor
                 else if (Const.Id == Const.GameId.MegaManX3 && Id > 0xE) id = (Id - 0xF) + 2;
                 else id = Id;
 
-                int infoOffset = SNES.CpuToOffset(BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(Const.PaletteInfoOffset + id * 2 + Const.PaletteStageBase)), Const.PaletteBank);
+                PaletteId = id * 2 + Const.PaletteStageBase;
+                int infoOffset = SNES.CpuToOffset(BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(Const.PaletteInfoOffset + PaletteId)), Const.PaletteBank);
 
                 while (SNES.rom[infoOffset] != 0)
                 {
                     int colorCount = SNES.rom[infoOffset]; //how many colors are going to be dumped
                     byte colorIndex = SNES.rom[infoOffset + 3]; //which color index to start dumping at
                     int colorOffset = SNES.CpuToOffset(BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(infoOffset + 1)) + (Const.PaletteColorBank << 16)); //where the colors are located
+                    PaletteColorAddress = SNES.OffsetToCpu(colorOffset);
 
                     for (int c = 0; c < colorCount; c++)
                     {
@@ -856,6 +860,8 @@ namespace TeheManX_Editor
             }
             else
             {
+                PaletteId = -1;
+                PaletteColorAddress = -1;
                 for (int s = 0; s < 8; s++)
                 {
                     for (int i = 0; i < 16; i++) // 0x00 → 0xF8

@@ -20,13 +20,39 @@
         <!--Palette-->
         <StackPanel Grid.Column="1">
             <StackPanel Orientation="Horizontal">
-                <TextBlock x:Name="palTxt" Foreground="White" FontFamily="Consolas" FontSize="20" Margin="5,0,0,0" Width="115" VerticalAlignment="Center">Palette: 0</TextBlock>
+                <TextBlock x:Name="palTxt" Foreground="White" FontFamily="Consolas" FontSize="19" Margin="5,0,0,0" Width="224" VerticalAlignment="Center">Palette: 0</TextBlock>
                 <Button Style="{StaticResource TileButton}" Click="GearBtn_Click">⚙️</Button>
             </StackPanel>
             <Border BorderBrush="White" BorderThickness="2" HorizontalAlignment="Left" VerticalAlignment="Top">
                 <Grid x:Name="paletteGrid"  Width="256" Height="128">
 
                 </Grid>
+            </Border>
+            <TextBlock x:Name="colorAddressTxt" Foreground="White" FontFamily="Consolas" FontSize="19" Margin="5,0,0,0" Width="224" HorizontalAlignment="Left">Color Address: 0</TextBlock>
+
+            <Border BorderBrush="White" BorderThickness="2" Width="256" HorizontalAlignment="Left">
+                <StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock FontSize="24" Foreground="White" FontFamily="Consolas">Swap Palette Id:</TextBlock>
+                        <local:NumInt FontSize="20" x:Name="bgPalIdInt" Minimum="0" ValueChanged="bgPalIdInt_ValueChanged"></local:NumInt>
+                    </StackPanel>
+                    <Grid x:Name="paletteGrid2"  Width="256" Height="16" HorizontalAlignment="Left">
+
+                    </Grid>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Width="201" FontSize="18" Foreground="White" FontFamily="Consolas">Palette Set:</TextBlock>
+                        <local:NumInt Width="50" FontSize="20" x:Name="paletteSetInt" Minimum="0" ValueChanged="paletteSetInt_ValueChanged"></local:NumInt>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Width="201" FontSize="18" Foreground="White" FontFamily="Consolas">Color Index:</TextBlock>
+                        <local:NumInt Width="50" FontSize="20" x:Name="colorIndexInt" Minimum="0" ValueChanged="colorIndexInt_ValueChanged"></local:NumInt>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Width="201" FontSize="17" Foreground="White" FontFamily="Consolas">16 bit Color Address:</TextBlock>
+                        <TextBox Width="50" FontSize="18" Foreground="White" Background="Black" x:Name="colorAddressBox" TextChanged="colorAddressBox_TextChanged"></TextBox>
+                    </StackPanel>
+                    <Button x:Name="dumpPalBtn" Click="DumpPaletteBtn_Click">Dump Palettes</Button>
+                </StackPanel>
             </Border>
         </StackPanel>
     </Grid>

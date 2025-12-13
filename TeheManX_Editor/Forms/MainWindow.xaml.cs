@@ -351,12 +351,12 @@ namespace TeheManX_Editor.Forms
             bool update = false;
             if (key == "Up")
             {
-                window.paletteE.palId--;
+                window.paletteE.selectedSet--;
                 update = true;
             }
             else if (key == "Down")
             {
-                window.paletteE.palId++;
+                window.paletteE.selectedSet++;
                 update = true;
             }
             else if (Keyboard.IsKeyDown(Key.LeftShift))
@@ -377,7 +377,7 @@ namespace TeheManX_Editor.Forms
 
             if (update)
             {
-                window.paletteE.palId &= 7;
+                window.paletteE.selectedSet &= 7;
                 window.paletteE.UpdatePaletteText();
                 window.paletteE.DrawVramTiles();
                 window.paletteE.UpdateCursor();

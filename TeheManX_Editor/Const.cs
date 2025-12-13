@@ -45,6 +45,8 @@ namespace TeheManX_Editor
         public static int PaletteInfoOffset;
         public static int PaletteStageBase; //Base Id for Stage Palettes
 
+        public static int BackgroundPaletteOffset;
+
         public static int LoadTileSetBank;
         public static int LoadTileSetInfoOffset;
         public static int LoadTileSetStageBase; //Base Id for Stage Load CHR Info
@@ -181,6 +183,7 @@ namespace TeheManX_Editor
                 public const int CheckpointOffset = 0x32780;
                 public const int CameraTriggersOffset = 0x364E2;
                 public const int CameraSettingsOffset = 0x36CD0;
+                public const int BackgroundPaletteOffset = 0x32260;
                 public const int BackgroundTileInfoOffset = 0x321D5;
                 public static readonly int[] EnemyBankAsmOffsets = { 0x5B93 , 0x5BDA, 0x5D4D }; //for expansion
             }
@@ -191,6 +194,7 @@ namespace TeheManX_Editor
                 public const int CheckpointOffset = 0x32783;
                 public const int CameraTriggersOffset = 0x364E5;
                 public const int CameraSettingsOffset = 0x36CD3;
+                public const int BackgroundPaletteOffset = 0x32263;
                 public const int BackgroundTileInfoOffset = 0x321D8;
                 public static readonly int[] EnemyBankAsmOffsets = { 0x5B91 , 0x5BD8, 0x5D4B }; //for expansion
             }
@@ -364,6 +368,7 @@ namespace TeheManX_Editor
                 public const int EnemyPointersOffset = 0x14D3D1;
                 public const int CheckpointOffset = 0x324C5;
                 public const int BackgroundTileInfoOffset = 0x31D6A;
+                public const int BackgroundPaletteOffset = 0x31DD1;
             }
             internal static class JP // Japanese Version
             {
@@ -372,6 +377,7 @@ namespace TeheManX_Editor
                 public const int EnemyPointersOffset = 0x14D3D9;
                 public const int CheckpointOffset = 0x324C6;
                 public const int BackgroundTileInfoOffset = 0x31D6B;
+                public const int BackgroundPaletteOffset = 0x31DD2;
             }
             public static readonly int[,] LayoutLength = new int[0xD, 2]
             {
@@ -529,6 +535,7 @@ namespace TeheManX_Editor
                 public const int CompressedTileInfoOffset = 0x37732;
                 public const int CheckpointOffset = 0x328E4;
                 public const int BackgroundTileInfoOffset = 0x32085;
+                public const int BackgroundPaletteOffset = 0x32172;
             }
             internal class JP
             {
@@ -536,6 +543,7 @@ namespace TeheManX_Editor
                 public const int CompressedTileInfoOffset = 0x37733;
                 public const int CheckpointOffset = 0x328E5;
                 public const int BackgroundTileInfoOffset = 0x32086;
+                public const int BackgroundPaletteOffset = 0x32173;
             }
         }
         public static void AssignProperties(GameId gameId, GameVersion gameVersion, bool expanded)
@@ -586,6 +594,7 @@ namespace TeheManX_Editor
                     LoadTileSetInfoOffset = MegaManX.NA.LoadTileSetInfoOffset;
                     CompressedTileInfoOffset = MegaManX.NA.CompressedTileInfoOffset;
                     CheckpointOffset = MegaManX.NA.CheckpointOffset;
+                    BackgroundPaletteOffset = MegaManX.NA.BackgroundPaletteOffset;
                     BackgroundTileInfoOffset = MegaManX.NA.BackgroundTileInfoOffset;
                     EnemyBankAsmOffsets = MegaManX.NA.EnemyBankAsmOffsets;
                     CameraTriggersOffset = MegaManX.NA.CameraTriggersOffset;
@@ -596,6 +605,7 @@ namespace TeheManX_Editor
                     LoadTileSetInfoOffset = MegaManX.JP.LoadTileSetInfoOffset;
                     CompressedTileInfoOffset = MegaManX.JP.CompressedTileInfoOffset;
                     CheckpointOffset = MegaManX.JP.CheckpointOffset;
+                    BackgroundPaletteOffset = MegaManX.JP.BackgroundPaletteOffset;
                     BackgroundTileInfoOffset = MegaManX.JP.BackgroundTileInfoOffset;
                     EnemyBankAsmOffsets = MegaManX.JP.EnemyBankAsmOffsets;
                     CameraTriggersOffset = MegaManX.JP.CameraTriggersOffset;
@@ -651,6 +661,7 @@ namespace TeheManX_Editor
                     EnemyPointersOffset = MegaManX2.NA.EnemyPointersOffset;
                     CheckpointOffset = MegaManX2.NA.CheckpointOffset;
                     BackgroundTileInfoOffset = MegaManX2.NA.BackgroundTileInfoOffset;
+                    BackgroundPaletteOffset = MegaManX2.NA.BackgroundPaletteOffset;
                 }
                 else
                 {
@@ -659,6 +670,7 @@ namespace TeheManX_Editor
                     EnemyPointersOffset = MegaManX2.JP.EnemyPointersOffset;
                     CheckpointOffset = MegaManX2.JP.CheckpointOffset;
                     BackgroundTileInfoOffset = MegaManX2.JP.BackgroundTileInfoOffset;
+                    BackgroundPaletteOffset = MegaManX2.JP.BackgroundPaletteOffset;
                 }
             }
             else if (gameId == GameId.MegaManX3)
@@ -711,6 +723,7 @@ namespace TeheManX_Editor
                     CompressedTileInfoOffset = MegaManX3.NA.CompressedTileInfoOffset;
                     CheckpointOffset = MegaManX3.NA.CheckpointOffset;
                     BackgroundTileInfoOffset = MegaManX3.NA.BackgroundTileInfoOffset;
+                    BackgroundPaletteOffset = MegaManX3.NA.BackgroundPaletteOffset;
                 }
                 else
                 {
@@ -718,6 +731,7 @@ namespace TeheManX_Editor
                     CompressedTileInfoOffset = MegaManX3.JP.CompressedTileInfoOffset;
                     CheckpointOffset = MegaManX3.JP.CheckpointOffset;
                     BackgroundTileInfoOffset = MegaManX3.JP.BackgroundTileInfoOffset;
+                    BackgroundPaletteOffset = MegaManX3.JP.BackgroundPaletteOffset;
                 }
             }
 
