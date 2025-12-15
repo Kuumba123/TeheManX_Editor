@@ -76,6 +76,11 @@ namespace TeheManX_Editor
         public static ushort CameraBorderBottomWRAM;
 
         public static int BackgroundTileInfoOffset;
+        public static int ObjectTileInfoOffset;
+        public static int CompressedTilesSwapInfoOffset;
+
+        public static int MegaManTilesOffset; //Offset to MegaMan X sprite tiles
+        public static int[] MegaManGreenChargeShotTilesOffset = new int[2]; //Offset to MegaMan X Pink Green Shot sprite tiles
 
         public static int[] LayoutPointersOffset = new int[2]; //Layout Pointers Offset to compressed data
         public static int[] ScreenDataPointersOffset = new int[2];
@@ -165,9 +170,12 @@ namespace TeheManX_Editor
             public const int CameraTriggersLength = 0x7EE; //size includes all the pointers
 
             public const ushort CameraBorderLeftWRAM = 0x1E5E;
-            public static ushort CameraBorderRightWRAM = 0x1E60;
-            public static ushort CameraBorderTopWRAM = 0x1E68;
-            public static ushort CameraBorderBottomWRAM = 0x1E6E;
+            public const ushort CameraBorderRightWRAM = 0x1E60;
+            public const ushort CameraBorderTopWRAM = 0x1E68;
+            public const ushort CameraBorderBottomWRAM = 0x1E6E;
+
+            public const int MegaManTilesOffset = 0x170000; //Offset to MegaMan X sprite tiles
+            public static readonly int[] MegaManGreenChargeShotTilesOffset = { 0x178400, 0x178500 }; //Offset to MegaMan X Pink Green Shot sprite tiles
 
             public static readonly int[] LayoutPointersOffset = { 0x30D24, 0x30F4F }; //Layout Pointers Offset to compressed data
             public static readonly int[] ScreenDataPointersOffset = { 0x30D93, 0x30FBE };
@@ -185,6 +193,8 @@ namespace TeheManX_Editor
                 public const int CameraSettingsOffset = 0x36CD0;
                 public const int BackgroundPaletteOffset = 0x32260;
                 public const int BackgroundTileInfoOffset = 0x321D5;
+                public const int ObjectTileInfoOffset = 0x32CEE;
+                public const int CompressedTilesSwapInfoOffset = 0x371B7;
                 public static readonly int[] EnemyBankAsmOffsets = { 0x5B93 , 0x5BDA, 0x5D4D }; //for expansion
             }
             internal static class JP // Japanese Version
@@ -196,6 +206,8 @@ namespace TeheManX_Editor
                 public const int CameraSettingsOffset = 0x36CD3;
                 public const int BackgroundPaletteOffset = 0x32263;
                 public const int BackgroundTileInfoOffset = 0x321D8;
+                public const int ObjectTileInfoOffset = 0x32CF1;
+                public const int CompressedTilesSwapInfoOffset = 0x371BA;
                 public static readonly int[] EnemyBankAsmOffsets = { 0x5B91 , 0x5BD8, 0x5D4B }; //for expansion
             }
             public static readonly int[,] LayoutLength = new int[0x25, 2]
@@ -354,6 +366,11 @@ namespace TeheManX_Editor
             public static ushort CameraBorderTopWRAM = 0x1E78;
             public static ushort CameraBorderBottomWRAM = 0x1E7E;
 
+            public const int ObjectTileInfoOffset = 0x1532D4;
+            public const int CompressedTilesSwapInfoOffset = 0x157B02;
+
+            public const int MegaManTilesOffset = 0x168000; //Offset to MegaMan X sprite tiles
+
             public static readonly int[] LayoutPointersOffset = { 0x030888, 0x30AB3 };
             public static readonly int[] ScreenDataPointersOffset = { 0x0308F7, 0x30B22 };
             public static readonly int[] Tile32DataPointersOffset = { 0x030966, 0x30B91 };
@@ -458,6 +475,12 @@ namespace TeheManX_Editor
             public const int CameraSettingsBank = 0x3;
             public const int CameraTriggersOffset = 0x1DE43;
             public const int CameraSettingsOffset = 0x1F2CC;
+
+            public const int ObjectTileInfoOffset = 0x40623;
+            public const int CompressedTilesSwapInfoOffset = 0x457C9;
+
+            public const int MegaManTilesOffset = 0x168000; //Offset to MegaMan X sprite tiles
+            public static readonly int[] MegaManGreenChargeShotTilesOffset = { 0x1E0400, 0x1E0500 }; //Offset to MegaMan X Pink Green Shot sprite tiles
 
             public static readonly int[] LayoutPointersOffset = { 0x309B3, 0x30BDE };
             public static readonly int[] ScreenDataPointersOffset = { 0x30A22, 0x30C4D };
@@ -585,6 +608,9 @@ namespace TeheManX_Editor
                 Tile16DataPointersOffset = MegaManX.Tile16DataPointersOffset;
                 TileCollisionDataPointersOffset = MegaManX.TileCollisionDataPointersOffset;
 
+                MegaManTilesOffset = MegaManX.MegaManTilesOffset;
+                MegaManGreenChargeShotTilesOffset = MegaManX.MegaManGreenChargeShotTilesOffset;
+
                 LayoutLength = MegaManX.LayoutLength;
                 Tile32Count = MegaManX.Tile32Count;
                 Tile16Count = MegaManX.Tile16Count;
@@ -599,6 +625,8 @@ namespace TeheManX_Editor
                     EnemyBankAsmOffsets = MegaManX.NA.EnemyBankAsmOffsets;
                     CameraTriggersOffset = MegaManX.NA.CameraTriggersOffset;
                     CameraSettingsOffset = MegaManX.NA.CameraSettingsOffset;
+                    ObjectTileInfoOffset = MegaManX.NA.ObjectTileInfoOffset;
+                    CompressedTilesSwapInfoOffset = MegaManX.NA.CompressedTilesSwapInfoOffset;
                 }
                 else
                 {
@@ -610,6 +638,8 @@ namespace TeheManX_Editor
                     EnemyBankAsmOffsets = MegaManX.JP.EnemyBankAsmOffsets;
                     CameraTriggersOffset = MegaManX.JP.CameraTriggersOffset;
                     CameraSettingsOffset = MegaManX.JP.CameraSettingsOffset;
+                    ObjectTileInfoOffset = MegaManX.JP.ObjectTileInfoOffset;
+                    CompressedTilesSwapInfoOffset = MegaManX.JP.CompressedTilesSwapInfoOffset;
                 }
             }
             else if (gameId == GameId.MegaManX2)
@@ -649,6 +679,12 @@ namespace TeheManX_Editor
                 Tile32DataPointersOffset = MegaManX2.Tile32DataPointersOffset;
                 Tile16DataPointersOffset = MegaManX2.Tile16DataPointersOffset;
                 TileCollisionDataPointersOffset = MegaManX2.TileCollisionDataPointersOffset;
+
+                ObjectTileInfoOffset = MegaManX2.ObjectTileInfoOffset;
+                CompressedTilesSwapInfoOffset = MegaManX2.CompressedTilesSwapInfoOffset;
+
+                MegaManTilesOffset = MegaManX2.MegaManTilesOffset;
+                MegaManGreenChargeShotTilesOffset = MegaManX.MegaManGreenChargeShotTilesOffset;
 
                 LayoutLength = MegaManX2.LayoutLength;
                 Tile32Count = MegaManX2.Tile32Count;
@@ -712,6 +748,12 @@ namespace TeheManX_Editor
                 Tile32DataPointersOffset = MegaManX3.Tile32DataPointersOffset;
                 Tile16DataPointersOffset = MegaManX3.Tile16DataPointersOffset;
                 TileCollisionDataPointersOffset = MegaManX3.TileCollisionDataPointersOffset;
+
+                ObjectTileInfoOffset = MegaManX3.ObjectTileInfoOffset;
+                CompressedTilesSwapInfoOffset = MegaManX3.CompressedTilesSwapInfoOffset;
+
+                MegaManTilesOffset = MegaManX3.MegaManTilesOffset;
+                MegaManGreenChargeShotTilesOffset = MegaManX3.MegaManGreenChargeShotTilesOffset;
 
                 LayoutLength = MegaManX3.LayoutLength;
                 Tile32Count = MegaManX3.Tile32Count;

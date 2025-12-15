@@ -2,6 +2,9 @@
 using System.Buffers.Binary;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using System.Windows.Shapes;
 
 namespace TeheManX_Editor.Forms
 {
@@ -10,14 +13,59 @@ namespace TeheManX_Editor.Forms
     /// </summary>
     public partial class TileEditor : UserControl
     {
+        #region Fields
+        public static byte[] ObjectTiles = new byte[0x4000];
+        public static Color[,] Palette = new Color[8, 16]; //Converted to 24-bit Color
+        public static byte[] bank7F = new byte[0x7E00];
+        #endregion Fields
+
         #region Properties
         private bool _suppressBgSrcBoxTextChanged;
+        public static int objectTileSetId;
+        public static int objectTileSlotId;
+        public static int palId = 1;
+        WriteableBitmap vramTiles = new WriteableBitmap(128, 128, 96, 96, PixelFormats.Bgra32, null);
+        Rectangle selectSetRect = new Rectangle() { IsHitTestVisible = false, StrokeThickness = 2.5, StrokeDashArray = new DoubleCollection() { 2.2 }, CacheMode = null, Stroke = Brushes.PapayaWhip };
+        private bool suppressObjectTileInt;
         #endregion Properties
 
         #region Constructor
         public TileEditor()
         {
             InitializeComponent();
+
+            for (int col = 0; col < 16; col++)
+            {
+                paletteGrid.ColumnDefinitions.Add(new ColumnDefinition());
+                objectTileGrid.ColumnDefinitions.Add(new ColumnDefinition());
+            }
+            for (int row = 0; row < 8; row++)
+                paletteGrid.RowDefinitions.Add(new RowDefinition());
+
+            for (int row = 0; row < 16; row++)
+                objectTileGrid.RowDefinitions.Add(new RowDefinition());
+
+            for (int y = 0; y < 8; y++)
+            {
+                for (int x = 0; x < 16; x++)
+                {
+                    //Create Color
+                    Rectangle rect = new Rectangle();
+                    rect.Focusable = false;
+                    rect.Width = 16;
+                    rect.Height = 16;
+                    rect.MouseDown += Color_Down;
+                    rect.Fill = Brushes.Transparent;
+                    rect.HorizontalAlignment = HorizontalAlignment.Stretch;
+                    rect.VerticalAlignment = VerticalAlignment.Stretch;
+                    Grid.SetColumn(rect, x);
+                    Grid.SetRow(rect, y);
+                    paletteGrid.Children.Add(rect);
+                }
+            }
+            Grid.SetColumnSpan(selectSetRect, 16);
+            paletteGrid.Children.Add(selectSetRect);
+            objectTilesImage.Source = vramTiles;
         }
         #endregion Constructor
 
@@ -32,6 +80,14 @@ namespace TeheManX_Editor.Forms
                 MainWindow.window.tileE.bgAddressInt.IsEnabled = false;
                 MainWindow.window.tileE.bgSrcBox.IsEnabled = false;
                 MainWindow.window.tileE.bgPalInt.IsEnabled = false;
+
+                MainWindow.window.tileE.objTileSetInt.IsEnabled = false;
+                MainWindow.window.tileE.compressTileInt.IsEnabled = false;
+                MainWindow.window.tileE.vramLocationInt.IsEnabled = false;
+                MainWindow.window.tileE.palSetInt.IsEnabled = false;
+                MainWindow.window.tileE.dumpInt.IsEnabled = false;
+                MainWindow.window.tileE.oam1Btn.IsEnabled = false;
+                MainWindow.window.tileE.oam2Btn.IsEnabled = false;
                 return;
             }
 
@@ -84,6 +140,115 @@ namespace TeheManX_Editor.Forms
                 MainWindow.window.tileE.bgSrcBox.IsEnabled = false;
                 MainWindow.window.tileE.bgPalInt.IsEnabled = false;
             }
+
+
+            //Get Max Amount of Object Tile Settings
+            suppressObjectTileInt = true;
+            int maxOBJTiles = 0;
+            Buffer.BlockCopy(SNES.rom, Const.ObjectTileInfoOffset, offsets, 0, offsets.Length * 2);
+            Array.Sort(offsets);
+
+            int maxIndex = 0;
+            for (int i = 0; i < offsets.Length; i++)
+            {
+                if (offsets[i] > offsets[maxIndex])
+                    maxIndex = i;
+            }
+
+            int tempOffset = (Const.Id == Const.GameId.MegaManX) ? 32 * 2 : Const.Id == Const.GameId.MegaManX2 ? 15 * 2 : 18 * 2;
+            tempOffset += Const.ObjectTileInfoOffset;
+            int endOffset = offsets[maxIndex] + Const.ObjectTileInfoOffset;
+
+            int lowestPointer = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(tempOffset));
+
+            while (tempOffset != endOffset)
+            {
+                int addr = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(tempOffset));
+
+                if (addr < lowestPointer)
+                    lowestPointer = addr;
+                tempOffset += 2;
+            }
+
+            ushort currentOffset = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(Const.ObjectTileInfoOffset + Level.Id * 2));
+            int currentIndex = Array.IndexOf(offsets, currentOffset);
+
+            if (currentIndex == maxIndex)
+                maxOBJTiles = ((lowestPointer - currentOffset) / 2) - 1;
+            else
+                maxOBJTiles = ((offsets[currentIndex + 1] - currentOffset) / 2) - 1;
+
+            objTileSetInt.Maximum = maxOBJTiles;
+            objTileSetInt.Value = 0;
+            objectTileSetId = (int)MainWindow.window.tileE.objTileSetInt.Value;
+            objectTileSlotId = 0;
+            objectSlotInt.Value = 0;
+
+            //Set Max Compressed Tiles
+            if (Const.Id == Const.GameId.MegaManX)
+                compressTileInt.Maximum = Const.MegaManX.CompressedTilesAmount;
+            else if (Const.Id == Const.GameId.MegaManX2)
+                compressTileInt.Maximum = Const.MegaManX2.CompressedTilesAmount;
+            else
+                compressTileInt.Maximum = Const.MegaManX3.CompressedTilesAmount;
+
+            Array.Clear(ObjectTiles);
+
+            int[] palsToLoad = { 0, 0x14, 0x1C, 0x40 };
+            int[] palsDest = { 0x10, 0x0, 0x20, 0x30 };
+
+            for (int i = 0; i < 4; i++)
+            {
+                int palId = palsToLoad[i];
+                int dumpLocation = palsDest[i];
+
+                int infoOffset = SNES.CpuToOffset(BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(Const.PaletteInfoOffset + palId)), Const.PaletteBank);
+
+                while (SNES.rom[infoOffset] != 0)
+                {
+                    int colorCount = SNES.rom[infoOffset]; //how many colors are going to be dumped
+                    int colorIndex = SNES.rom[infoOffset + 3] + dumpLocation - 0x80; //which color index to start dumping at
+                    int colorOffset = SNES.CpuToOffset(BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(infoOffset + 1)) + (Const.PaletteColorBank << 16)); //where the colors are located
+
+                    for (int c = 0; c < colorCount; c++)
+                    {
+                        if ((colorIndex + c) > 0x7F)
+                            return;
+
+                        ushort color = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(colorOffset + c * 2));
+                        byte R = (byte)(color % 32 * 8);
+                        byte G = (byte)(color / 32 % 32 * 8);
+                        byte B = (byte)(color / 1024 % 32 * 8);
+
+                        Palette[((colorIndex + c) >> 4) & 0xF, (colorIndex + c) & 0xF] = Color.FromRgb(R, G, B);
+                    }
+                    infoOffset += 4;
+                }
+            }
+
+            Array.Copy(SNES.rom, Const.MegaManTilesOffset, ObjectTiles, 0, 32 * 16 * 2);
+            Array.Copy(Level.DefaultObjectTiles, 0, ObjectTiles, 0x1000, Level.DefaultObjectTiles.Length);
+
+            //Green Charge Shot
+            Array.Copy(SNES.rom, Const.MegaManGreenChargeShotTilesOffset[0], ObjectTiles, 0x400, 0x100);
+            Array.Copy(SNES.rom, Const.MegaManGreenChargeShotTilesOffset[1], ObjectTiles, 0x600, 0x100);
+
+            DrawObjectTiles();
+            DrawPalette();
+            UpdateCursor();
+            SetMaxObjectSlots();
+            SetObjectSlotValues();
+
+            //Re Enable Object Tile UI
+            MainWindow.window.tileE.objTileSetInt.IsEnabled = true;
+            MainWindow.window.tileE.compressTileInt.IsEnabled = true;
+            MainWindow.window.tileE.vramLocationInt.IsEnabled = true;
+            MainWindow.window.tileE.palSetInt.IsEnabled = true;
+            MainWindow.window.tileE.dumpInt.IsEnabled = true;
+            MainWindow.window.tileE.oam1Btn.IsEnabled = true;
+            MainWindow.window.tileE.oam2Btn.IsEnabled = true;
+
+            suppressObjectTileInt = false;
         }
         private void SetBackgroundValues(int offset)
         {
@@ -101,6 +266,265 @@ namespace TeheManX_Editor.Forms
             MainWindow.window.tileE.bgSrcBox.Text = srcAddr.ToString("X6");
             _suppressBgSrcBoxTextChanged = false;
             MainWindow.window.tileE.bgPalInt.Value = palId;
+        }
+        private unsafe void DrawObjectTiles()
+        {
+            int id;
+            if (Const.Id == Const.GameId.MegaManX3 && Level.Id > 0xE) id = (Level.Id - 0xF) + 2; //Buffalo or Beetle
+            else id = Level.Id;
+            int listOffset = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(Const.ObjectTileInfoOffset + id * 2)) + Const.ObjectTileInfoOffset;
+            int offset = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(listOffset + (int)objectTileSetId * 2)) + Const.ObjectTileInfoOffset;
+
+            while (true)
+            {
+                byte compressedTileId = SNES.rom[offset];
+
+                if (compressedTileId == 0xFF)
+                    break;
+
+                //Load Object Tiles
+                ushort relativeVramAddr = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + 1));
+
+                int specOffset = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(Const.CompressedTilesSwapInfoOffset + compressedTileId * 2)) + Const.CompressedTilesSwapInfoOffset;
+                int srcOffset = 0;
+
+                Level.DecompressTiles2(compressedTileId, bank7F, 0, Const.Id);
+
+                while (true)
+                {
+                    int length = SNES.rom[specOffset];
+                    if (length == 0)
+                        break;
+                    if (length == 0xFF)
+                    {
+                        specOffset++;
+                        continue;
+                    }
+                    length *= 16;
+
+                    byte vramBaseHigh = SNES.rom[specOffset + 1];
+                    int destOffset = (relativeVramAddr + (((vramBaseHigh & 0x7F) - 0x60) << 8)) * 2;
+
+                    int srcAvailable = bank7F.Length - srcOffset;
+                    int dstAvailable = ObjectTiles.Length - destOffset;
+
+                    // Nothing to copy
+                    if (srcAvailable <= 0 || dstAvailable <= 0 || length <= 0)
+                        ;
+                    else
+                    {
+                        // Clamp length to what is actually available
+                        int safeLength = Math.Min(length, Math.Min(srcAvailable, dstAvailable));
+
+                        Array.Copy(bank7F, srcOffset, ObjectTiles, destOffset, safeLength);
+                    }
+
+
+                    if ((vramBaseHigh & 0x80) != 0)
+                        break;
+                    srcOffset += length;
+                    specOffset += 2;
+                }
+
+                //Load Object Palette
+                ushort palId = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + 3));
+                byte dumpLocation = SNES.rom[offset + 5];
+
+                int infoOffset = SNES.CpuToOffset(BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(Const.PaletteInfoOffset + palId)), Const.PaletteBank);
+
+                while (SNES.rom[infoOffset] != 0)
+                {
+                    int colorCount = SNES.rom[infoOffset]; //how many colors are going to be dumped
+                    int colorIndex = SNES.rom[infoOffset + 3] + dumpLocation - 0x80; //which color index to start dumping at
+                    int colorOffset = SNES.CpuToOffset(BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(infoOffset + 1)) + (Const.PaletteColorBank << 16)); //where the colors are located
+
+                    for (int c = 0; c < colorCount; c++)
+                    {
+                        if ((colorIndex + c) > 0x7F)
+                            return;
+
+                        ushort color = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(colorOffset + c * 2));
+                        byte R = (byte)(color % 32 * 8);
+                        byte G = (byte)(color / 32 % 32 * 8);
+                        byte B = (byte)(color / 1024 % 32 * 8);
+
+                        Palette[((colorIndex + c) >> 4) & 0xF, (colorIndex + c) & 0xF] = Color.FromRgb(R, G, B);
+                    }
+                    infoOffset += 4;
+                }
+                offset += 6;
+            }
+            /****************/
+
+            vramTiles.Lock();
+            byte* buffer = (byte*)vramTiles.BackBuffer;
+            int set = palId;
+
+            /*
+             *  Draw 0x200 tiles from VRAM
+             */
+
+            int readBase = (MainWindow.window.tileE.oam1Btn.IsChecked != false) ? 0x0000 : 0x2000;
+
+            for (int y = 0; y < 16; y++)
+            {
+                for (int x = 0; x < 16; x++)
+                {
+                    int tid = x + (y * 16);
+                    int tileOffset = tid * 0x20 + readBase; // 32 bytes per tile
+
+                    for (int row = 0; row < 8; row++)
+                    {
+                        int base1 = tileOffset + (row * 2);
+                        int base2 = tileOffset + 0x10 + (row * 2);
+
+                        for (int col = 0; col < 8; col++)
+                        {
+                            int bit = 7 - col; // leftmost pixel = bit7
+                            int p0 = (ObjectTiles[base1] >> bit) & 1;
+                            int p1 = (ObjectTiles[base1 + 1] >> bit) & 1;
+                            int p2 = (ObjectTiles[base2] >> bit) & 1;
+                            int p3 = (ObjectTiles[base2 + 1] >> bit) & 1;
+
+                            byte index = (byte)(p0 | (p1 << 1) | (p2 << 2) | (p3 << 3));
+
+                            // compute pixel position once and write 32-bit BGRA in a single store
+                            int px = x * 8 + col;
+                            int py = y * 8 + row;
+                            int baseIdx = px * 4 + py * vramTiles.BackBufferStride;
+                            Color colStruct = Palette[set, index];
+                            uint bgra = (0xFFu << 24) | ((uint)colStruct.R << 16) | ((uint)colStruct.G << 8) | (uint)colStruct.B;
+                            *(uint*)(buffer + baseIdx) = bgra;
+                        }
+                    }
+                }
+            }
+            vramTiles.AddDirtyRect(new Int32Rect(0, 0, 128, 128));
+            vramTiles.Unlock();
+        }
+        private void DrawPalette()
+        {
+            for (int y = 0; y < 8; y++)
+            {
+                for (int x = 0; x < 16; x++)
+                {
+                    int index = x + (y * 16);
+                    Rectangle rect = (Rectangle)paletteGrid.Children[index];
+                    Color colStruct = Palette[y, x];
+                    rect.Fill = new SolidColorBrush(colStruct);
+                }
+            }
+        }
+        private void SetObjectSlotValues()
+        {
+            int id;
+            if (Const.Id == Const.GameId.MegaManX3 && Level.Id > 0xE) id = (Level.Id - 0xF) + 2; //Buffalo or Beetle
+            else id = Level.Id;
+            int listOffset = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(Const.ObjectTileInfoOffset + id * 2)) + Const.ObjectTileInfoOffset;
+            int offset = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(listOffset + (int)objectTileSetId * 2)) + Const.ObjectTileInfoOffset;
+
+            int currentSlot = 0;
+
+            while (true)
+            {
+                int compressedTileId = SNES.rom[offset];
+
+                if (compressedTileId == 0xFF)
+                    break;
+
+                if (currentSlot != objectTileSlotId)
+                {
+                    offset += 6;
+                    currentSlot++;
+                    continue;
+                }
+
+                //Load Object Tiles
+                int relativeVramAddr = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + 1));
+                int paletteId = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + 3));
+                int dumpLocation = SNES.rom[offset + 5];
+                MainWindow.window.tileE.compressTileInt.Value = compressedTileId;
+                MainWindow.window.tileE.vramLocationInt.Value = relativeVramAddr;
+                MainWindow.window.tileE.palSetInt.Value = paletteId;
+                MainWindow.window.tileE.dumpInt.Value = dumpLocation;
+                return;
+            }
+        }
+        private void SetMaxObjectSlots()
+        {
+            int id;
+            if (Const.Id == Const.GameId.MegaManX3 && Level.Id > 0xE) id = (Level.Id - 0xF) + 2; //Buffalo or Beetle
+            else id = Level.Id;
+            int listOffset = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(Const.ObjectTileInfoOffset + id * 2)) + Const.ObjectTileInfoOffset;
+            int offset = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(listOffset + (int)objectTileSetId * 2)) + Const.ObjectTileInfoOffset;
+
+            int currentSlot = 0;
+
+            while (true)
+            {
+                int compressedTileId = SNES.rom[offset];
+
+                if (compressedTileId == 0xFF)
+                {
+                    objectSlotInt.Maximum = currentSlot - 1;
+                    return;
+                }
+
+                offset += 6;
+                currentSlot++;
+            }
+        }
+        private void SetObjectSlotProperty(int propertyId)
+        {
+            int id;
+            if (Const.Id == Const.GameId.MegaManX3 && Level.Id > 0xE) id = (Level.Id - 0xF) + 2; //Buffalo or Beetle
+            else id = Level.Id;
+            int listOffset = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(Const.ObjectTileInfoOffset + id * 2)) + Const.ObjectTileInfoOffset;
+            int offset = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(listOffset + (int)objectTileSetId * 2)) + Const.ObjectTileInfoOffset;
+
+            int currentSlot = 0;
+
+            while (true)
+            {
+                int compressedTileId = SNES.rom[offset];
+
+                if (compressedTileId == 0xFF)
+                    break;
+
+                if (currentSlot != objectTileSlotId)
+                {
+                    offset += 6;
+                    currentSlot++;
+                    continue;
+                }
+
+                //Load Object Tiles
+                switch (propertyId)
+                {
+                    case 0: //Compressed Tile Id
+                        SNES.rom[offset] = (byte)MainWindow.window.tileE.compressTileInt.Value;
+                        break;
+                    case 1: //VRAM Location
+                        ushort vramAddr = (ushort)(int)MainWindow.window.tileE.vramLocationInt.Value;
+                        BinaryPrimitives.WriteUInt16LittleEndian(SNES.rom.AsSpan(offset + 1), vramAddr);
+                        break;
+                    case 2: //Palette Set
+                        ushort palId = (ushort)(int)MainWindow.window.tileE.palSetInt.Value;
+                        BinaryPrimitives.WriteUInt16LittleEndian(SNES.rom.AsSpan(offset + 3), palId);
+                        break;
+                    case 3: //Dump Location
+                        SNES.rom[offset + 5] = (byte)MainWindow.window.tileE.dumpInt.Value;
+                        break;
+                    default:
+                        break;
+                }
+                SNES.edit = true;
+                return;
+            }
+        }
+        public void UpdateCursor()
+        {
+            Grid.SetRow(selectSetRect, palId);
         }
         #endregion Methods
 
@@ -311,6 +735,93 @@ namespace TeheManX_Editor.Forms
         {
             LoadWindow loadWindow = new LoadWindow();
             loadWindow.ShowDialog();
+        }
+        private void Color_Down(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            if (SNES.rom == null || !MainWindow.window.tileE.objTileSetInt.IsEnabled)
+                return;
+            Rectangle rect = (Rectangle)sender;
+            palId = Grid.GetRow(rect);
+            DrawPalette();
+            UpdateCursor();
+            DrawObjectTiles();
+        }
+        private void oamBtn_CheckChange(object sender, RoutedEventArgs e)
+        {
+            if (SNES.rom == null || objTileSetInt.Value == null)
+                return;
+            DrawObjectTiles();
+        }
+        private void objectTileSetInt_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        {
+            if (e.NewValue == null || SNES.rom == null || suppressObjectTileInt)
+                return;
+            suppressObjectTileInt = true;
+            objectTileSetId = (int)e.NewValue;
+            objectSlotInt.Value = 0;
+            SetMaxObjectSlots();
+            SetObjectSlotValues();
+            DrawObjectTiles();
+            DrawPalette();
+            UpdateCursor();
+            suppressObjectTileInt = false;
+        }
+        private void objectSlotInt_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        {
+            if (e.NewValue == null || SNES.rom == null || suppressObjectTileInt)
+                return;
+            suppressObjectTileInt = true;
+            objectTileSlotId = (int)e.NewValue;
+            SetObjectSlotValues();
+            suppressObjectTileInt = false;
+        }
+        private void compressTileId_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        {
+            if (e.NewValue == null || SNES.rom == null || suppressObjectTileInt)
+                return;
+            SetObjectSlotProperty(0);
+        }
+        private void vramLocationInt_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        {
+            if (e.NewValue == null || SNES.rom == null || suppressObjectTileInt)
+                return;
+            SetObjectSlotProperty(1);
+        }
+        private void palSetInt_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        {
+            if (e.NewValue == null || SNES.rom == null || ((int)e.NewValue & 1) != 0 || suppressObjectTileInt)
+                return;
+            SetObjectSlotProperty(2);
+        }
+        private void dumpInt_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        {
+            if (e.NewValue == null || SNES.rom == null || suppressObjectTileInt)
+                return;
+            SetObjectSlotProperty(3);
+        }
+        private void objectTilesImage_MouseUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            if (SNES.rom == null || !MainWindow.window.tileE.objTileSetInt.IsEnabled)
+                return;
+            Point pos = e.GetPosition(objectTilesImage);
+            int cX = SNES.GetSelectedTile((int)pos.X, MainWindow.window.tileE.objectTilesImage.ActualWidth, 8);
+            int cY = SNES.GetSelectedTile((int)pos.Y, MainWindow.window.tileE.objectTilesImage.ActualHeight, 8);
+            int oamBase = (MainWindow.window.tileE.oam1Btn.IsChecked != false) ? 0 : 0x100;
+            int selectedTile = cX + (cY * 16) + oamBase;
+            vramLocationInt.Value = selectedTile * 16;
+        }
+        private void ReDrawVramBtn_Click(object sender, RoutedEventArgs e)
+        {
+            if (SNES.rom == null || !MainWindow.window.tileE.objTileSetInt.IsEnabled)
+                return;
+            DrawObjectTiles();
+        }
+        private void gridBtn_Click(object sender, RoutedEventArgs e)
+        {
+            if (objectTileGrid.ShowGridLines)
+                objectTileGrid.ShowGridLines = false;
+            else
+                objectTileGrid.ShowGridLines = true;
         }
         #endregion Events
     }

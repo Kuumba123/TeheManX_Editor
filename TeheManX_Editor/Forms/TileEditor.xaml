@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:TeheManX_Editor.Forms"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
+             d:DesignHeight="450" d:DesignWidth="1200">
     <UserControl.Resources>
         <Style TargetType="TextBlock">
             <Setter Property="FontFamily" Value="Consolas" />
@@ -36,6 +36,8 @@
     <Grid Background="Black">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="auto"/>
+            <ColumnDefinition Width="auto"/>
+            <ColumnDefinition Width="auto"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>
@@ -43,7 +45,7 @@
         </Grid.RowDefinitions>
         
         <StackPanel>
-            <TextBlock FontSize="18" Foreground="White" FontFamily="Consolas" HorizontalAlignment="Center">Background</TextBlock>
+            <TextBlock FontSize="18" Foreground="White" FontFamily="Consolas" HorizontalAlignment="Center">Background Tiles</TextBlock>
             <Border BorderBrush="White" BorderThickness="2">
                 <StackPanel>
                     <StackPanel Orientation="Horizontal">
@@ -85,6 +87,53 @@
         <StackPanel Grid.Row="1">
             <Button Width="30" Height="30" Margin="5" Click="GearBtn_Click">⚙️</Button>
             <Button Width="30" Height="30" Click="LoadBtn_Click">↺</Button>
+        </StackPanel>
+
+        <!--Object Tile Display Area -->
+        <StackPanel Grid.Column="1">
+            <Grid x:Name="objectTileGrid">
+                <Image x:Name="objectTilesImage" Width="512" Height="512" Grid.ColumnSpan="16" Grid.RowSpan="16" MouseUp="objectTilesImage_MouseUp"></Image>
+            </Grid>
+        </StackPanel>
+        
+        <!--Object Tile Swapping Related Info-->
+        <StackPanel Grid.Column="2">
+            <TextBlock FontSize="18" Foreground="White" FontFamily="Consolas" HorizontalAlignment="Center">Object Tiles</TextBlock>
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Width="160">OBJ Setting</TextBlock>
+                <local:NumInt x:Name="objTileSetInt" Value="0" Minimum="0" ValueChanged="objectTileSetInt_ValueChanged"></local:NumInt>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Width="160">OBJ Slot</TextBlock>
+                <local:NumInt x:Name="objectSlotInt" Value="0" Minimum="0" ValueChanged="objectSlotInt_ValueChanged"></local:NumInt>
+            </StackPanel>
+            <Separator></Separator>
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Width="160">Tile Id:</TextBlock>
+                <local:NumInt x:Name="compressTileInt" Value="0" Minimum="0" ValueChanged="compressTileId_ValueChanged"></local:NumInt>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <TextBlock FontSize="21" Width="160">VRAM Location:</TextBlock>
+                <local:NumInt x:Name="vramLocationInt" Value="0" Minimum="0" Maximum="#FFFF" ValueChanged="vramLocationInt_ValueChanged"></local:NumInt>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Width="160">Palette Id:</TextBlock>
+                <local:NumInt x:Name="palSetInt" Value="0" Minimum="0" Maximum="#200" ValueChanged="palSetInt_ValueChanged"></local:NumInt>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Width="160">Palette Dest:</TextBlock>
+                <local:NumInt x:Name="dumpInt" Value="0" Minimum="0" Maximum="#70" ValueChanged="dumpInt_ValueChanged"></local:NumInt>
+            </StackPanel>
+            <Separator></Separator>
+            <StackPanel Orientation="Horizontal">
+                <RadioButton x:Name="oam1Btn" Checked="oamBtn_CheckChange" Unchecked="oamBtn_CheckChange" IsChecked="True" VerticalContentAlignment="Center"  Foreground="White" FontSize="18">OAM1</RadioButton>
+                <RadioButton x:Name="oam2Btn" Checked="oamBtn_CheckChange" Unchecked="oamBtn_CheckChange" VerticalContentAlignment="Center" Foreground="White" FontSize="18">OAM2</RadioButton>
+                <Button Click="ReDrawVramBtn_Click"  Width="25" Height="25" Padding="0" Margin="8,1,0,0" VerticalContentAlignment="Top" VerticalAlignment="Top">🔄</Button>
+            </StackPanel>
+            <Button Margin="10" Name="gridBtn" Click="gridBtn_Click">Enable Grid</Button>
+            <Grid x:Name="paletteGrid"  Width="256" Height="128">
+
+            </Grid>
         </StackPanel>
     </Grid>
 </UserControl>

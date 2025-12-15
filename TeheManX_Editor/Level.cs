@@ -15,6 +15,7 @@ namespace TeheManX_Editor
         public static int BG = 0;
         public static int TileSet = 0; //For backgrounds that use multiple TileSets
         public static byte[] Tiles = new byte[0x8000]; //Includes Filler Tiles
+        public static byte[] DefaultObjectTiles; //Object Tiles for HP/Weapon/Tanks etc
         public static byte[,,] Layout = new byte[Const.MaxLevels, 2, 0x400];
         public static Color[,] Palette = new Color[8, 16]; //Converted to 24-bit Color
         public static int PaletteId;
@@ -30,6 +31,7 @@ namespace TeheManX_Editor
             TileSet = 0;
             LoadLayouts();
             LoadEnemyData();
+            DefaultObjectTiles = DecompressTiles(0xA, Const.Id);
         }
         public static unsafe void Draw16xTile(int id, int x, int y, int stride, IntPtr dest)
         {
@@ -959,114 +961,221 @@ namespace TeheManX_Editor
 
             int infoOffset = SNES.CpuToOffset(BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(Const.LoadTileSetInfoOffset + id * 2 + Const.LoadTileSetStageBase)), Const.LoadTileSetBank);
 
-            if (Const.Id == Const.GameId.MegaManX) // compression algorithem just for MMX
+            if (SNES.rom[infoOffset] != 0xFF)
             {
-                int addr_W = 0x200;
+                int compressId = SNES.rom[infoOffset]; //which compressed tile Id to load
+                DecompressTiles2(compressId, Tiles, 0x200, Const.Id);
+            }
+        }
+        public static byte[] DecompressTiles(int compressedTileId, Const.GameId gameId)
+        {
+            byte[] decompressed = null;
+
+            if (gameId == Const.GameId.MegaManX)
+            {
+                int addr_W = 0;
+                int addr_R = SNES.CpuToOffset(BinaryPrimitives.ReadInt32LittleEndian(SNES.rom.AsSpan((compressedTileId * 5) + Const.CompressedTileInfoOffset + 2)));
+                ushort size = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(compressedTileId * 5 + Const.CompressedTileInfoOffset));
+                decompressed = new byte[size];
+                size = (ushort)((size + 7) >> 3);
                 int controlB;
                 byte copyB;
 
-                if (SNES.rom[infoOffset] != 0xFF)
+                try
                 {
-                    int compressId = SNES.rom[infoOffset]; //which compressed tile Id to load
-                    int vramOffset = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(infoOffset + 3)) & 0x7FFF; //where in vram to diump the tiles
-                    ushort size = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(compressId * 5 + Const.CompressedTileInfoOffset));
-                    size = (ushort)((size + 7) >> 3);
-                    int addr_R = SNES.CpuToOffset(BinaryPrimitives.ReadInt32LittleEndian(SNES.rom.AsSpan((compressId * 5) + Const.CompressedTileInfoOffset + 2)));
-                    try
+                    while (size != 0)
                     {
-                        while (size != 0)
-                        {
-                            controlB = SNES.rom[addr_R];
-                            addr_R++;
-                            copyB = SNES.rom[addr_R];
-                            addr_R++;
-                            for (int i = 0; i < 8; i++)
-                            {
-                                controlB <<= 1;
-                                if ((controlB & 0x100) != 0x100)
-                                {
-                                    Tiles[addr_W] = copyB;
-                                    addr_W++;
-                                }
-                                else
-                                {
-                                    Tiles[addr_W] = SNES.rom[addr_R];
-                                    addr_R++;
-                                    addr_W++;
-                                }
-                            }
-                            size--;
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        MessageBox.Show($"Error happened when decompress - {compressId:X}" + " Tile Graphics" + e.Message + "\nCorrupted ROM ?", "ERROR");
-                        Application.Current.Shutdown();
-                    }
-                }
-            }
-            else // compression algorithem for MMX2 and MMX3
-            {
-                if (SNES.rom[infoOffset] != 0xFF)
-                {
-                    int compressId = SNES.rom[infoOffset]; //which compressed tile Id to load
-                    int vramOffset = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(infoOffset + 3)) & 0x7FFF; //where in vram to diump the tiles
-
-                    int addr_R = SNES.CpuToOffset(BinaryPrimitives.ReadInt32LittleEndian(SNES.rom.AsSpan(compressId * 5 + Const.CompressedTileInfoOffset)));
-                    int size = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(compressId * 5 + Const.CompressedTileInfoOffset + 3));
-                    int addr_W = 0x200;
-
-                    try
-                    {
-                        byte controlB = SNES.rom[addr_R];
+                        controlB = SNES.rom[addr_R];
                         addr_R++;
-                        byte controlC = 8;
-
-                        while (true)
+                        copyB = SNES.rom[addr_R];
+                        addr_R++;
+                        for (int i = 0; i < 8; i++)
                         {
-                            if ((controlB & 0x80) == 0)
+                            controlB <<= 1;
+                            if ((controlB & 0x100) != 0x100)
                             {
-                                Tiles[addr_W] = SNES.rom[addr_R];
+                                decompressed[addr_W] = copyB;
+                                addr_W++;
+                            }
+                            else
+                            {
+                                decompressed[addr_W] = SNES.rom[addr_R];
                                 addr_R++;
                                 addr_W++;
-                                size--;
-                            }
-                            else // Copy from Window
-                            {
-                                int windowPosition = (SNES.rom[addr_R] & 3) << 8;
-                                windowPosition |= SNES.rom[addr_R + 1];
-                                int length = SNES.rom[addr_R] >> 2;
-
-                                for (int i = 0; i < length; i++)
-                                {
-                                    Tiles[addr_W] = Tiles[addr_W - windowPosition];
-                                    addr_W++;
-                                }
-                                size -= length;
-                                addr_R += 2;
-                            }
-                            controlB <<= 1;
-                            controlC--;
-
-                            if (size < 1)
-                                break;
-
-                            if (controlC == 0)
-                            {
-                                //Reload Control Byte
-                                controlB = SNES.rom[addr_R];
-                                addr_R++;
-                                controlC = 8;
                             }
                         }
-                    }
-                    catch (Exception e)
-                    {
-                        MessageBox.Show($"Error happened when decompress - {compressId:X}" + " Tile Graphics" + e.Message + "\nCorrupted ROM ?", "ERROR");
-                        Application.Current.Shutdown();
+                        size--;
                     }
                 }
+                catch (Exception e)
+                {
+                    MessageBox.Show($"Error happened when decompress - {compressedTileId:X}" + " Tile Graphics" + e.Message + "\nCorrupted ROM ?", "ERROR");
+                    Application.Current.Shutdown();
+                }
             }
+            else
+            {
+                int addr_W = 0;
+                int addr_R = SNES.CpuToOffset(BinaryPrimitives.ReadInt32LittleEndian(SNES.rom.AsSpan(compressedTileId * 5 + Const.CompressedTileInfoOffset)));
+                int size = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(compressedTileId * 5 + Const.CompressedTileInfoOffset + 3));
+                decompressed = new byte[size];
+
+                try
+                {
+                    byte controlB = SNES.rom[addr_R];
+                    addr_R++;
+                    byte controlC = 8;
+
+                    while (true)
+                    {
+                        if ((controlB & 0x80) == 0)
+                        {
+                            decompressed[addr_W] = SNES.rom[addr_R];
+                            addr_R++;
+                            addr_W++;
+                            size--;
+                        }
+                        else // Copy from Window
+                        {
+                            int windowPosition = (SNES.rom[addr_R] & 3) << 8;
+                            windowPosition |= SNES.rom[addr_R + 1];
+                            int length = SNES.rom[addr_R] >> 2;
+
+                            for (int i = 0; i < length; i++)
+                            {
+                                decompressed[addr_W] = decompressed[addr_W - windowPosition];
+                                addr_W++;
+                            }
+                            size -= length;
+                            addr_R += 2;
+                        }
+                        controlB <<= 1;
+                        controlC--;
+
+                        if (size < 1)
+                            break;
+
+                        if (controlC == 0)
+                        {
+                            //Reload Control Byte
+                            controlB = SNES.rom[addr_R];
+                            addr_R++;
+                            controlC = 8;
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    MessageBox.Show($"Error happened when decompress - {compressedTileId:X}" + " Tile Graphics" + e.Message + "\nCorrupted ROM ?", "ERROR");
+                    Application.Current.Shutdown();
+                }
+            }
+
+            return decompressed;
+        }
+        public static byte[] DecompressTiles2(int compressedTileId, byte[] dest, int destOffset, Const.GameId gameId)
+        {
+            byte[] decompressed = dest;
+            int addr_W = destOffset;
+
+            if (gameId == Const.GameId.MegaManX)
+            {
+                int addr_R = SNES.CpuToOffset(BinaryPrimitives.ReadInt32LittleEndian(SNES.rom.AsSpan((compressedTileId * 5) + Const.CompressedTileInfoOffset + 2)));
+                ushort size = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(compressedTileId * 5 + Const.CompressedTileInfoOffset));
+                size = (ushort)((size + 7) >> 3);
+                int controlB;
+                byte copyB;
+
+
+                try
+                {
+                    while (size != 0)
+                    {
+                        controlB = SNES.rom[addr_R];
+                        addr_R++;
+                        copyB = SNES.rom[addr_R];
+                        addr_R++;
+                        for (int i = 0; i < 8; i++)
+                        {
+                            controlB <<= 1;
+                            if ((controlB & 0x100) != 0x100)
+                            {
+                                decompressed[addr_W] = copyB;
+                                addr_W++;
+                            }
+                            else
+                            {
+                                decompressed[addr_W] = SNES.rom[addr_R];
+                                addr_R++;
+                                addr_W++;
+                            }
+                        }
+                        size--;
+                    }
+                }
+                catch (Exception e)
+                {
+                    MessageBox.Show($"Error happened when decompress - {compressedTileId:X}" + " Tile Graphics" + e.Message + "\nCorrupted ROM ?", "ERROR");
+                    Application.Current.Shutdown();
+                }
+            }
+            else
+            {
+                int addr_R = SNES.CpuToOffset(BinaryPrimitives.ReadInt32LittleEndian(SNES.rom.AsSpan(compressedTileId * 5 + Const.CompressedTileInfoOffset)));
+                int size = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(compressedTileId * 5 + Const.CompressedTileInfoOffset + 3));
+
+                try
+                {
+                    byte controlB = SNES.rom[addr_R];
+                    addr_R++;
+                    byte controlC = 8;
+
+                    while (true)
+                    {
+                        if ((controlB & 0x80) == 0)
+                        {
+                            dest[addr_W] = SNES.rom[addr_R];
+                            addr_R++;
+                            addr_W++;
+                            size--;
+                        }
+                        else // Copy from Window
+                        {
+                            int windowPosition = (SNES.rom[addr_R] & 3) << 8;
+                            windowPosition |= SNES.rom[addr_R + 1];
+                            int length = SNES.rom[addr_R] >> 2;
+
+                            for (int i = 0; i < length; i++)
+                            {
+                                dest[addr_W] = dest[addr_W - windowPosition];
+                                addr_W++;
+                            }
+                            size -= length;
+                            addr_R += 2;
+                        }
+                        controlB <<= 1;
+                        controlC--;
+
+                        if (size < 1)
+                            break;
+
+                        if (controlC == 0)
+                        {
+                            //Reload Control Byte
+                            controlB = SNES.rom[addr_R];
+                            addr_R++;
+                            controlC = 8;
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    MessageBox.Show($"Error happened when decompress - {compressedTileId:X}" + " Tile Graphics" + e.Message + "\nCorrupted ROM ?", "ERROR");
+                    Application.Current.Shutdown();
+                }
+            }
+
+            return decompressed;
         }
         #endregion Methods
     }
