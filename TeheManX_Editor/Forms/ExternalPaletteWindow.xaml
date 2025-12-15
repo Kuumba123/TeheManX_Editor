@@ -29,6 +29,7 @@
             <TextBlock x:Name="colorIndexTxt" FontSize="19">Color Index:</TextBlock>
             <Button x:Name="importBtn" Margin="10,5" Click="importBtn_Click">Import Palette Colors</Button>
             <Button x:Name="exportBtn" Margin="10,5" Click="exportBtn_Click">Export Palette Colors</Button>
+            <Button x:Name="exportAllBtn" Margin="10,5" Click="exportAllBtn_Click">Export All Palettes</Button>
             <Button x:Name="saveBtn" Margin="10,5" Click="saveBtn_Click">Save Game</Button>
         </StackPanel>
 

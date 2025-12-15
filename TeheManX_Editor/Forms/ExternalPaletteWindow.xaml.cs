@@ -294,6 +294,92 @@ namespace TeheManX_Editor.Forms
                 }
             }
         }
+        private void exportAllBtn_Click(object sender, RoutedEventArgs e)
+        {
+            Button exportAsPal = new Button();
+            exportAsPal.Content = "Export All as .PAL Files";
+            exportAsPal.Click += (s , ev) =>
+            {
+                var sfd = new Ookii.Dialogs.Wpf.VistaFolderBrowserDialog();
+                sfd.Description = "Select Save Location";
+                sfd.UseDescriptionForTitle = true;
+
+                if ((bool)sfd.ShowDialog())
+                {
+                    for (int p = 0; p <= ((int)palIdInt.Maximum + 2); p += 2)
+                    {
+                        MemoryStream ms = new MemoryStream();
+                        BinaryWriter bw = new BinaryWriter(ms);
+
+                        int infoOffset = SNES.CpuToOffset(BinaryPrimitives.ReadUInt16LittleEndian(rom.AsSpan(paletteInfoOffset + p)), paletteBank);
+                        while (rom[infoOffset] != 0)
+                        {
+                            int colorCount = rom[infoOffset]; //how many colors are going to be dumped
+                            int address = BinaryPrimitives.ReadUInt16LittleEndian(rom.AsSpan(infoOffset + 1)) + (paletteColorBank << 16);
+                            int colorOffset = SNES.CpuToOffset(address); //where the colors are located
+                            for (int c = 0; c < colorCount; c++)
+                            {
+                                ushort color = BinaryPrimitives.ReadUInt16LittleEndian(rom.AsSpan(colorOffset + c * 2));
+                                byte R = (byte)(color % 32 * 8);
+                                byte G = (byte)(color / 32 % 32 * 8);
+                                byte B = (byte)(color / 1024 % 32 * 8);
+                                bw.Write(R);
+                                bw.Write(G);
+                                bw.Write(B);
+                            }
+                            infoOffset += 4;
+                        }
+                        bw.Close();
+                        File.WriteAllBytes($"{sfd.SelectedPath}\\Palette_{p:X2}.pal", ms.ToArray());
+                        ms.Close();
+                    }
+                    MessageBox.Show("All Palettes Exported!");
+                }
+            };
+            Button exportAsTxt = new Button();
+            exportAsTxt.Content = "Export All as .TXT Files";
+            exportAsTxt.Click += (s , ev) =>             {
+                var sfd = new Ookii.Dialogs.Wpf.VistaFolderBrowserDialog();
+                sfd.Description = "Select Save Location";
+                sfd.UseDescriptionForTitle = true;
+                if ((bool)sfd.ShowDialog())
+                {
+                    for (int p = 0; p <= ((int)palIdInt.Maximum + 2); p += 2)
+                    {
+                        List<string> lines = new List<string>();
+                        int infoOffset = SNES.CpuToOffset(BinaryPrimitives.ReadUInt16LittleEndian(rom.AsSpan(paletteInfoOffset + p)), paletteBank);
+                        while (rom[infoOffset] != 0)
+                        {
+                            int colorCount = rom[infoOffset]; //how many colors are going to be dumped
+                            int address = BinaryPrimitives.ReadUInt16LittleEndian(rom.AsSpan(infoOffset + 1)) + (paletteColorBank << 16);
+                            int colorOffset = SNES.CpuToOffset(address); //where the colors are located
+                            for (int c = 0; c < colorCount; c++)
+                            {
+                                ushort color = BinaryPrimitives.ReadUInt16LittleEndian(rom.AsSpan(colorOffset + c * 2));
+                                byte R = (byte)(color % 32 * 8);
+                                byte G = (byte)(color / 32 % 32 * 8);
+                                byte B = (byte)(color / 1024 % 32 * 8);
+                                lines.Add($"#{R:X2}{G:X2}{B:X2}");
+                            }
+                            infoOffset += 4;
+                        }
+                        File.WriteAllLines($"{sfd.SelectedPath}\\Palette_{p:X2}.txt", lines.ToArray());
+                    }
+                    MessageBox.Show("All Palettes Exported!");
+                }
+            };
+            Grid.SetRow(exportAsTxt, 1);
+            Grid grid = new Grid();
+            grid.RowDefinitions.Add(new RowDefinition());
+            grid.RowDefinitions.Add(new RowDefinition());
+            grid.Children.Add(exportAsPal);
+            grid.Children.Add(exportAsTxt);
+
+            Window window = new Window() { SizeToContent = SizeToContent.WidthAndHeight , ResizeMode = ResizeMode.NoResize , WindowStartupLocation = WindowStartupLocation.CenterScreen , Title = "Export Palettes"};
+
+            window.Content = grid;
+            window.ShowDialog();
+        }
         private void saveBtn_Click(object sender, RoutedEventArgs e)
         {
             File.WriteAllBytes(saveLocation, rom);
