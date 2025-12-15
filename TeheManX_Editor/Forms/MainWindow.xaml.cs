@@ -349,12 +349,12 @@ namespace TeheManX_Editor.Forms
         private void PaletteKeyCheck(string key)
         {
             bool update = false;
-            if (key == "Up")
+            if (key == "W")
             {
                 window.paletteE.selectedSet--;
                 update = true;
             }
-            else if (key == "Down")
+            else if (key == "S")
             {
                 window.paletteE.selectedSet++;
                 update = true;
@@ -512,7 +512,7 @@ namespace TeheManX_Editor.Forms
                     }
 
                     SNES.rom = rom;
-
+                    SNES.edit = false;
                     //File Validated
                     SNES.date = File.GetLastWriteTime(fd.FileName);
                     SNES.savePath = fd.FileName;
