@@ -130,6 +130,8 @@
                 <RadioButton x:Name="oam2Btn" Checked="oamBtn_CheckChange" Unchecked="oamBtn_CheckChange" VerticalContentAlignment="Center" Foreground="White" FontSize="18">OAM2</RadioButton>
                 <Button Click="ReDrawVramBtn_Click"  Width="25" Height="25" Padding="0" Margin="8,1,0,0" VerticalContentAlignment="Top" VerticalAlignment="Top">🔄</Button>
             </StackPanel>
+            <CheckBox  x:Name="objectFreshCheck" FontSize="18" Foreground="White" FontFamily="Consolas">Fresh Rdraw</CheckBox>
+            <ToggleButton FontSize="16" Margin="10" Name="vramSelectToggleBtn" Click="vramSelectToggleBtn_Click">Enable VRAM Select</ToggleButton>
             <Button Margin="10" Name="gridBtn" Click="gridBtn_Click">Enable Grid</Button>
             <Grid x:Name="paletteGrid"  Width="256" Height="128">
 
