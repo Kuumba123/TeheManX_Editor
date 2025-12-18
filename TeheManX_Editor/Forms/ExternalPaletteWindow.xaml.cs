@@ -177,10 +177,7 @@ namespace TeheManX_Editor.Forms
             if (e.NewValue == null || palId == (int)e.NewValue) return;
             int val = (int)e.NewValue;
             if ((val & 1) != 0)
-            {
-                MessageBox.Show("You must input an even number when selecting a Palette to load.", "ERROR");
-                return;
-            }
+                return; //only even values
 
             palId = val;
             groupId = 0;
@@ -190,6 +187,8 @@ namespace TeheManX_Editor.Forms
         private void groupInt_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
             if (e.NewValue == null || groupId == (int)e.NewValue) return;
+            if ((palId & 1) != 0)
+                return; //only even values
 
             groupId = (int)e.NewValue;
             UpdateColorUI();
