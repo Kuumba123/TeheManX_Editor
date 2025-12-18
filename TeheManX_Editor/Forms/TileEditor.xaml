@@ -131,7 +131,7 @@
                 <Button Click="ReDrawVramBtn_Click"  Width="25" Height="25" Padding="0" Margin="8,1,0,0" VerticalContentAlignment="Top" VerticalAlignment="Top">🔄</Button>
             </StackPanel>
             <CheckBox  x:Name="objectFreshCheck" FontSize="18" Foreground="White" FontFamily="Consolas">Fresh Rdraw</CheckBox>
-            <ToggleButton FontSize="16" Margin="10" Name="vramSelectToggleBtn" Click="vramSelectToggleBtn_Click">Enable VRAM Select</ToggleButton>
+            <ToggleButton Background="#101010" Foreground="White" FontSize="16" Margin="10" Padding="4" Name="vramSelectToggleBtn" Click="vramSelectToggleBtn_Click">Enable VRAM Select</ToggleButton>
             <Button Margin="10" Name="gridBtn" Click="gridBtn_Click">Enable Grid</Button>
             <Grid x:Name="paletteGrid"  Width="256" Height="128">
 
