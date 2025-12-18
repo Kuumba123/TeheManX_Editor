@@ -184,6 +184,9 @@ namespace TeheManX_Editor
             public static int TileCollisionDataPointersOffset = 0x30EE0;
 
             public const int BankCount = 48; //$80-AF
+
+            public static readonly int[] HadoukenAsmOffsets = { 0x03CA8A, 0x0427AA , 0x03D0D6 }; //Hadouken Stage ID
+            public static readonly int[] RevistsAsmOffset = { 0x03CA97 , 0x03CA9B }; //Revists Count
             internal static class NA // North America Version
             {
                 public const int LoadTileSetInfoOffset = 0x3756F;
@@ -196,6 +199,12 @@ namespace TeheManX_Editor
                 public const int ObjectTileInfoOffset = 0x32CEE;
                 public const int CompressedTilesSwapInfoOffset = 0x371B7;
                 public static readonly int[] EnemyBankAsmOffsets = { 0x5B93 , 0x5BDA, 0x5D4D }; //for expansion
+
+                public const int CapsulePositionOffset = 0x03533E;
+                public const int CapsuleArmorIndexesOffset = 0x035362;
+                public const int UpgradeMovementOffset = 0x03536B;
+                public const int CapsuleCameraPositionOffset = 0x0353A1;
+                public const int CapsuleTextOffset = 0x0354E3;
             }
             internal static class JP // Japanese Version
             {
@@ -209,6 +218,12 @@ namespace TeheManX_Editor
                 public const int ObjectTileInfoOffset = 0x32CF1;
                 public const int CompressedTilesSwapInfoOffset = 0x371BA;
                 public static readonly int[] EnemyBankAsmOffsets = { 0x5B91 , 0x5BD8, 0x5D4B }; //for expansion
+
+                public const int CapsulePositionOffset = 0x035341;
+                public const int CapsuleArmorIndexesOffset = 0x035365;
+                public const int UpgradeMovementOffset = 0x03536E;
+                public const int CapsuleCameraPositionOffset = 0x0353A4;
+                public const int CapsuleTextOffset = 0x0354E5;
             }
             public static readonly int[,] LayoutLength = new int[0x25, 2]
 {
@@ -386,6 +401,15 @@ namespace TeheManX_Editor
                 public const int CheckpointOffset = 0x324C5;
                 public const int BackgroundTileInfoOffset = 0x31D6A;
                 public const int BackgroundPaletteOffset = 0x31DD1;
+
+                public static readonly int[] ShoryukenAsmOffsets = { 0x14930F, 0x00CE0E }; //Shoryuken Stage ID
+                public const int CapsulePositionOffset = 0x0356F1;
+                public const int CapsuleArmorIndexesOffset = 0x035721;
+                public const int UpgradeMovementOffset = 0x03572D;
+                public const int CapsuleCameraPositionOffset = 0x03579F;
+                public const int CapsuleTextOffset = 0x035A94;
+
+                public const int OstrichIdOffset = 0x14937F;
             }
             internal static class JP // Japanese Version
             {
@@ -395,6 +419,15 @@ namespace TeheManX_Editor
                 public const int CheckpointOffset = 0x324C6;
                 public const int BackgroundTileInfoOffset = 0x31D6B;
                 public const int BackgroundPaletteOffset = 0x31DD2;
+
+                public static readonly int[] ShoryukenAsmOffsets = { 0x149317, 0x00CE0E }; //Shoryuken Stage ID
+                public const int CapsulePositionOffset = 0x0356F2;
+                public const int CapsuleArmorIndexesOffset = 0x035722;
+                public const int UpgradeMovementOffset = 0x03572E;
+                public const int CapsuleCameraPositionOffset = 0x0357A0;
+                public const int CapsuleTextOffset = 0x035A95;
+
+                public const int OstrichIdOffset = 0x149387;
             }
             public static readonly int[,] LayoutLength = new int[0xD, 2]
             {
@@ -492,6 +525,8 @@ namespace TeheManX_Editor
 
             public static readonly int[] FreeBanks = { 0x14, 0x16, 0x17, 0x18, 0x19, 0x34, 0x38, 0x3D }; //Needed for 16x16 Tile Data
 
+            public const int GoldenArmorIdOffset = 0x09C015;
+
             public static readonly int[,] LayoutLength = new int[0x11, 2]
             {
                     {0x4C, 0x3A }, 
@@ -559,6 +594,12 @@ namespace TeheManX_Editor
                 public const int CheckpointOffset = 0x328E4;
                 public const int BackgroundTileInfoOffset = 0x32085;
                 public const int BackgroundPaletteOffset = 0x32172;
+
+                public const int CapsulePositionOffset = 0x034CBE;
+                public const int CapsuleArmorIndexesOffset = 0x034CFA;
+                public const int UpgradeMovementOffset = 0x034D09;
+                public const int CapsuleCameraPositionOffset = 0x034D9F;
+                public const int CapsuleTextOffset = 0x034EED;
             }
             internal class JP
             {
@@ -567,6 +608,12 @@ namespace TeheManX_Editor
                 public const int CheckpointOffset = 0x328E5;
                 public const int BackgroundTileInfoOffset = 0x32086;
                 public const int BackgroundPaletteOffset = 0x32173;
+
+                public const int CapsulePositionOffset = 0x034CBF;
+                public const int CapsuleArmorIndexesOffset = 0x034CFB;
+                public const int UpgradeMovementOffset = 0x034D0A;
+                public const int CapsuleCameraPositionOffset = 0x034DA0;
+                public const int CapsuleTextOffset = 0x034EEE;
             }
         }
         public static void AssignProperties(GameId gameId, GameVersion gameVersion, bool expanded)
