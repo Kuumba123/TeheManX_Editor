@@ -346,8 +346,11 @@ namespace TeheManX_Editor.Forms
                 }
             }
         }
-        private void PaletteKeyCheck(string key)
+        private void PaletteKeyCheck(string key, bool notFocus)
         {
+            if (!notFocus)  //check if NumInt is focused
+                return;
+
             bool update = false;
             if (key == "W")
             {
@@ -1019,16 +1022,6 @@ namespace TeheManX_Editor.Forms
                 window.tile16E.x16grid.Width = main;
                 window.tile16E.x16grid.Height = main;
             }
-            if (settings.EnemyFixedScale)
-            {
-                window.enemyE.viewBox.Width = 768 * EnemyEditor.scale;
-                window.enemyE.viewBox.Height = EnemyEditor.scale * 512;
-            }
-            else
-            {
-                window.enemyE.viewBox.Width = double.NaN;
-                window.enemyE.viewBox.Height = double.NaN;
-            }
         }
         #endregion Methods
 
@@ -1291,7 +1284,7 @@ namespace TeheManX_Editor.Forms
                     }
                 case "paletteTab":
                     {
-                        PaletteKeyCheck(key);
+                        PaletteKeyCheck(key, nonNumInt);
                         break;
                     }
                 case "enemyTab":

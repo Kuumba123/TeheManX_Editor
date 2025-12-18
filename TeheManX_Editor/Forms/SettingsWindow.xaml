@@ -83,7 +83,6 @@
                 <StackPanel Background="#191919">
                     <Label HorizontalAlignment="Center">Enemy Tab Config</Label>
                 </StackPanel>
-                <CheckBox x:Name="enemyScaleCheck" Checked="enemyScaleCheckChange" Unchecked="enemyScaleCheckChange">Disable Auto Scale</CheckBox>
                 <CheckBox x:Name="enemyInvertSpeedCheck" Checked="enemyInvertSpeedCheckChange" Unchecked="enemyInvertSpeedCheckChange">Invert Speeds</CheckBox>
             </StackPanel>
         </Grid>

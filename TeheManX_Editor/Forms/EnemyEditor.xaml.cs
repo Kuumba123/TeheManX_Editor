@@ -871,6 +871,21 @@ namespace TeheManX_Editor.Forms
             window.Content = stackPanel;
             window.ShowDialog();
         }
+        private void zoomInBtn_Click(object sender, RoutedEventArgs e)
+        {
+            if (scale != 8)
+                scale++;
+            MainWindow.window.enemyE.viewBox.Width = scale * 768;
+            MainWindow.window.enemyE.viewBox.Height = scale * 512;
+        }
+
+        private void zoomOutBtn_Click(object sender, RoutedEventArgs e)
+        {
+            if (scale != 1)
+                scale--;
+            MainWindow.window.enemyE.viewBox.Width = scale * 768;
+            MainWindow.window.enemyE.viewBox.Height = scale * 512;
+        }
         private void Help_Click(object sender, RoutedEventArgs e)
         {
             /*HelpWindow h = new HelpWindow(3);

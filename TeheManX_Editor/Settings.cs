@@ -16,7 +16,6 @@
         public double Tile32Scale { get; set; }
         public double Tile32Image16Scale { get; set; }
         public double Tile16Scale { get; set; }
-        public bool EnemyFixedScale { get; set; }
         #endregion Properties
 
         #region Constructors

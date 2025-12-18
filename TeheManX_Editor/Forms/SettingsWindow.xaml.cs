@@ -42,7 +42,6 @@ namespace TeheManX_Editor.Forms
             tile16Double.Value = MainWindow.settings.Tile16Scale;
             tile16Double.Maximum = Const.MaxScaleUI;
 
-            enemyScaleCheck.IsChecked = MainWindow.settings.EnemyFixedScale;
             enemyInvertSpeedCheck.IsChecked = MainWindow.settings.InvertSpeed;
             enable = true;
         }
@@ -136,12 +135,6 @@ namespace TeheManX_Editor.Forms
         {
             if (!enable || e.NewValue == null || e.OldValue == null) return;
             MainWindow.settings.Tile16Scale = (double)e.NewValue;
-            edited = true;
-        }
-        private void enemyScaleCheckChange(object sender, RoutedEventArgs e)
-        {
-            if (!enable) return;
-            MainWindow.settings.EnemyFixedScale = (bool)enemyScaleCheck.IsChecked;
             edited = true;
         }
         private void enemyInvertSpeedCheckChange(object sender, RoutedEventArgs e)
