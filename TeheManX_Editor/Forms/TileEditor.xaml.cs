@@ -90,6 +90,7 @@ namespace TeheManX_Editor.Forms
                 MainWindow.window.tileE.oam2Btn.IsEnabled = false;
                 return;
             }
+            suppressObjectTileInt = true;
 
             // Enable Background Tile UI
             MainWindow.window.tileE.bgTileSetInt.IsEnabled = true;
@@ -143,7 +144,6 @@ namespace TeheManX_Editor.Forms
 
 
             //Get Max Amount of Object Tile Settings
-            suppressObjectTileInt = true;
             int maxOBJTiles = 0;
             Buffer.BlockCopy(SNES.rom, Const.ObjectTileInfoOffset, offsets, 0, offsets.Length * 2);
             Array.Sort(offsets);
@@ -173,7 +173,7 @@ namespace TeheManX_Editor.Forms
             ushort currentOffset = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(Const.ObjectTileInfoOffset + Level.Id * 2));
             int currentIndex = Array.IndexOf(offsets, currentOffset);
 
-            if (currentIndex == maxIndex)
+            if (currentIndex == maxIndex) //TODO: this does not set the correct value for the fianl Sigma Stage in MegaMan X1
                 maxOBJTiles = ((lowestPointer - currentOffset) / 2) - 1;
             else
                 maxOBJTiles = ((offsets[currentIndex + 1] - currentOffset) / 2) - 1;
