@@ -43,8 +43,8 @@ namespace TeheManX_Editor.Forms
                 megaFlipInt.IsEnabled = false;
                 collisionInt.IsEnabled = false;
 
-                unknownInt.IsEnabled = false;
-                unknown2Int.IsEnabled = false;
+                silkShotInt.IsEnabled = false;
+                wramInt.IsEnabled = false;
             }
             else
             {
@@ -87,19 +87,19 @@ namespace TeheManX_Editor.Forms
                 objectTileInt.IsEnabled = true;
                 if (Const.Id != Const.GameId.MegaManX)
                 {
-                    unknownInt.IsEnabled = true;
-                    unknown2Int.IsEnabled = true;
-                    unknownInt.Visibility = Visibility.Visible;
-                    unknown2Int.Visibility = Visibility.Visible;
-                    unknownText.Visibility = Visibility.Visible;
-                    unknownText2.Visibility = Visibility.Visible;
+                    silkShotInt.IsEnabled = true;
+                    wramInt.IsEnabled = true;
+                    silkShotInt.Visibility = Visibility.Visible;
+                    wramInt.Visibility = Visibility.Visible;
+                    silkShotTxt.Visibility = Visibility.Visible;
+                    wramTxt.Visibility = Visibility.Visible;
                 }
                 else
                 {
-                    unknownInt.Visibility = Visibility.Collapsed;
-                    unknown2Int.Visibility = Visibility.Collapsed;
-                    unknownText.Visibility = Visibility.Collapsed;
-                    unknownText2.Visibility = Visibility.Collapsed;
+                    silkShotInt.Visibility = Visibility.Collapsed;
+                    wramInt.Visibility = Visibility.Collapsed;
+                    silkShotTxt.Visibility = Visibility.Collapsed;
+                    wramTxt.Visibility = Visibility.Collapsed;
                 }
                 backgroundPalInt.IsEnabled = true;
                 megaIntX.IsEnabled = true;
@@ -129,8 +129,8 @@ namespace TeheManX_Editor.Forms
             MainWindow.window.spawnE.backgroundPalInt.Value = SNES.rom[offset + 2];
             if (Const.Id != Const.GameId.MegaManX)
             {
-                MainWindow.window.spawnE.unknownInt.Value = SNES.rom[offset + 3];
-                MainWindow.window.spawnE.unknown2Int.Value = SNES.rom[offset + 0x1C];
+                MainWindow.window.spawnE.silkShotInt.Value = SNES.rom[offset + 3];
+                MainWindow.window.spawnE.wramInt.Value = SNES.rom[offset + 0x1C];
                 MainWindow.window.spawnE.megaFlipInt.Value = SNES.rom[offset  + 0x1E];
                 MainWindow.window.spawnE.collisionInt.Value = SNES.rom[offset + 0x1D];
                 offset++;
@@ -200,7 +200,7 @@ namespace TeheManX_Editor.Forms
             SNES.rom[offset + 2] = value;
             SNES.edit = true;
         }
-        private void unknownInt_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        private void silkShotInt_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
             if (e.NewValue == null || SNES.rom == null || Level.Id >= Const.PlayableLevelsCount)
                 return;
@@ -380,7 +380,7 @@ namespace TeheManX_Editor.Forms
             BinaryPrimitives.WriteUInt16LittleEndian(SNES.rom.AsSpan(offset + 0x19), value);
             SNES.edit = true;
         }
-        private void unknown2Int_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        private void wramIntInt_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
             if (e.NewValue == null || SNES.rom == null || Level.Id >= Const.PlayableLevelsCount)
                 return;

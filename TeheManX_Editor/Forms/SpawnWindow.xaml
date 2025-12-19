@@ -48,12 +48,12 @@
                 <local:NumInt Minimum="0" Maximum="#FF" Uid="1 1" x:Name="backgroundTileInt" ValueChanged="backgroundTileInt_ValueChanged"></local:NumInt>
             </StackPanel>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                <TextBlock>Background Palette Set???</TextBlock>
+                <TextBlock>Background Palette Set</TextBlock>
                 <local:NumInt Minimum="0" Maximum="#FF" Uid="2 1" x:Name="backgroundPalInt" ValueChanged="backgroundPalInt_ValueChanged"></local:NumInt>
             </StackPanel>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                <TextBlock x:Name="unknownText">Unknown 8 bit value???</TextBlock>
-                <local:NumInt Minimum="0" Maximum="#FF" Uid="255 1" x:Name="unknownInt" ValueChanged="unknownInt_ValueChanged"></local:NumInt>
+                <TextBlock x:Name="silkShotTxt">Silk Shot Flag</TextBlock>
+                <local:NumInt Minimum="0" Maximum="#FF" Uid="255 1" x:Name="silkShotInt" ValueChanged="silkShotInt_ValueChanged"></local:NumInt>
             </StackPanel>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                 <TextBlock>Mega-X</TextBlock>
@@ -104,11 +104,11 @@
                 <local:NumInt Minimum="0" Maximum="#FFFF" Uid="25" x:Name="bg2IntBaseY" ValueChanged="bg2IntBaseY_ValueChanged"></local:NumInt>
             </StackPanel>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                <TextBlock x:Name="unknownText2">2nd Unknown 8 bit value???</TextBlock>
-                <local:NumInt Minimum="0" Maximum="#FF" Uid="255 1" x:Name="unknown2Int" ValueChanged="unknown2Int_ValueChanged"></local:NumInt>
+                <TextBlock x:Name="wramTxt">WRAM Flag???</TextBlock>
+                <local:NumInt Minimum="0" Maximum="#FF" Uid="255 1" x:Name="wramInt" ValueChanged="wramIntInt_ValueChanged"></local:NumInt>
             </StackPanel>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                <TextBlock>Mega Flip???</TextBlock>
+                <TextBlock>Mega Flip</TextBlock>
                 <local:NumInt Minimum="0" Maximum="#FF" Uid="27 1" x:Name="megaFlipInt" ValueChanged="megaFlipInt_ValueChanged"></local:NumInt>
             </StackPanel>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
