@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Media;
+using TeheManX_Editor.Forms;
 
 namespace TeheManX_Editor
 {
@@ -824,6 +825,44 @@ namespace TeheManX_Editor
                 }
             }
 
+            return true;
+        }
+        public static bool SaveProject()
+        {
+            /*
+             * Object Tiles Export
+             */
+
+            int objectStages = Const.Id == Const.GameId.MegaManX ? 0x24 : Const.Id == Const.GameId.MegaManX2 ? 0xF : 0x12;
+
+            if (true) //Using data in game
+            {
+
+                /*
+                 * Step 1. Get the Max Amount of Object Tile Settings
+                 */
+
+                int[] maxAmount = new int[objectStages];
+                int[] shared = new int[objectStages];
+                TileEditor.GetMaxObjectSettingsFromRom(maxAmount, shared);
+
+                /*
+                 * Step 2. Collect Object Tile Settings
+                 */
+
+                List<List<ObjectSetting>> sourceSettings = TileEditor.CollecObjectSettingsFromRom(maxAmount, shared);
+
+
+                /*
+                 * Step 3. Export Object Tile Settings
+                 */
+                byte[] exportData = TileEditor.CreateObjectSettingsData(sourceSettings, shared);
+                Array.Copy(exportData, 0, SNES.rom, Const.ObjectTileInfoOffset, exportData.Length);
+            }
+            else //Using data in json project file
+            {
+
+            }
             return true;
         }
         public static void AssignPallete()

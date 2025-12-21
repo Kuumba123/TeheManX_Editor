@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Buffers.Binary;
+using System.Collections.Generic;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -502,6 +504,242 @@ namespace TeheManX_Editor.Forms
         public void UpdateCursor()
         {
             Grid.SetRow(selectSetRect, palId);
+        }
+        public static byte[] CreateObjectSettingsData(List<List<ObjectSetting>> sourceSettings,int[] sharedList)
+        {
+            Dictionary<ReadOnlyMemory<byte>, int> dict =
+                new Dictionary<ReadOnlyMemory<byte>, int>();
+
+            /*
+             * Step 1. Create a dictionary of unique object settings data & keep track of stage keys
+             */
+
+            int nextKey = 0; //used as an offset into the object settings data table
+
+            List<List<int>> keyList = new List<List<int>>(sourceSettings.Count);
+
+            foreach (var innerList in sourceSettings)
+                keyList.Add(Enumerable.Repeat(0, innerList.Count).ToList());
+
+
+            for (int id = 0; id < sourceSettings.Count; id++)
+            {
+                if (sharedList[id] != -1)
+                    continue;
+                for (int s = 0; s < sourceSettings[id].Count; s++)
+                {
+                    byte[] slotsData = new byte[sourceSettings[id][s].Slots.Count * 6 + 1];
+                    if (slotsData.Length == 1)
+                        slotsData[0] = 0xFF;
+                    else
+                    {
+                        slotsData[slotsData.Length - 1] = 0xFF;
+                        for (int slot = 0; slot < sourceSettings[id][s].Slots.Count; slot++)
+                        {
+                            slotsData[slot * 6] = sourceSettings[id][s].Slots[slot].TileId;
+                            BinaryPrimitives.WriteUInt16LittleEndian(slotsData.AsSpan(slot * 6 + 1), sourceSettings[id][s].Slots[slot].VramAddress);
+                            BinaryPrimitives.WriteUInt16LittleEndian(slotsData.AsSpan(slot * 6 + 3), sourceSettings[id][s].Slots[slot].PaletteId);
+                            slotsData[slot * 6 + 5] = sourceSettings[id][s].Slots[slot].PaletteDestination;
+                        }
+                    }
+                    if (!dict.ContainsKey(slotsData))
+                    {
+                        dict.Add(slotsData, nextKey);
+                        nextKey += slotsData.Length;
+                    }
+                    int value = dict[slotsData];
+                    keyList[id][s] = value;
+                }
+            }
+
+            /*
+             * Step 2. Get the length of all the pointers
+             */
+
+            int totalPointersLength = 0;
+
+            for (int id = 0; id < sourceSettings.Count; id++)
+            {
+                totalPointersLength += 2;
+
+                if (sharedList[id] != -1)
+                    continue;
+
+                for (int s = 0; s < sourceSettings[id].Count; s++)
+                    totalPointersLength += 2;
+            }
+
+            /*
+             * Step 3. Create the byte array and setup the pointers
+             */
+
+            int stagePointersLength = sourceSettings.Count * 2;
+            int nextOffset = stagePointersLength;
+
+            byte[] exportData = new byte[nextKey + totalPointersLength];
+
+            //Fix the stage pointers
+            for (int i = 0; i < sourceSettings.Count; i++)
+            {
+                if (sharedList[i] == -1)
+                {
+                    BinaryPrimitives.WriteUInt16LittleEndian(exportData.AsSpan(i * 2), (ushort)nextOffset);
+                    nextOffset += sourceSettings[i].Count * 2;
+                }
+                else
+                {
+                    ushort writeOffset = BinaryPrimitives.ReadUInt16LittleEndian(exportData.AsSpan(sharedList[i] * 2));
+                    BinaryPrimitives.WriteUInt16LittleEndian(exportData.AsSpan(i * 2), writeOffset);
+                }
+            }
+            //Fix the object setting pointers
+            nextOffset = stagePointersLength;
+            for (int i = 0; i < sourceSettings.Count; i++)
+            {
+                if (sharedList[i] != -1)
+                    continue;
+
+                for (int st = 0; st < sourceSettings[i].Count; st++)
+                    BinaryPrimitives.WriteUInt16LittleEndian(exportData.AsSpan(nextOffset + st * 2), (ushort)(keyList[i][st] + totalPointersLength));
+                nextOffset += sourceSettings[i].Count * 2;
+            }
+            /*
+             * Step 4. Copy the unique object settings data
+             */
+            nextOffset = totalPointersLength;
+            foreach (var kvp in dict)
+            {
+                kvp.Key.Span.CopyTo(exportData.AsSpan(nextOffset));
+                nextOffset += kvp.Key.Length;
+            }
+
+            // Done
+            return exportData;
+        }
+        public static void GetMaxObjectSettingsFromRom(int[] destAmount, int[] shared = null)
+        {
+            int objectStages = Const.Id == Const.GameId.MegaManX ? 0x24 : Const.Id == Const.GameId.MegaManX2 ? 0xF : 0x12;
+
+            if (shared == null)
+                shared = new int[objectStages];
+
+            for (int i = 0; i < objectStages; i++)
+                shared[i] = -1;
+
+            ushort[] offsets = new ushort[objectStages];
+            ushort[] sortedOffsets = new ushort[objectStages];
+            Buffer.BlockCopy(SNES.rom, Const.ObjectTileInfoOffset, offsets, 0, objectStages * 2);
+            Array.Copy(offsets, sortedOffsets, objectStages);
+            Array.Sort(sortedOffsets);
+
+            for (int i = 0; i < objectStages; i++)
+            {
+                if (i == 0) continue;
+
+                ushort stageOffset = offsets[i];
+
+                for (int j = i; j != 0; j--)
+                {
+                    if (i == j) continue;
+                    ushort currentOffset = offsets[j];
+                    if (stageOffset == currentOffset)
+                    {
+                        shared[i] = j;
+                        break;
+                    }
+                }
+            }
+
+            int[] maxAmounts = destAmount;
+
+            int maxIndex = 0;
+            for (int j = 0; j < offsets.Length; j++)
+            {
+                if (sortedOffsets[j] > sortedOffsets[maxIndex])
+                    maxIndex = j;
+            }
+
+            for (int i = 0; i < objectStages; i++)
+            {
+                if (shared[i] != -1) continue;
+
+                ushort toFindOffset = offsets[i];
+
+                if (Array.IndexOf(sortedOffsets, toFindOffset) != maxIndex)
+                {
+                    int index = Array.IndexOf(sortedOffsets, toFindOffset);
+
+                    while (sortedOffsets[index] == sortedOffsets[index + 1])
+                        index++;
+                    maxAmounts[i] = ((sortedOffsets[index + 1] - toFindOffset) / 2);
+                }
+                else //Last Stage
+                {
+                    if (Const.Id != Const.GameId.MegaManX)
+                    {
+                        int tempOffset = Const.ObjectTileInfoOffset + objectStages * 2;
+                        int endOffset = offsets[maxIndex] + Const.ObjectTileInfoOffset;
+
+                        int lowestPointer = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(tempOffset));
+
+                        while (tempOffset != endOffset)
+                        {
+                            int addr = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(tempOffset));
+
+                            if (addr < lowestPointer)
+                                lowestPointer = addr;
+                            tempOffset += 2;
+                        }
+                        ushort currentOffset = offsets[i];
+                        maxAmounts[i] = ((lowestPointer - currentOffset) / 2);
+                    }
+                    else //MegaMan X Special Case (math just doesnt work cause of how they jumbled around the pointers)
+                        maxAmounts[i] = 1;
+                }
+                System.Diagnostics.Debug.WriteLine($"Stage {i:X2} Max Amount: {maxAmounts[i]}");
+            }
+        }
+        public static List<List<ObjectSetting>> CollecObjectSettingsFromRom(int[] destAmount, int[] shared)
+        {
+            List<List<ObjectSetting>> sourceSettings = new List<List<ObjectSetting>>();
+            int objectStages = Const.Id == Const.GameId.MegaManX ? 0x24 : Const.Id == Const.GameId.MegaManX2 ? 0xF : 0x12;
+
+            for (int i = 0; i < objectStages; i++)
+            {
+                List<ObjectSetting> objectSettings = new List<ObjectSetting>();
+                if (shared[i] != -1)
+                {
+                    sourceSettings.Add(objectSettings);
+                    continue;
+                }
+                for (int j = 0; j < destAmount[i]; j++)
+                {
+                    int listOffset = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(Const.ObjectTileInfoOffset + i * 2)) + Const.ObjectTileInfoOffset;
+                    int offset = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(listOffset + j * 2)) + Const.ObjectTileInfoOffset;
+
+                    ObjectSetting setting = new ObjectSetting();
+
+                    while (true)
+                    {
+                        byte compressedTileId = SNES.rom[offset];
+
+                        if (compressedTileId == 0xFF)
+                            break;
+
+                        ObjectSlot slot = new ObjectSlot();
+
+                        slot.TileId = compressedTileId;
+                        slot.VramAddress = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + 1));
+                        slot.PaletteId = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + 3));
+                        slot.PaletteDestination = SNES.rom[offset + 5];
+                        setting.Slots.Add(slot);
+                        offset += 6;
+                    }
+                    objectSettings.Add(setting);
+                }
+                sourceSettings.Add(objectSettings);
+            }
+            return sourceSettings;
         }
         #endregion Methods
 
