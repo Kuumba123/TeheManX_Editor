@@ -69,8 +69,8 @@ namespace TeheManX_Editor.Forms
                         }
                         for (int s = 0; s < Const.MegaManX.CompressedTilesAmount; s++)
                         {
-                            int addr_R = SNES.CpuToOffset(BitConverter.ToInt32(rom, (s * 5) + offset + 2));
-                            ushort size = BitConverter.ToUInt16(rom, s * 5 + offset);
+                            int addr_R = SNES.CpuToOffset(BinaryPrimitives.ReadInt32LittleEndian(rom.AsSpan((s * 5) + offset + 2)));
+                            ushort size = BinaryPrimitives.ReadUInt16LittleEndian(rom.AsSpan(s * 5 + offset));
                             size = (ushort)((size + 7) >> 3);
                             byte[] data = new byte[size * 8];
 
@@ -276,8 +276,8 @@ namespace TeheManX_Editor.Forms
                         {
                             MemoryStream ms = new MemoryStream();
                             BinaryWriter bw = new BinaryWriter(ms);
-                            int addr_R = SNES.CpuToOffset(BitConverter.ToInt32(rom, (s * 5) + offset + 2));
-                            ushort size = BitConverter.ToUInt16(rom, s * 5 + offset);
+                            int addr_R = SNES.CpuToOffset(BinaryPrimitives.ReadInt32LittleEndian(rom.AsSpan((s * 5) + offset + 2)));
+                            ushort size = BinaryPrimitives.ReadUInt16LittleEndian(rom.AsSpan(s * 5 + offset));
                             size = (ushort)((size + 7) >> 3);
 
                             int controlB = 0;
@@ -289,7 +289,7 @@ namespace TeheManX_Editor.Forms
                                 {
                                     controlB = rom[addr_R];
                                     addr_R++;
-                                    bw.Write(controlB);
+                                    bw.Write((byte)controlB);
                                     copyB = rom[addr_R];
                                     addr_R++;
                                     bw.Write(copyB);
@@ -395,8 +395,8 @@ namespace TeheManX_Editor.Forms
                             count = Const.MegaManX3.CompressedTilesAmount;
                         for (int s = 0; s < count; s++)
                         {
-                            int addr_R = SNES.CpuToOffset(BitConverter.ToInt32(rom, (s * 5) + offset));
-                            int size = BitConverter.ToUInt16(rom, s * 5 + offset + 3);
+                            int addr_R = SNES.CpuToOffset(BinaryPrimitives.ReadInt32LittleEndian(rom.AsSpan((s * 5) + offset)));
+                            int size = BinaryPrimitives.ReadUInt16LittleEndian(rom.AsSpan(s * 5 + offset + 3));
                             byte[] data = new byte[size];
                             int addr_W = 0;
 
@@ -617,12 +617,13 @@ namespace TeheManX_Editor.Forms
                         {
                             MemoryStream ms = new MemoryStream();
                             BinaryWriter bw = new BinaryWriter(ms);
-                            int addr_R = SNES.CpuToOffset(BitConverter.ToInt32(rom, (s * 5) + offset));
-                            int size = BitConverter.ToUInt16(rom, s * 5 + offset + 3);
+                            int addr_R = SNES.CpuToOffset(BinaryPrimitives.ReadInt32LittleEndian(rom.AsSpan((s * 5) + offset)));
+                            int size = BinaryPrimitives.ReadUInt16LittleEndian(rom.AsSpan(s * 5 + offset + 3));
 
                             try
                             {
                                 byte controlB = rom[addr_R];
+                                bw.Write(controlB);
                                 addr_R++;
                                 byte controlC = 8;
 
