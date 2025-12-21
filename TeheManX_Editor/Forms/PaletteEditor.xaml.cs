@@ -144,10 +144,11 @@ namespace TeheManX_Editor.Forms
             Array.Sort(offsetList);
             int currentIndex = Array.IndexOf(offsetList, currentOffset);
 
-            if (currentIndex == maxIndex)
+            maxSwaps = 0; //TODO: Fix this calculation since it doesnt work for MegaMan X3
+            /*if (currentIndex == maxIndex)
                 maxSwaps = ((lowestPointer - currentOffset) / 2) - 1;
             else
-                maxSwaps = ((offsetList[currentIndex + 1] - currentOffset) / 2) - 1;
+                maxSwaps = ((offsetList[currentIndex + 1] - currentOffset) / 2) - 1;*/
 
             bgPalIdInt.Maximum = maxSwaps;
             if (MainWindow.window.paletteE.bgPalIdInt.Value > maxSwaps)
