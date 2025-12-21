@@ -68,6 +68,7 @@ namespace TeheManX_Editor
         public static int CameraTriggersOffset;
         public static int CameraSettingsOffset;
         public static int CameraSettingsBank;
+        public static int CameraTriggersLength;
         public static int MaxTotalCameraSettings;
 
         public static ushort CameraBorderLeftWRAM;
@@ -78,6 +79,9 @@ namespace TeheManX_Editor
         public static int BackgroundTileInfoOffset;
         public static int ObjectTileInfoOffset;
         public static int CompressedTilesSwapInfoOffset;
+
+        public static int ObjectTileInfoLength;
+        public static int BackgroundTileInfoLength;
 
         public static int MegaManTilesOffset; //Offset to MegaMan X sprite tiles
         public static int[] MegaManGreenChargeShotTilesOffset = new int[2]; //Offset to MegaMan X Pink Green Shot sprite tiles
@@ -173,6 +177,9 @@ namespace TeheManX_Editor
             public const ushort CameraBorderRightWRAM = 0x1E60;
             public const ushort CameraBorderTopWRAM = 0x1E68;
             public const ushort CameraBorderBottomWRAM = 0x1E6E;
+
+            public const int ObjectTileInfoLength = 0xCC3; //size includes all the pointers & the un-playable stages
+            public const int BackgroundTileInfoLength = 0x8B;
 
             public const int MegaManTilesOffset = 0x170000; //Offset to MegaMan X sprite tiles
             public static readonly int[] MegaManGreenChargeShotTilesOffset = { 0x178400, 0x178500 }; //Offset to MegaMan X Pink Green Shot sprite tiles
@@ -376,6 +383,9 @@ namespace TeheManX_Editor
             public const int CameraTriggersOffset = 0x16BE9;
             public const int CameraSettingsOffset = 0x17AE4;
 
+            public const int ObjectTileInfoLength = 0xCF7; //size includes all the pointers & the un-playable stages
+            public const int BackgroundTileInfoLength = 0x67;
+
             public const ushort CameraBorderLeftWRAM = 0x1E6E;
             public static ushort CameraBorderRightWRAM = 0x1E70;
             public static ushort CameraBorderTopWRAM = 0x1E78;
@@ -512,6 +522,9 @@ namespace TeheManX_Editor
             public const int ObjectTileInfoOffset = 0x40623;
             public const int CompressedTilesSwapInfoOffset = 0x457C9;
 
+            public const int ObjectTileInfoLength = 0xBCF; //size includes all the pointers & the un-playable stages
+            public const int BackgroundTileInfoLength = 0xED; //size includes all pointers
+
             public const int MegaManTilesOffset = 0x168000; //Offset to MegaMan X sprite tiles
             public static readonly int[] MegaManGreenChargeShotTilesOffset = { 0x1E0400, 0x1E0500 }; //Offset to MegaMan X Pink Green Shot sprite tiles
 
@@ -642,12 +655,16 @@ namespace TeheManX_Editor
 
                 MaxTotalCheckpoints = MegaManX.MaxTotalCheckpoints;
                 CameraSettingsBank = MegaManX.CameraSettingsBank;
+                CameraTriggersLength = MegaManX.CameraTriggersLength;
                 MaxTotalCameraSettings = MegaManX.MaxTotalCameraSettings;
 
                 CameraBorderLeftWRAM = MegaManX.CameraBorderLeftWRAM;
                 CameraBorderRightWRAM = MegaManX.CameraBorderRightWRAM;
                 CameraBorderTopWRAM = MegaManX.CameraBorderTopWRAM;
                 CameraBorderBottomWRAM = MegaManX.CameraBorderTopWRAM;
+
+                BackgroundTileInfoLength = MegaManX.BackgroundTileInfoLength;
+                ObjectTileInfoLength = MegaManX.ObjectTileInfoLength;
 
                 LayoutPointersOffset = MegaManX.LayoutPointersOffset;
                 ScreenDataPointersOffset = MegaManX.ScreenDataPointersOffset;
@@ -711,12 +728,16 @@ namespace TeheManX_Editor
 
                 MaxTotalCheckpoints = MegaManX2.MaxTotalCheckpoints;
                 CameraSettingsBank = MegaManX2.CameraSettingsBank;
+                CameraTriggersLength = MegaManX2.CameraTriggersLength;
                 MaxTotalCameraSettings = MegaManX2.MaxTotalCameraSettings;
 
                 CameraBorderLeftWRAM = MegaManX2.CameraBorderLeftWRAM;
                 CameraBorderRightWRAM = MegaManX2.CameraBorderRightWRAM;
                 CameraBorderTopWRAM = MegaManX2.CameraBorderTopWRAM;
                 CameraBorderBottomWRAM = MegaManX2.CameraBorderTopWRAM;
+
+                BackgroundTileInfoLength = MegaManX2.BackgroundTileInfoLength;
+                ObjectTileInfoLength = MegaManX2.ObjectTileInfoLength;
 
                 CameraTriggersOffset = MegaManX2.CameraTriggersOffset;
                 CameraSettingsOffset = MegaManX2.CameraSettingsOffset;
@@ -780,6 +801,7 @@ namespace TeheManX_Editor
 
                 MaxTotalCheckpoints = MegaManX3.MaxTotalCheckpoints;
                 CameraSettingsBank = MegaManX3.CameraSettingsBank;
+                CameraTriggersLength = MegaManX3.CameraTriggersLength;
 
                 CameraTriggersOffset = MegaManX3.CameraTriggersOffset;
                 CameraSettingsOffset = MegaManX3.CameraSettingsOffset;
@@ -789,6 +811,9 @@ namespace TeheManX_Editor
                 CameraBorderRightWRAM = MegaManX2.CameraBorderRightWRAM;
                 CameraBorderTopWRAM = MegaManX2.CameraBorderTopWRAM;
                 CameraBorderBottomWRAM = MegaManX2.CameraBorderTopWRAM;
+
+                BackgroundTileInfoLength = MegaManX3.BackgroundTileInfoLength;
+                ObjectTileInfoLength = MegaManX3.ObjectTileInfoLength;
 
                 LayoutPointersOffset = MegaManX3.LayoutPointersOffset;
                 ScreenDataPointersOffset = MegaManX3.ScreenDataPointersOffset;

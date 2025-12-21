@@ -123,8 +123,8 @@ namespace TeheManX_Editor.Forms
                 MainWindow.window.tileE.bgTileSetInt.Value = 0;
             }
             // Set Background Tile Values
-            int listOffset = BitConverter.ToUInt16(SNES.rom, Const.BackgroundTileInfoOffset + id * 2) + Const.BackgroundTileInfoOffset;
-            int offset = BitConverter.ToUInt16(SNES.rom, listOffset + (int)MainWindow.window.tileE.bgTileSetInt.Value * 2) + Const.BackgroundTileInfoOffset;
+            int listOffset = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(Const.BackgroundTileInfoOffset + id * 2)) + Const.BackgroundTileInfoOffset;
+            int offset = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(listOffset + (int)MainWindow.window.tileE.bgTileSetInt.Value * 2)) + Const.BackgroundTileInfoOffset;
 
             if (BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset)) != 0)
             {
@@ -144,39 +144,13 @@ namespace TeheManX_Editor.Forms
 
 
             //Get Max Amount of Object Tile Settings
-            int maxOBJTiles = 0;
-            Buffer.BlockCopy(SNES.rom, Const.ObjectTileInfoOffset, offsets, 0, offsets.Length * 2);
+            int objectStages = Const.Id == Const.GameId.MegaManX ? 0x24 : Const.Id == Const.GameId.MegaManX2 ? 0xF : 0x12;
+            offsets = new ushort[objectStages];
+            Buffer.BlockCopy(SNES.rom, Const.ObjectTileInfoOffset, offsets, 0, objectStages * 2);
+            toFindOffset = offsets[id];
             Array.Sort(offsets);
-
-            int maxIndex = 0;
-            for (int i = 0; i < offsets.Length; i++)
-            {
-                if (offsets[i] > offsets[maxIndex])
-                    maxIndex = i;
-            }
-
-            int tempOffset = (Const.Id == Const.GameId.MegaManX) ? 32 * 2 : Const.Id == Const.GameId.MegaManX2 ? 15 * 2 : 18 * 2;
-            tempOffset += Const.ObjectTileInfoOffset;
-            int endOffset = offsets[maxIndex] + Const.ObjectTileInfoOffset;
-
-            int lowestPointer = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(tempOffset));
-
-            while (tempOffset != endOffset)
-            {
-                int addr = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(tempOffset));
-
-                if (addr < lowestPointer)
-                    lowestPointer = addr;
-                tempOffset += 2;
-            }
-
-            ushort currentOffset = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(Const.ObjectTileInfoOffset + Level.Id * 2));
-            int currentIndex = Array.IndexOf(offsets, currentOffset);
-
-            if (currentIndex == maxIndex) //TODO: this does not set the correct value for the fianl Sigma Stage in MegaMan X1
-                maxOBJTiles = ((lowestPointer - currentOffset) / 2) - 1;
-            else
-                maxOBJTiles = ((offsets[currentIndex + 1] - currentOffset) / 2) - 1;
+            index = Array.IndexOf(offsets, toFindOffset);
+            int maxOBJTiles = ((offsets[index + 1] - toFindOffset) / 2) - 1;
 
             objTileSetInt.Maximum = maxOBJTiles;
             objTileSetInt.Value = 0;
