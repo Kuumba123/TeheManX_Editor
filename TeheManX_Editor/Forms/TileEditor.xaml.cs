@@ -507,8 +507,7 @@ namespace TeheManX_Editor.Forms
         }
         public static byte[] CreateObjectSettingsData(List<List<ObjectSetting>> sourceSettings,int[] sharedList)
         {
-            Dictionary<ReadOnlyMemory<byte>, int> dict =
-                new Dictionary<ReadOnlyMemory<byte>, int>();
+            Dictionary<byte[], int> dict = new Dictionary<byte[], int>(ByteArrayComparer.Default);
 
             /*
              * Step 1. Create a dictionary of unique object settings data & keep track of stage keys
@@ -609,7 +608,7 @@ namespace TeheManX_Editor.Forms
             nextOffset = totalPointersLength;
             foreach (var kvp in dict)
             {
-                kvp.Key.Span.CopyTo(exportData.AsSpan(nextOffset));
+                kvp.Key.CopyTo(exportData.AsSpan(nextOffset));
                 nextOffset += kvp.Key.Length;
             }
 
@@ -696,7 +695,6 @@ namespace TeheManX_Editor.Forms
                     else //MegaMan X Special Case (math just doesnt work cause of how they jumbled around the pointers)
                         maxAmounts[i] = 1;
                 }
-                System.Diagnostics.Debug.WriteLine($"Stage {i:X2} Max Amount: {maxAmounts[i]}");
             }
         }
         public static List<List<ObjectSetting>> CollecObjectSettingsFromRom(int[] destAmount, int[] shared)
