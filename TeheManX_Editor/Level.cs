@@ -837,31 +837,42 @@ namespace TeheManX_Editor
 
             if (true) //Using data in game
             {
-
-                /*
-                 * Step 1. Get the Max Amount of Object Tile Settings
-                 */
-
+                //Get the Max Amount of Object Tile Settings
                 int[] maxAmount = new int[objectStages];
                 int[] shared = new int[objectStages];
                 TileEditor.GetMaxObjectSettingsFromRom(maxAmount, shared);
 
-                /*
-                 * Step 2. Collect Object Tile Settings
-                 */
+                List<List<ObjectSetting>> sourceSettings = TileEditor.ObjectSettings;
 
-                List<List<ObjectSetting>> sourceSettings = TileEditor.CollecObjectSettingsFromRom(maxAmount, shared);
-
-
-                /*
-                 * Step 3. Export Object Tile Settings
-                 */
+                //Export Object Tile Settings
                 byte[] exportData = TileEditor.CreateObjectSettingsData(sourceSettings, shared);
                 Array.Copy(exportData, 0, SNES.rom, Const.ObjectTileInfoOffset, exportData.Length);
             }
             else //Using data in json project file
             {
+            }
 
+            /*
+             * Background Tiles Export
+             */
+
+            int bgStages = Const.Id == Const.GameId.MegaManX3 ? 0xF : Const.PlayableLevelsCount;
+
+            if (true) //Using data in game
+            {
+                //Get the Max Amount of BG Tile Settings
+                int[] maxAmount = new int[bgStages];
+                int[] shared = new int[bgStages];
+                TileEditor.GetMaxBGSettingsFromRom(maxAmount, shared);
+
+                List<List<BGSetting>> sourceSettings = TileEditor.BGSettings;
+
+                //Export BG Tile Settings
+                byte[] exportData = TileEditor.CreateBGSettingsData(sourceSettings, shared);
+                Array.Copy(exportData, 0, SNES.rom, Const.BackgroundTileInfoOffset, exportData.Length);
+            }
+            else //Using data in json project file
+            {
             }
             return true;
         }

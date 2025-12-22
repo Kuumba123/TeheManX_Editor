@@ -49,11 +49,13 @@
             <Border BorderBrush="White" BorderThickness="2">
                 <StackPanel>
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Width="160">Tile Setting:</TextBlock>
+                        <TextBlock Width="160">BG Setting:</TextBlock>
                         <local:NumInt x:Name="bgTileSetInt" Width="85" Minimum="0" Maximum="#FF" ValueChanged="bgTileSetInt_ValueChanged" Value="#0"></local:NumInt>
                     </StackPanel>
-                    <Separator></Separator>
-                    <TextBlock HorizontalAlignment="Center" FontSize="18">Properties</TextBlock>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Width="160">Entry Slot:</TextBlock>
+                        <local:NumInt x:Name="bgEntrySlotInt" Width="85" Minimum="0" Maximum="#FF" Value="#0" ValueChanged="bgEntrySlotInt_ValueChanged"></local:NumInt>
+                    </StackPanel>
                     <Separator></Separator>
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Width="160">VRAM Length:</TextBlock>
