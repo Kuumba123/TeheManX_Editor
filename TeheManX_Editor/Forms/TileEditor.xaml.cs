@@ -764,7 +764,11 @@ namespace TeheManX_Editor.Forms
 
             for (int i = 0; i < bgStages; i++)
             {
-                if (shared[i] != -1) continue;
+                if (shared[i] != -1)
+                {
+                    maxAmounts[i] = maxAmounts[shared[i]];
+                    continue;
+                }
 
                 ushort toFindOffset = offsets[i];
 
@@ -815,11 +819,6 @@ namespace TeheManX_Editor.Forms
             for (int i = 0; i < bgStages; i++)
             {
                 List<BGSetting> bgSettings = new List<BGSetting>();
-                if (shared[i] != -1)
-                {
-                    sourceSettings.Add(bgSettings);
-                    continue;
-                }
                 for (int j = 0; j < destAmount[i]; j++)
                 {
                     int listOffset = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(Const.BackgroundTileInfoOffset + i * 2)) + Const.BackgroundTileInfoOffset;
