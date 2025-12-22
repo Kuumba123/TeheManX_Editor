@@ -171,7 +171,6 @@ namespace TeheManX_Editor.Forms
             DrawObjectTiles();
             DrawPalette();
             UpdateCursor();
-            SetMaxObjectSlots();
             SetObjectSlotValues();
 
             //Re Enable Object Tile UI
@@ -208,18 +207,13 @@ namespace TeheManX_Editor.Forms
             int id;
             if (Const.Id == Const.GameId.MegaManX3 && Level.Id > 0xE) id = (Level.Id - 0xF) + 2; //Buffalo or Beetle
             else id = Level.Id;
-            int listOffset = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(Const.ObjectTileInfoOffset + id * 2)) + Const.ObjectTileInfoOffset;
-            int offset = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(listOffset + (int)objectTileSetId * 2)) + Const.ObjectTileInfoOffset;
 
-            while (true)
+            for (int i = 0; i < ObjectSettings[id][objectTileSetId].Slots.Count; i++)
             {
-                byte compressedTileId = SNES.rom[offset];
-
-                if (compressedTileId == 0xFF)
-                    break;
-
                 //Load Object Tiles
-                ushort relativeVramAddr = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + 1));
+                ushort relativeVramAddr = ObjectSettings[id][objectTileSetId].Slots[i].VramAddress;
+
+                byte compressedTileId = ObjectSettings[id][objectTileSetId].Slots[i].TileId;
 
                 int specOffset = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(Const.CompressedTilesSwapInfoOffset + compressedTileId * 2)) + Const.CompressedTilesSwapInfoOffset;
                 int srcOffset = 0;
@@ -263,8 +257,8 @@ namespace TeheManX_Editor.Forms
                 }
 
                 //Load Object Palette
-                ushort palId = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + 3));
-                byte dumpLocation = SNES.rom[offset + 5];
+                ushort palId = ObjectSettings[id][objectTileSetId].Slots[i].PaletteId;
+                byte dumpLocation = ObjectSettings[id][objectTileSetId].Slots[i].PaletteDestination;
 
                 int infoOffset = SNES.CpuToOffset(BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(Const.PaletteInfoOffset + palId)), Const.PaletteBank);
 
@@ -288,7 +282,6 @@ namespace TeheManX_Editor.Forms
                     }
                     infoOffset += 4;
                 }
-                offset += 6;
             }
             /****************/
 
@@ -354,34 +347,23 @@ namespace TeheManX_Editor.Forms
         private void SetObjectSlotValues()
         {
             int id = Level.Id;
+            if (ObjectSettings[id][objectTileSetId].Slots.Count == 0)
+            {
+                MainWindow.window.tileE.compressTileInt.IsEnabled = false;
+                MainWindow.window.tileE.vramLocationInt.IsEnabled = false;
+                MainWindow.window.tileE.palSetInt.IsEnabled = false;
+                MainWindow.window.tileE.dumpInt.IsEnabled = false;
+                return;
+            }
             MainWindow.window.tileE.compressTileInt.Value = ObjectSettings[id][objectTileSetId].Slots[objectTileSlotId].TileId;
             MainWindow.window.tileE.vramLocationInt.Value = ObjectSettings[id][objectTileSetId].Slots[objectTileSlotId].VramAddress;
             MainWindow.window.tileE.palSetInt.Value = ObjectSettings[id][objectTileSetId].Slots[objectTileSlotId].PaletteId;
             MainWindow.window.tileE.dumpInt.Value = ObjectSettings[id][objectTileSetId].Slots[objectTileSlotId].PaletteDestination;
-        }
-        private void SetMaxObjectSlots()
-        {
-            int id;
-            if (Const.Id == Const.GameId.MegaManX3 && Level.Id > 0xE) id = (Level.Id - 0xF) + 2; //Buffalo or Beetle
-            else id = Level.Id;
-            int listOffset = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(Const.ObjectTileInfoOffset + id * 2)) + Const.ObjectTileInfoOffset;
-            int offset = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(listOffset + (int)objectTileSetId * 2)) + Const.ObjectTileInfoOffset;
 
-            int currentSlot = 0;
-
-            while (true)
-            {
-                int compressedTileId = SNES.rom[offset];
-
-                if (compressedTileId == 0xFF)
-                {
-                    objectSlotInt.Maximum = currentSlot - 1;
-                    return;
-                }
-
-                offset += 6;
-                currentSlot++;
-            }
+            MainWindow.window.tileE.compressTileInt.IsEnabled = true;
+            MainWindow.window.tileE.vramLocationInt.IsEnabled = true;
+            MainWindow.window.tileE.palSetInt.IsEnabled = true;
+            MainWindow.window.tileE.dumpInt.IsEnabled = true;
         }
         public void UpdateCursor()
         {
@@ -823,7 +805,6 @@ namespace TeheManX_Editor.Forms
 
                     maxAmounts[i] = max;
                 }
-                System.Diagnostics.Debug.WriteLine($"BG Stage {i:X2} - Max Settings: {maxAmounts[i]}");
             }
         }
         public static List<List<BGSetting>> CollecBGSettingsFromRom(int[] destAmount, int[] shared)
@@ -1077,7 +1058,7 @@ namespace TeheManX_Editor.Forms
             }
             _suppressBgSrcBoxTextChanged = false;
         }
-        private void GearBtn_Click(object sender, RoutedEventArgs e)
+        private void EditBGSlotCountBtn_Click(object sender, RoutedEventArgs e)
         {
 
         }
@@ -1113,7 +1094,7 @@ namespace TeheManX_Editor.Forms
             if (MainWindow.window.tileE.objectFreshCheck.IsChecked == true)
                 LoadDefaultObjectTiles();
 
-            SetMaxObjectSlots();
+            objectSlotInt.Maximum = ObjectSettings[Level.Id][objectTileSetId].Slots.Count - 1;
             SetObjectSlotValues();
             DrawObjectTiles();
             DrawPalette();
@@ -1206,6 +1187,107 @@ namespace TeheManX_Editor.Forms
                 objectTileGrid.ShowGridLines = false;
             else
                 objectTileGrid.ShowGridLines = true;
+        }
+        private void EditObjectSlotCountBtn_Click(object sender, RoutedEventArgs e)
+        {
+            if (SNES.rom == null || !MainWindow.window.tileE.objTileSetInt.IsEnabled || Level.Id >= Const.PlayableLevelsCount)
+                return;
+
+            List<ObjectSetting> trueCopy = ObjectSettings[Level.Id].Select(os => new ObjectSetting(os)).ToList();
+
+            Window window = new Window() { WindowStartupLocation = WindowStartupLocation.CenterScreen, Title = "Object Tiles Settings" , ResizeMode = ResizeMode.CanMinimize};
+            window.Width = 310;
+            window.Height = 760;
+
+            StackPanel stackPanel = new StackPanel();
+
+            for (int i = 0; i < trueCopy.Count; i++)
+            {
+                DataEntry entry = new DataEntry(trueCopy, i);
+                stackPanel.Children.Add(entry);
+            }
+
+            ScrollViewer scrollViewer = new ScrollViewer();
+            scrollViewer.Content = stackPanel;
+
+            Button confirmBtn = new Button() { Content = "Confirm" };
+            confirmBtn.Click += (s, ev) =>
+            {
+                for (int i = 0; i < trueCopy.Count; i++)
+                {
+                    int neededSlots = ((DataEntry)(stackPanel.Children[i])).slotCount;
+
+                    while (trueCopy[i].Slots.Count < neededSlots)
+                    {
+                        ObjectSlot slot = new ObjectSlot(); //Default is a Heart Tank
+                        slot.TileId = 0x36;
+                        slot.VramAddress = 0x400;
+                        slot.PaletteId = 0x98;
+                        slot.PaletteDestination = 0x40;
+                        trueCopy[i].Slots.Add(slot);
+                    }
+                    while (trueCopy[i].Slots.Count > neededSlots)
+                        trueCopy[i].Slots.RemoveAt(trueCopy[i].Slots.Count - 1);
+                }
+
+                List<ObjectSetting> uneditedList = ObjectSettings[Level.Id];
+                ObjectSettings[Level.Id] = trueCopy;
+
+                int objectStages = Const.Id == Const.GameId.MegaManX ? 0x24 : Const.Id == Const.GameId.MegaManX2 ? 0xF : 0x12;
+
+                int[] maxAmount = new int[objectStages];
+                int[] shared = new int[objectStages];
+                GetMaxObjectSettingsFromRom(maxAmount, shared);
+
+                if (false) //no stages share data when using json
+                {
+                    for (int i = 0; i < objectStages; i++)
+                        shared[i] = -1;
+                }
+
+                if (CreateObjectSettingsData(ObjectSettings, shared).Length > Const.ObjectTileInfoLength)
+                {
+                    ObjectSettings[Level.Id] = uneditedList;
+                    MessageBox.Show($"The new Object Tile Info length exceeds the maximum allowed space in the ROM (0x{Const.ObjectTileInfoLength:X}). Please lower some counts for this or another stage.");
+                    return;
+                }
+
+                AssignLimits();
+                SNES.edit = true;
+                MessageBox.Show("Object Slot counts updated!");
+                window.Close();
+            };
+            Grid.SetRow(confirmBtn, 2);
+
+            Button addBtn = new Button() { Content = "Add Setting" };
+            addBtn.Click += (s, e) =>
+            {
+                int newIndex = trueCopy.Count;
+                ObjectSlot slot = new ObjectSlot(); //Default is a Heart Tank
+                slot.TileId = 0x36;
+                slot.VramAddress = 0x400;
+                slot.PaletteId = 0x98;
+                slot.PaletteDestination = 0x40;
+
+                ObjectSetting objectSetting = new ObjectSetting();
+                objectSetting.Slots.Add(slot);
+                trueCopy.Add(objectSetting);
+
+                DataEntry entry = new DataEntry(trueCopy, newIndex);
+                stackPanel.Children.Add(entry);
+            };
+            Grid.SetRow(addBtn, 1);
+
+            Grid grid = new Grid();
+            grid.RowDefinitions.Add(new RowDefinition());
+            grid.RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
+            grid.RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
+            grid.Children.Add(scrollViewer);
+            grid.Children.Add(confirmBtn);
+            grid.Children.Add(addBtn);
+            grid.Background = Brushes.Black;
+            window.Content = grid;
+            window.ShowDialog();
         }
         #endregion Events
     }

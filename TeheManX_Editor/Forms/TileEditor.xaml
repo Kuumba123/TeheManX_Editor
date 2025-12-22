@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:TeheManX_Editor.Forms"
              mc:Ignorable="d" 
-             d:DesignHeight="600" d:DesignWidth="1200">
+             d:DesignHeight="650" d:DesignWidth="1200">
     <UserControl.Resources>
         <Style TargetType="TextBlock">
             <Setter Property="FontFamily" Value="Consolas" />
@@ -87,8 +87,8 @@
         </StackPanel>
 
         <StackPanel Grid.Row="1">
-            <Button Width="30" Height="30" Margin="5" Click="GearBtn_Click">⚙️</Button>
-            <Button Width="30" Height="30" Click="LoadBtn_Click">↺</Button>
+            <Button Margin="10" Click="EditBGSlotCountBtn_Click">Edit BG Entry Slot Counts</Button>
+            <Button Margin="10" Click="LoadBtn_Click">Load External Assets</Button>
         </StackPanel>
 
         <!--Object Tile Display Area -->
@@ -138,6 +138,7 @@
             <Grid x:Name="paletteGrid"  Width="256" Height="128">
 
             </Grid>
+            <Button Margin="10" Click="EditObjectSlotCountBtn_Click">Edit Object Slot Counts</Button>
         </StackPanel>
     </Grid>
 </UserControl>
