@@ -17,12 +17,13 @@
         </Grid.RowDefinitions>
         
         <!--Layout Viewer-->
-        <Viewbox Grid.ColumnSpan="2" HorizontalAlignment="Left" x:Name="viewBox" VerticalAlignment="Top">
-            <Canvas x:Name="canvas" Width="768" Height="512" ClipToBounds="True" MouseDown="canvas_MouseDown" PreviewMouseMove="canvas_PreviewMouseMove" PreviewMouseUp="canvas_PreviewMouseUp">
-                <Image x:Name="layoutImage" PreviewMouseDown="LayoutImage_PreviewMouseDown" PreviewMouseMove="LayoutImage_PreviewMouseMove" PreviewMouseUp="LayoutImage_PreviewMouseUp" MouseLeave="LayoutImage_MouseLeave" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-                <Rectangle x:Name="selectRect" Visibility="Collapsed" Stroke="Blue" Panel.ZIndex="1"></Rectangle>
-            </Canvas>
-        </Viewbox>
+        <Canvas VerticalAlignment="Top" HorizontalAlignment="Left" x:Name="canvas" Width="768" Height="512" ClipToBounds="True" MouseDown="canvas_MouseDown" PreviewMouseMove="canvas_PreviewMouseMove" PreviewMouseUp="canvas_PreviewMouseUp">
+            <Canvas.RenderTransform>
+                <ScaleTransform x:Name="ZoomTransform" ScaleX="1" ScaleY="1"/>
+            </Canvas.RenderTransform>
+            <Image SnapsToDevicePixels="True" x:Name="layoutImage" PreviewMouseDown="LayoutImage_PreviewMouseDown" PreviewMouseMove="LayoutImage_PreviewMouseMove" PreviewMouseUp="LayoutImage_PreviewMouseUp" MouseLeave="LayoutImage_MouseLeave" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+            <Rectangle x:Name="selectRect" Visibility="Collapsed" Stroke="Blue" Panel.ZIndex="1"></Rectangle>
+        </Canvas>
         <TextBlock x:Name="camLbl" Grid.Row="0" IsHitTestVisible="False" Foreground="White" FontFamily="Consolas" Margin="5,0,0,0" HorizontalAlignment="Left" FontSize="20"></TextBlock>
 
         <Grid Focusable="False" Grid.Column="1" Background="Black">

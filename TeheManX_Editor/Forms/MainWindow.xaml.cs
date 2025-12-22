@@ -454,15 +454,15 @@ namespace TeheManX_Editor.Forms
                 {
                     if (EnemyEditor.scale != 8)
                         EnemyEditor.scale++;
-                    window.enemyE.viewBox.Width = EnemyEditor.scale * 768;
-                    window.enemyE.viewBox.Height = EnemyEditor.scale * 512;
+                    window.enemyE.ZoomTransform.ScaleX = EnemyEditor.scale;
+                    window.enemyE.ZoomTransform.ScaleY = EnemyEditor.scale;
                 }
                 else if (key == "OemMinus")
                 {
                     if (EnemyEditor.scale != 1)
                         EnemyEditor.scale--;
-                    window.enemyE.viewBox.Width = EnemyEditor.scale * 768;
-                    window.enemyE.viewBox.Height = EnemyEditor.scale * 512;
+                    window.enemyE.ZoomTransform.ScaleX = EnemyEditor.scale;
+                    window.enemyE.ZoomTransform.ScaleY = EnemyEditor.scale;
                 }
             }
         }
@@ -1024,6 +1024,8 @@ namespace TeheManX_Editor.Forms
                 window.tile16E.x16grid.Width = main;
                 window.tile16E.x16grid.Height = main;
             }
+            window.enemyE.ZoomTransform.ScaleX = EnemyEditor.scale;
+            window.enemyE.ZoomTransform.ScaleY = EnemyEditor.scale;
         }
         #endregion Methods
 

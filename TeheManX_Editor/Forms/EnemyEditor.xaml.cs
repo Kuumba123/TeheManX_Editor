@@ -875,16 +875,16 @@ namespace TeheManX_Editor.Forms
         {
             if (scale != 8)
                 scale++;
-            MainWindow.window.enemyE.viewBox.Width = scale * 768;
-            MainWindow.window.enemyE.viewBox.Height = scale * 512;
+            MainWindow.window.enemyE.ZoomTransform.ScaleX = scale;
+            MainWindow.window.enemyE.ZoomTransform.ScaleY = scale;
         }
 
         private void zoomOutBtn_Click(object sender, RoutedEventArgs e)
         {
             if (scale != 1)
                 scale--;
-            MainWindow.window.enemyE.viewBox.Width = scale * 768;
-            MainWindow.window.enemyE.viewBox.Height = scale * 512;
+            MainWindow.window.enemyE.ZoomTransform.ScaleX = scale;
+            MainWindow.window.enemyE.ZoomTransform.ScaleY = scale;
         }
         private void Help_Click(object sender, RoutedEventArgs e)
         {
