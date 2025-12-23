@@ -17,7 +17,7 @@
         </Grid.RowDefinitions>
         
         <!--Layout Viewer-->
-        <Canvas VerticalAlignment="Top" HorizontalAlignment="Left" x:Name="canvas" Width="768" Height="512" ClipToBounds="True" MouseDown="canvas_MouseDown" PreviewMouseMove="canvas_PreviewMouseMove" PreviewMouseUp="canvas_PreviewMouseUp">
+        <Canvas VerticalAlignment="Top" HorizontalAlignment="Left" x:Name="canvas" Width="768" Height="768" ClipToBounds="True" MouseDown="canvas_MouseDown" PreviewMouseMove="canvas_PreviewMouseMove" PreviewMouseUp="canvas_PreviewMouseUp">
             <Canvas.RenderTransform>
                 <ScaleTransform x:Name="ZoomTransform" ScaleX="1" ScaleY="1"/>
             </Canvas.RenderTransform>

@@ -24,7 +24,7 @@ namespace TeheManX_Editor.Forms
 
         #region Properties
         public bool update;
-        internal WriteableBitmap layoutBMP = new WriteableBitmap(768, 512, 96, 96, PixelFormats.Bgra32, null);
+        internal WriteableBitmap layoutBMP = new WriteableBitmap(768, 768, 96, 96, PixelFormats.Bgra32, null);
         public int viewerX = 0x400;
         public int viewerY = 0;
         UIElement obj;
@@ -143,14 +143,14 @@ namespace TeheManX_Editor.Forms
             unsafe
             {
                 uint* ptr = (uint*)bufferP;
-                for (int i = 0; i < (768 * 512); i++)
+                for (int i = 0; i < (768 * 768); i++)
                 {
                     *ptr = 0xFF000000;
                     ptr++;
                 }
             }
 
-            for (int sy = 0; sy < 3; sy++)
+            for (int sy = 0; sy < 4; sy++)
             {
                 for (int sx = 0; sx < 4; sx++)
                 {
@@ -196,7 +196,7 @@ namespace TeheManX_Editor.Forms
                 }
             }
 
-            layoutBMP.AddDirtyRect(new Int32Rect(0, 0, 768, 512));
+            layoutBMP.AddDirtyRect(new Int32Rect(0, 0, 768, 768));
             layoutBMP.Unlock();
         }
         public void UpdateEnemyLabelPositions()
