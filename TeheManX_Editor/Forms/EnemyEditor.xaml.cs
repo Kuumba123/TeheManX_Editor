@@ -477,11 +477,8 @@ namespace TeheManX_Editor.Forms
             double dx = pos.X - panStartMouse.X;
             double dy = pos.Y - panStartMouse.Y;
 
-            viewerX = panStartViewerX - (int)dx;
-            viewerY = panStartViewerY - (int)dy;
-
-            if (viewerX < 0) viewerX = 0;
-            if (viewerY < 0) viewerY = 0;
+            viewerX = Math.Clamp(panStartViewerX - (int)dx, 0, 0x1FFF);
+            viewerY = Math.Clamp(panStartViewerY - (int)dy, 0, 0x1FFF);
 
             MainWindow.window.UpdateEnemyViewerCam();
             DrawLayout();
