@@ -14,6 +14,7 @@ namespace TeheManX_Editor.Forms
     public partial class LayoutEditor : UserControl
     {
         #region Properties
+        public bool update;
         WriteableBitmap layoutBMP = new WriteableBitmap(768, 768, 96, 96, PixelFormats.Bgra32, null);
         WriteableBitmap selectBMP = new WriteableBitmap(256, 256, 96, 96, PixelFormats.Bgra32, null);
         public int viewerX = 0;
@@ -36,6 +37,15 @@ namespace TeheManX_Editor.Forms
         #region Methods
         public void DrawLayout()
         {
+            update = true;
+        }
+        public void DrawScreen()
+        {
+            update = true;
+        }
+        public void Paint()
+        {
+            update = false;
             layoutBMP.Lock();
             for (int y = 0; y < 3; y++)
             {
@@ -46,9 +56,7 @@ namespace TeheManX_Editor.Forms
             }
             layoutBMP.AddDirtyRect(new Int32Rect(0, 0, 768, 768));
             layoutBMP.Unlock();
-        }
-        public void DrawScreen()
-        {
+
             selectBMP.Lock();
             Level.DrawScreen(selectedScreen, selectBMP.BackBufferStride, selectBMP.BackBuffer);
             selectBMP.AddDirtyRect(new Int32Rect(0, 0, 256, 256));

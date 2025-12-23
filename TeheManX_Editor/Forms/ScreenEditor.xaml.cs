@@ -15,6 +15,9 @@ namespace TeheManX_Editor.Forms
     public partial class ScreenEditor : UserControl
     {
         #region Properties
+        public bool updateScreen;
+        public bool updateTiles;
+        public bool updateTile;
         WriteableBitmap screenBMP = new WriteableBitmap(256, 256, 96, 96, PixelFormats.Bgra32, null); //for both modes
         WriteableBitmap tileBMP = new WriteableBitmap(256, 1024, 96, 96, PixelFormats.Bgra32, null);
         WriteableBitmap tileBMP_S = new WriteableBitmap(32, 32, 96, 96, PixelFormats.Bgra32, null);
@@ -72,20 +75,34 @@ namespace TeheManX_Editor.Forms
             DrawTiles();
             DrawTile();
         }
-        public void DrawScreen()
+        public void PaintScreen()
         {
-            screenBMP.Lock();
-            Level.DrawScreen(screenId, screenBMP.BackBufferStride, screenBMP.BackBuffer);
-            screenBMP.AddDirtyRect(new Int32Rect(0, 0, 256, 256));
-            screenBMP.Unlock();
-        }
-        public void DrawTiles()
-        {
-            if (mode16) //just to make maintaining the code simpler...
+            updateScreen = false;
+            if (mode16)
             {
-                DrawTiles16();
-                return;
+                screenBMP.Lock();
+                for (int y = 0; y < 16; y++)
+                {
+                    for (int x = 0; x < 16; x++)
+                    {
+                        ushort id = BitConverter.ToUInt16(screenData16, x * 2 + y * 32 + screenId * 0x200);
+                        Level.Draw16xTile(id, x * 16, y * 16, screenBMP.BackBufferStride, screenBMP.BackBuffer);
+                    }
+                }
+                screenBMP.AddDirtyRect(new Int32Rect(0, 0, 256, 256));
+                screenBMP.Unlock();
             }
+            else
+            {
+                screenBMP.Lock();
+                Level.DrawScreen(screenId, screenBMP.BackBufferStride, screenBMP.BackBuffer);
+                screenBMP.AddDirtyRect(new Int32Rect(0, 0, 256, 256));
+                screenBMP.Unlock();
+            }
+        }
+        public void PaintTiles()
+        {
+            updateTiles = false;
             int Id;
             if (Const.Id == Const.GameId.MegaManX3 && Level.Id == 0xE) Id = 0x10; //special case for MMX3 rekt version of dophler 2
             else if (Const.Id == Const.GameId.MegaManX3 && Level.Id > 0xE) Id = (Level.Id - 0xF) + 0xE; //Buffalo or Beetle
@@ -99,7 +116,7 @@ namespace TeheManX_Editor.Forms
                 for (int x = 0; x < 8; x++)
                 {
                     int tileId32 = x + (y * 8) + (page * 0x100);
-                    if(tileId32 > (Const.Tile32Count[Level.Id, Level.BG] - 1))
+                    if (tileId32 > (Const.Tile32Count[Level.Id, Level.BG] - 1))
                     {
                         unsafe
                         {
@@ -126,13 +143,42 @@ namespace TeheManX_Editor.Forms
             tileBMP.AddDirtyRect(new Int32Rect(0, 0, 256, 1024));
             tileBMP.Unlock();
         }
-        public void DrawTile()
+        public void PaintTiles16()
         {
-            if (mode16) //just to make maintaining the code simpler...
+            updateTiles = false;
+            tileBMP16.Lock();
+            for (int y = 0; y < 16; y++)
             {
-                DrawTile16();
-                return;
+                for (int x = 0; x < 16; x++)
+                {
+                    int id = x + (y * 16) + (page16 * 0x100);
+                    if (id > (Const.Tile16Count[Level.Id, Level.BG] - 1))
+                    {
+                        unsafe
+                        {
+                            byte* buffer = (byte*)tileBMP16.BackBuffer;
+                            for (int r = 0; r < 16; r++)
+                            {
+                                for (int c = 0; c < 16; c++)
+                                {
+                                    buffer[(x * 16 + c) * 4 + (y * 16 + r) * tileBMP16.BackBufferStride + 0] = 0;
+                                    buffer[(x * 16 + c) * 4 + (y * 16 + r) * tileBMP16.BackBufferStride + 1] = 0;
+                                    buffer[(x * 16 + c) * 4 + (y * 16 + r) * tileBMP16.BackBufferStride + 2] = 0;
+                                    buffer[(x * 16 + c) * 4 + (y * 16 + r) * tileBMP16.BackBufferStride + 3] = 0xFF;
+                                }
+                            }
+                        }
+                        continue;
+                    }
+                    Level.Draw16xTile(id, x * 16, y * 16, tileBMP16.BackBufferStride, tileBMP16.BackBuffer);
+                }
             }
+            tileBMP16.AddDirtyRect(new Int32Rect(0, 0, 256, 256));
+            tileBMP16.Unlock();
+        }
+        public void PaintTile()
+        {
+            updateTile = false;
             tileBMP_S.Lock();
 
             int Id;
@@ -147,6 +193,26 @@ namespace TeheManX_Editor.Forms
             Level.Draw16xTile(BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(tile32Offset + (selectedTile * 8) + 6)), 16, 16, tileBMP_S.BackBufferStride, tileBMP_S.BackBuffer);
             tileBMP_S.AddDirtyRect(new Int32Rect(0, 0, 32, 32));
             tileBMP_S.Unlock();
+        }
+        public void PaintTile16()
+        {
+            updateTile = false;
+            tileBMP_S16.Lock();
+            Level.Draw16xTile(selectedTile16, 0, 0, tileBMP_S16.BackBufferStride, tileBMP_S16.BackBuffer);
+            tileBMP_S16.AddDirtyRect(new Int32Rect(0, 0, 16, 16));
+            tileBMP_S16.Unlock();
+        }
+        public void DrawScreen()
+        {
+            updateScreen = true;
+        }
+        public void DrawTiles()
+        {
+            updateTiles = true;
+        }
+        public void DrawTile()
+        {
+            updateTile = true;
         }
         private void ChangePageTxt()
         {
@@ -192,56 +258,15 @@ namespace TeheManX_Editor.Forms
         */
         public void DrawScreen16()
         {
-            screenBMP.Lock();
-            for (int y = 0; y < 16; y++)
-            {
-                for (int x = 0; x < 16; x++)
-                {
-                    ushort id = BitConverter.ToUInt16(screenData16, x * 2 + y * 32 + screenId * 0x200);
-                    Level.Draw16xTile(id, x * 16, y * 16, screenBMP.BackBufferStride, screenBMP.BackBuffer);
-                }
-            }
-            screenBMP.AddDirtyRect(new Int32Rect(0, 0, 256, 256));
-            screenBMP.Unlock();
+            updateScreen = true;
         }
         private void DrawTiles16()
         {
-            tileBMP16.Lock();
-            for (int y = 0; y < 16; y++)
-            {
-                for (int x = 0; x < 16; x++)
-                {
-                    int id = x + (y * 16) + (page16 * 0x100);
-                    if (id > (Const.Tile16Count[Level.Id, Level.BG] - 1))
-                    {
-                        unsafe
-                        {
-                            byte* buffer = (byte*)tileBMP16.BackBuffer;
-                            for (int r = 0; r < 16; r++)
-                            {
-                                for (int c = 0; c < 16; c++)
-                                {
-                                    buffer[(x * 16 + c) * 4 + (y * 16 + r) * tileBMP16.BackBufferStride + 0] = 0;
-                                    buffer[(x * 16 + c) * 4 + (y * 16 + r) * tileBMP16.BackBufferStride + 1] = 0;
-                                    buffer[(x * 16 + c) * 4 + (y * 16 + r) * tileBMP16.BackBufferStride + 2] = 0;
-                                    buffer[(x * 16 + c) * 4 + (y * 16 + r) * tileBMP16.BackBufferStride + 3] = 0xFF;
-                                }
-                            }
-                        }
-                        continue;
-                    }
-                    Level.Draw16xTile(id, x * 16, y * 16, tileBMP16.BackBufferStride, tileBMP16.BackBuffer);
-                }
-            }
-            tileBMP16.AddDirtyRect(new Int32Rect(0, 0, 256, 256));
-            tileBMP16.Unlock();
+            updateTiles = true;
         }
         private void DrawTile16()
         {
-            tileBMP_S16.Lock();
-            Level.Draw16xTile(selectedTile16, 0, 0, tileBMP_S16.BackBufferStride, tileBMP_S16.BackBuffer);
-            tileBMP_S16.AddDirtyRect(new Int32Rect(0, 0, 16, 16));
-            tileBMP_S16.Unlock();
+            updateTile = true;
         }
         private void UpdateCursor16() //witch tile is selected in 16x16 mode
         {

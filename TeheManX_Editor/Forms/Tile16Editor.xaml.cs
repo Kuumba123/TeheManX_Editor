@@ -18,6 +18,9 @@ namespace TeheManX_Editor.Forms
         #endregion Fields
 
         #region Properties
+        public bool updateVramTiles;
+        public bool updateTiles;
+        public bool updateTile;
         WriteableBitmap x16BMP = new WriteableBitmap(256, 256, 96, 96, PixelFormats.Bgra32, null);
         WriteableBitmap vramTiles = new WriteableBitmap(128, 512, 96, 96, PixelFormats.Bgra32, null);
         WriteableBitmap tileBMP_S = new WriteableBitmap(16, 16, 96, 96, PixelFormats.Bgra32, null);
@@ -75,8 +78,9 @@ namespace TeheManX_Editor.Forms
             UpdateTile8SelectionUI();
             UpdateTileAttributeUI();
         }
-        public unsafe void DrawVramTiles()
+        public unsafe void PaintVramTiles()
         {
+            updateVramTiles = false;
             vramTiles.Lock();
             byte* buffer = (byte*)vramTiles.BackBuffer;
             int set = palId;
@@ -121,8 +125,9 @@ namespace TeheManX_Editor.Forms
             vramTiles.AddDirtyRect(new Int32Rect(0, 0, 128, 512));
             vramTiles.Unlock();
         }
-        public void Draw16xTiles()
+        public unsafe void PaintTiles()
         {
+            updateTiles = false;
             x16BMP.Lock();
 
             int Id;
@@ -135,7 +140,7 @@ namespace TeheManX_Editor.Forms
                 for (int x = 0; x < 16; x++)
                 {
                     int id = x + (y * 16) + (page * 0x100);
-                    if (id > (Const.Tile16Count[Level.Id,Level.BG]) - 1)
+                    if (id > (Const.Tile16Count[Level.Id, Level.BG]) - 1)
                     {
                         unsafe
                         {
@@ -157,12 +162,25 @@ namespace TeheManX_Editor.Forms
             x16BMP.AddDirtyRect(new Int32Rect(0, 0, 256, 256));
             x16BMP.Unlock();
         }
-        public void DrawTile()
+        public unsafe void PaintTile()
         {
+            updateTile = false;
             tileBMP_S.Lock();
             Level.Draw16xTile(selectedTile, 0, 0, tileBMP_S.BackBufferStride, tileBMP_S.BackBuffer);
             tileBMP_S.AddDirtyRect(new Int32Rect(0, 0, 16, 16));
             tileBMP_S.Unlock();
+        }
+        public unsafe void DrawVramTiles()
+        {
+            updateVramTiles = true;
+        }
+        public void Draw16xTiles()
+        {
+            updateTiles = true;
+        }
+        public void DrawTile()
+        {
+            updateTile = true;
         }
         private void UpdateTile16SelectionUI()
         {

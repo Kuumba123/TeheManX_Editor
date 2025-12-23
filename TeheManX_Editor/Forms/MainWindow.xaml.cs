@@ -9,6 +9,7 @@ using System.Text.Json.Serialization;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 using static TeheManX_Editor.Layout;
 
 namespace TeheManX_Editor.Forms
@@ -100,6 +101,8 @@ namespace TeheManX_Editor.Forms
 
                 LockWindows();
 
+                CompositionTarget.Rendering += CompositionTarget_Rendering;
+
                 string[] args = Environment.GetCommandLineArgs();
 
                 if (args.Length == 2) //Open Game Files using args
@@ -139,6 +142,60 @@ namespace TeheManX_Editor.Forms
                 hub.Visibility = Visibility.Visible;
                 this.Title = "Tehe SubWindow";
             }
+        }
+
+        private void CompositionTarget_Rendering(object? sender, EventArgs e)
+        {
+            //Layout
+            if (window.layoutE.update && (window.layoutE.layoutImage.IsVisible || window.layoutE.selectImage.IsVisible))
+                window.layoutE.Paint();
+
+            //Screen
+            if (window.screenE.updateScreen && (window.screenE.screenImage.IsVisible || window.screenE.screenImage16.IsVisible))
+                window.screenE.PaintScreen();
+
+            if (window.screenE.mode16)
+            {
+                if (window.screenE.updateTiles && window.screenE.tileImage.IsVisible)
+                    window.screenE.PaintTiles16();
+                if (window.screenE.updateTile && window.screenE.tileImageS16.IsVisible)
+                    window.screenE.PaintTile16();
+            }
+            else
+            {
+                if (window.screenE.updateTiles && window.screenE.tileImage.IsVisible)
+                    window.screenE.PaintTiles();
+                if (window.screenE.updateTile && window.screenE.tileImageS.IsVisible)
+                    window.screenE.PaintTile();
+            }
+
+            //Tile 32x32
+            if (window.tile32E.updateTiles32 && window.tile32E.tileImage.IsVisible)
+                window.tile32E.PaintTiles32();
+
+            if (window.tile32E.updateTiles16 && window.tile32E.x16Image.IsVisible)
+                window.tile32E.PaintTiles16();
+
+            if (window.tile32E.updateTile && window.tile32E.tileImageS.IsVisible)
+                window.tile32E.PaintTile();
+
+            //Tile 16x16
+            if (window.tile16E.updateVramTiles && window.tile16E.vramTileImage.IsVisible)
+                window.tile16E.PaintVramTiles();
+
+            if (window.tile16E.updateTiles && window.tile16E.x16Image.IsVisible)
+                window.tile16E.PaintTiles();
+
+            if (window.tile16E.updateTile && window.tile16E.tileImageS.IsVisible)
+                window.tile16E.PaintTile();
+
+            //Palette
+            if (window.paletteE.updateVramTiles && window.paletteE.vramTileImage.IsVisible)
+                window.paletteE.PaintVramTiles();
+
+            //Enemy
+            if (window.enemyE.update && window.enemyE.layoutImage.IsVisible)
+                window.enemyE.Paint();
         }
         #endregion Constructors
 

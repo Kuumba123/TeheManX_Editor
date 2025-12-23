@@ -23,6 +23,7 @@ namespace TeheManX_Editor.Forms
         #endregion Fields
 
         #region Properties
+        public bool update;
         internal WriteableBitmap layoutBMP = new WriteableBitmap(768, 512, 96, 96, PixelFormats.Bgra32, null);
         public int viewerX = 0x400;
         public int viewerY = 0;
@@ -49,76 +50,7 @@ namespace TeheManX_Editor.Forms
         #region Methods
         public void DrawLayout()
         {
-            layoutBMP.Lock();
-
-            int bmpWidth = layoutBMP.PixelWidth;
-            int bmpHeight = layoutBMP.PixelHeight;
-            nint bufferP = layoutBMP.BackBuffer;
-            int stride = layoutBMP.BackBufferStride;
-
-            int tileX = viewerX >> 8;   // 256-pixel screen index
-            int tileY = viewerY >> 8;
-            int offX = viewerX & 0xFF;  // sub-screen offset (0–255)
-            int offY = viewerY & 0xFF;
-
-            unsafe
-            {
-                uint* ptr = (uint*)bufferP;
-                for (int i = 0; i < (768 * 512); i++)
-                {
-                    *ptr = 0xFF000000;
-                    ptr++;
-                }
-            }
-
-            for (int sy = 0; sy < 3; sy++)
-            {
-                for (int sx = 0; sx < 4; sx++)
-                {
-                    int screenIndexX = tileX + sx;
-                    int screenIndexY = tileY + sy;
-
-                    // bounds check so we never index outside Layout
-                    if (screenIndexX < 0 || screenIndexX >= 32) continue;
-                    if (screenIndexY < 0 || screenIndexY >= 32) continue;
-
-                    int layoutIndex = screenIndexY * 32 + screenIndexX;
-
-                    int drawX = sx * 256 - offX;
-                    int drawY = sy * 256 - offY;
-
-                    bool fullyInside =
-                        drawX >= 0 &&
-                        drawY >= 0 &&
-                        (drawX + 256) <= bmpWidth &&
-                        (drawY + 256) <= bmpHeight;
-
-                    if (fullyInside)
-                    {
-                        // non-clamped version (no bmpWidth/bmpHeight args)
-                        Level.DrawScreen(
-                            Level.Layout[Level.Id, Level.BG, layoutIndex],
-                            drawX, drawY,
-                            stride,
-                            bufferP
-                        );
-                    }
-                    else
-                    {
-                        // partially outside - use clamped version
-                        Level.DrawScreen_Clamped(
-                            Level.Layout[Level.Id, Level.BG, layoutIndex],
-                            drawX, drawY,
-                            stride,
-                            bufferP,
-                            bmpWidth, bmpHeight
-                        );
-                    }
-                }
-            }
-
-            layoutBMP.AddDirtyRect(new Int32Rect(0, 0, 768, 512));
-            layoutBMP.Unlock();
+            update = true;
         }
         public void DrawEnemies()
         {
@@ -192,6 +124,80 @@ namespace TeheManX_Editor.Forms
 
                 triggerRects[i].Visibility = Visibility.Visible;
             }
+        }
+        public void Paint()
+        {
+            update = false;
+            layoutBMP.Lock();
+
+            int bmpWidth = layoutBMP.PixelWidth;
+            int bmpHeight = layoutBMP.PixelHeight;
+            nint bufferP = layoutBMP.BackBuffer;
+            int stride = layoutBMP.BackBufferStride;
+
+            int tileX = viewerX >> 8;   // 256-pixel screen index
+            int tileY = viewerY >> 8;
+            int offX = viewerX & 0xFF;  // sub-screen offset (0–255)
+            int offY = viewerY & 0xFF;
+
+            unsafe
+            {
+                uint* ptr = (uint*)bufferP;
+                for (int i = 0; i < (768 * 512); i++)
+                {
+                    *ptr = 0xFF000000;
+                    ptr++;
+                }
+            }
+
+            for (int sy = 0; sy < 3; sy++)
+            {
+                for (int sx = 0; sx < 4; sx++)
+                {
+                    int screenIndexX = tileX + sx;
+                    int screenIndexY = tileY + sy;
+
+                    // bounds check so we never index outside Layout
+                    if (screenIndexX < 0 || screenIndexX >= 32) continue;
+                    if (screenIndexY < 0 || screenIndexY >= 32) continue;
+
+                    int layoutIndex = screenIndexY * 32 + screenIndexX;
+
+                    int drawX = sx * 256 - offX;
+                    int drawY = sy * 256 - offY;
+
+                    bool fullyInside =
+                        drawX >= 0 &&
+                        drawY >= 0 &&
+                        (drawX + 256) <= bmpWidth &&
+                        (drawY + 256) <= bmpHeight;
+
+                    if (fullyInside)
+                    {
+                        // non-clamped version (no bmpWidth/bmpHeight args)
+                        Level.DrawScreen(
+                            Level.Layout[Level.Id, Level.BG, layoutIndex],
+                            drawX, drawY,
+                            stride,
+                            bufferP
+                        );
+                    }
+                    else
+                    {
+                        // partially outside - use clamped version
+                        Level.DrawScreen_Clamped(
+                            Level.Layout[Level.Id, Level.BG, layoutIndex],
+                            drawX, drawY,
+                            stride,
+                            bufferP,
+                            bmpWidth, bmpHeight
+                        );
+                    }
+                }
+            }
+
+            layoutBMP.AddDirtyRect(new Int32Rect(0, 0, 768, 512));
+            layoutBMP.Unlock();
         }
         public void UpdateEnemyLabelPositions()
         {

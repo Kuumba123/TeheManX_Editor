@@ -14,6 +14,9 @@ namespace TeheManX_Editor.Forms
     public partial class Tile32Editor : UserControl
     {
         #region Properties
+        public bool updateTiles32;
+        public bool updateTiles16;
+        public bool updateTile;
         WriteableBitmap x16BMP = new WriteableBitmap(256, 256, 96, 96, PixelFormats.Bgra32, null);
         WriteableBitmap tileBMP = new WriteableBitmap(256, 1024, 96, 96, PixelFormats.Bgra32, null);
         WriteableBitmap tileBMP_S = new WriteableBitmap(32, 32, 96, 96, PixelFormats.Bgra32, null);
@@ -67,8 +70,9 @@ namespace TeheManX_Editor.Forms
             Draw16xTiles();
             DrawTile();
         }
-        public void DrawTiles()
+        public void PaintTiles32()
         {
+            updateTiles32 = false;
             int Id;
             if (Const.Id == Const.GameId.MegaManX3 && Level.Id == 0xE) Id = 0x10; //special case for MMX3 rekt version of dophler 2
             else if (Const.Id == Const.GameId.MegaManX3 && Level.Id > 0xE) Id = (Level.Id - 0xF) + 0xE; //Buffalo or Beetle
@@ -109,8 +113,9 @@ namespace TeheManX_Editor.Forms
             tileBMP.AddDirtyRect(new Int32Rect(0, 0, 256, 1024));
             tileBMP.Unlock();
         }
-        public void Draw16xTiles()
+        public void PaintTiles16()
         {
+            updateTiles16 = false;
             x16BMP.Lock();
             int Id;
             if (Const.Id == Const.GameId.MegaManX3 && Level.Id == 0xE) Id = 0x10; //special case for MMX3 rekt version of dophler 2
@@ -146,8 +151,9 @@ namespace TeheManX_Editor.Forms
             x16BMP.AddDirtyRect(new Int32Rect(0, 0, 256, 256));
             x16BMP.Unlock();
         }
-        public void DrawTile()
+        public void PaintTile()
         {
+            updateTile = false;
             tileBMP_S.Lock();
 
             int Id;
@@ -162,6 +168,18 @@ namespace TeheManX_Editor.Forms
             Level.Draw16xTile(BitConverter.ToUInt16(SNES.rom, tile32Offset + (selectedTile * 8) + 6), 16, 16, tileBMP_S.BackBufferStride, tileBMP_S.BackBuffer);
             tileBMP_S.AddDirtyRect(new Int32Rect(0, 0, 32, 32));
             tileBMP_S.Unlock();
+        }
+        public void DrawTiles()
+        {
+            updateTiles32 = true;
+        }
+        public void Draw16xTiles()
+        {
+            updateTiles16 = true;
+        }
+        public void DrawTile()
+        {
+            updateTile = true;
         }
         private void ChangePageTxt()
         {
@@ -185,7 +203,7 @@ namespace TeheManX_Editor.Forms
             else if (Const.Id == Const.GameId.MegaManX3 && Level.Id > 0xE) Id = (Level.Id - 0xF) + 0xE; //Buffalo or Beetle
             else Id = Level.Id;
 
-            int offset = SNES.CpuToOffset(BitConverter.ToInt32(SNES.rom, Const.Tile32DataPointersOffset[Level.BG] + Id * 3));
+            int offset = SNES.CpuToOffset(BinaryPrimitives.ReadInt32LittleEndian(SNES.rom.AsSpan(Const.Tile32DataPointersOffset[Level.BG] + Id * 3)));
 
             ushort tile16 = BitConverter.ToUInt16(SNES.rom, offset + selectedTile * 8 + (selectedInnerTile * 2));
 
@@ -200,10 +218,14 @@ namespace TeheManX_Editor.Forms
         }
         public void UpdateTile32Ints(int offset)
         {
-            MainWindow.window.tile32E.topLeftInt.Value = BitConverter.ToUInt16(SNES.rom, offset + selectedTile * 8 + 0);
-            MainWindow.window.tile32E.topRightInt.Value = BitConverter.ToUInt16(SNES.rom, offset + selectedTile * 8 + 2);
-            MainWindow.window.tile32E.bottomLeftInt.Value = BitConverter.ToUInt16(SNES.rom, offset + selectedTile * 8 + 4);
-            MainWindow.window.tile32E.bottomRightInt.Value = BitConverter.ToUInt16(SNES.rom, offset + selectedTile * 8 + 6);
+            var rom = SNES.rom.AsSpan();
+
+            int baseOffset = offset + selectedTile * 8;
+
+            MainWindow.window.tile32E.topLeftInt.Value = BinaryPrimitives.ReadUInt16LittleEndian(rom.Slice(baseOffset + 0));
+            MainWindow.window.tile32E.topRightInt.Value = BinaryPrimitives.ReadUInt16LittleEndian(rom.Slice(baseOffset + 2));
+            MainWindow.window.tile32E.bottomLeftInt.Value = BinaryPrimitives.ReadUInt16LittleEndian(rom.Slice(baseOffset + 4));
+            MainWindow.window.tile32E.bottomRightInt.Value = BinaryPrimitives.ReadUInt16LittleEndian(rom.Slice(baseOffset + 6));
         }
         #endregion Methods
 

@@ -22,6 +22,7 @@ namespace TeheManX_Editor.Forms
         #endregion Fields
 
         #region Properties
+        public bool updateVramTiles;
         WriteableBitmap vramTiles = new WriteableBitmap(128, 512, 96, 96, PixelFormats.Bgra32, null);
         Rectangle selectSetRect = new Rectangle() { IsHitTestVisible = false, StrokeThickness = 2.5, StrokeDashArray = new DoubleCollection() { 2.2 }, CacheMode = null, Stroke = Brushes.PapayaWhip };
         public int selectedSet = 0;
@@ -216,8 +217,9 @@ namespace TeheManX_Editor.Forms
             paletteSetInt.Maximum = set - 1;
             DrawSwappablePalette(SNES.CpuToOffset(pointer, Const.PaletteColorBank));
         }
-        public unsafe void DrawVramTiles()
+        public unsafe void PaintVramTiles()
         {
+            updateVramTiles = false;
             vramTiles.Lock();
             byte* buffer = (byte*)vramTiles.BackBuffer;
             int set = selectedSet;
@@ -259,6 +261,10 @@ namespace TeheManX_Editor.Forms
             }
             vramTiles.AddDirtyRect(new Int32Rect(0, 0, 128, 512));
             vramTiles.Unlock();
+        }
+        public unsafe void DrawVramTiles()
+        {
+            updateVramTiles = true;
         }
         public void DrawPalette()
         {

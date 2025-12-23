@@ -39,6 +39,7 @@ namespace TeheManX_Editor.Forms
         #region Constructor
         public TileEditor()
         {
+            suppressInts = true;
             InitializeComponent();
 
             for (int col = 0; col < 16; col++)
@@ -73,6 +74,7 @@ namespace TeheManX_Editor.Forms
             Grid.SetColumnSpan(selectSetRect, 16);
             paletteGrid.Children.Add(selectSetRect);
             objectTilesImage.Source = vramTiles;
+            suppressInts = false;
         }
         #endregion Constructor
 
@@ -186,6 +188,15 @@ namespace TeheManX_Editor.Forms
         }
         private void SetBackgroundEntryValues()
         {
+            if (BGSettings[0][0].Slots.Count == 0)
+            {
+                MainWindow.window.tileE.bgLengthInt.IsEnabled = false;
+                MainWindow.window.tileE.bgAddressInt.IsEnabled = false;
+                MainWindow.window.tileE.bgSrcBox.IsEnabled = false;
+                MainWindow.window.tileE.bgPalInt.IsEnabled = false;
+                return;
+            }
+
             int id = Level.Id;
             int length = BGSettings[id][bgTileSetId].Slots[bgEntrySlotId].Length;
             int dest = BGSettings[id][bgTileSetId].Slots[bgEntrySlotId].VramAddress;
@@ -941,27 +952,27 @@ namespace TeheManX_Editor.Forms
         }
         private void bgTileSetInt_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            if (e.NewValue == null || Level.Id >= Const.PlayableLevelsCount || SNES.rom == null || suppressInts)
+            if (e.NewValue == null || Level.Id >= Const.PlayableLevelsCount || SNES.rom == null || suppressInts || bgTileSetInt == null)
                 return;
             suppressInts = true;
-            bgTileSetId = (byte)(int)e.NewValue;
-            bgEntrySlotInt.Value = 0;
+            bgTileSetId = (byte)(int)MainWindow.window.tileE.bgTileSetInt.Value;
+            MainWindow.window.tileE.bgEntrySlotInt.Value = 0;
             bgEntrySlotId = 0;
             SetBackgroundEntryValues();
             suppressInts = false;
         }
         private void bgEntrySlotInt_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            if (e.NewValue == null || Level.Id >= Const.PlayableLevelsCount || SNES.rom == null || suppressInts)
+            if (e.NewValue == null || Level.Id >= Const.PlayableLevelsCount || SNES.rom == null || suppressInts || bgEntrySlotInt == null)
                 return;
             suppressInts = true;
-            bgEntrySlotId = (int)e.NewValue;
+            bgEntrySlotId = (int)MainWindow.window.tileE.bgEntrySlotInt.Value;
             SetBackgroundEntryValues();
             suppressInts = false;
         }
         private void bgLengthInt_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            if (e.NewValue == null || Level.Id >= Const.PlayableLevelsCount || SNES.rom == null || suppressInts)
+            if (e.NewValue == null || Level.Id >= Const.PlayableLevelsCount || SNES.rom == null || suppressInts || !MainWindow.window.tileE.bgLengthInt.IsEnabled)
                 return;
             int id = Level.Id;
             ushort val = (ushort)(int)e.NewValue;
@@ -972,7 +983,7 @@ namespace TeheManX_Editor.Forms
         }
         private void bgAddressInt_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            if (e.NewValue == null || Level.Id >= Const.PlayableLevelsCount || SNES.rom == null || suppressInts)
+            if (e.NewValue == null || Level.Id >= Const.PlayableLevelsCount || SNES.rom == null || suppressInts || !MainWindow.window.tileE.bgAddressInt.IsEnabled)
                 return;
             int id = Level.Id;
             ushort val = (ushort)(int)e.NewValue;
@@ -983,7 +994,7 @@ namespace TeheManX_Editor.Forms
         }
         private void bgSrcBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            if (Level.Id >= Const.PlayableLevelsCount || SNES.rom == null || _suppressBgSrcBoxTextChanged || suppressInts)
+            if (Level.Id >= Const.PlayableLevelsCount || SNES.rom == null || _suppressBgSrcBoxTextChanged || suppressInts || !MainWindow.window.tileE.bgSrcBox.IsEnabled)
                 return;
 
             int id;
@@ -1013,7 +1024,7 @@ namespace TeheManX_Editor.Forms
         }
         private void bgPalInt_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            if (e.NewValue == null || Level.Id >= Const.PlayableLevelsCount || SNES.rom == null || suppressInts)
+            if (e.NewValue == null || Level.Id >= Const.PlayableLevelsCount || SNES.rom == null || suppressInts || !MainWindow.window.tileE.bgPalInt.IsEnabled)
                 return;
             int id = Level.Id;
             ushort val = (ushort)(int)e.NewValue;
