@@ -49,6 +49,7 @@
                 <Button Style="{StaticResource TileButton}" Click="Tile32PageButton_Click">2</Button>
                 <Button Style="{StaticResource TileButton}" Click="Tile32PageButton_Click">3</Button>
                 <Button Style="{StaticResource TileButton}" Click="Tile32PageButton_Click">4</Button>
+                <Button Style="{StaticResource TileButton}" Click="Tile32PageButton_Click">5</Button>
             </StackPanel>
 
             <!--32x32 Tile List-->

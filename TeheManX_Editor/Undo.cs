@@ -77,7 +77,6 @@ namespace TeheManX_Editor
             undoData[0] = screen;
             undoData[1] = x;
             undoData[2] = y;
-            undoData[3] = 0; // Screen Undo Type
             undoData[4] = (byte)Level.BG;
 
             int Id;
@@ -92,13 +91,47 @@ namespace TeheManX_Editor
 
             return new Undo() { data = undoData, type = UndoType.Screen};
         }
+        internal static Undo CreateGroupScreenUndo(byte screen, byte x, byte y, byte spanC, byte spanR)
+        {
+            byte[] undoData = new byte[7 + spanC * 2 + spanR * 16];
+            undoData[0] = screen;
+            undoData[1] = x;
+            undoData[2] = y;
+            undoData[3] = 1; // Group Undo
+            undoData[4] = (byte)Level.BG;
+            undoData[5] = spanC;
+            undoData[6] = spanR;
+
+            int Id;
+            if (Const.Id == Const.GameId.MegaManX3 && Level.Id == 0xE) Id = 0x10; //special case for MMX3 rekt version of dophler 2
+            else if (Const.Id == Const.GameId.MegaManX3 && Level.Id > 0xE) Id = (Level.Id - 0xF) + 0xE; //Buffalo or Beetle
+            else Id = Level.Id;
+
+            int readBase = SNES.CpuToOffset(BitConverter.ToInt32(SNES.rom, Const.ScreenDataPointersOffset[Level.BG] + Id * 3)) + screen * 0x80;
+
+            int writeOffset = 7;
+
+            for (int r = 0; r < spanR; r++)
+            {
+                for (int c = 0; c < spanC; c++)
+                {
+                    if (x + c > 7)
+                        continue;
+                    if (y + r > 7)
+                        continue;
+                    ushort tileId = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan((x + c) * 2 + (y + r) * 16 + readBase));
+                    BinaryPrimitives.WriteUInt16LittleEndian(undoData.AsSpan(writeOffset), tileId);
+                    writeOffset += 2;
+                }
+            }
+            return new Undo() { data = undoData, type = UndoType.Screen };
+        }
         internal static Undo CreateScreenUndo16(byte screen, byte x, byte y)
         {
             byte[] undoData = new byte[6];
             undoData[0] = screen;
             undoData[1] = x;
             undoData[2] = y;
-            undoData[3] = 0; // Screen Undo Type
 
 
             ushort tileId = BitConverter.ToUInt16(MainWindow.window.screenE.screenData16,screen * 0x200 + x * 2 + y * 32);
@@ -112,7 +145,7 @@ namespace TeheManX_Editor
             undoData[0] = screen;
             undoData[1] = x;
             undoData[2] = y;
-            undoData[3] = 1; // Screen Undo Type
+            undoData[3] = 1; // Group Undo
             undoData[4] = spanC;
             undoData[5] = spanR;
 
@@ -141,6 +174,7 @@ namespace TeheManX_Editor
                 byte screen = this.data[0];
                 byte x = this.data[1];
                 byte y = this.data[2];
+                byte type = this.data[3];
                 byte layer = this.data[4];
 
                 int Id;
@@ -148,10 +182,32 @@ namespace TeheManX_Editor
                 else if (Const.Id == Const.GameId.MegaManX3 && Level.Id > 0xE) Id = (Level.Id - 0xF) + 0xE; //Buffalo or Beetle
                 else Id = Level.Id;
 
-                ushort previousTileId = BinaryPrimitives.ReadUInt16LittleEndian(this.data.AsSpan(5));
-                int offset = x * 2 + y * 16 + screen * 0x80;
-                offset += SNES.CpuToOffset(BitConverter.ToInt32(SNES.rom, Const.ScreenDataPointersOffset[layer] + Id * 3));
-                BinaryPrimitives.WriteUInt16LittleEndian(SNES.rom.AsSpan(offset), previousTileId);
+                if (type == 0)
+                {
+                    int offset = SNES.CpuToOffset(BinaryPrimitives.ReadInt32LittleEndian(SNES.rom.AsSpan(Const.ScreenDataPointersOffset[layer] + Id * 3))) + x * 2 + y * 16 + screen * 0x80;
+                    ushort previousTileId = BinaryPrimitives.ReadUInt16LittleEndian(this.data.AsSpan(5));
+                    BinaryPrimitives.WriteUInt16LittleEndian(SNES.rom.AsSpan(offset), previousTileId);
+                }
+                else // Group Undo
+                {
+                    int offset = SNES.CpuToOffset(BinaryPrimitives.ReadInt32LittleEndian(SNES.rom.AsSpan(Const.ScreenDataPointersOffset[layer] + Id * 3))) + screen * 0x80;
+                    int readOffset = 7;
+
+                    for (int r = 0; r < data[5]; r++)
+                    {
+                        for (int c = 0; c < data[6]; c++)
+                        {
+                            if (x + c > 8)
+                                continue;
+                            if (y + r > 8)
+                                continue;
+                            ushort previousTileId = BinaryPrimitives.ReadUInt16LittleEndian(this.data.AsSpan(readOffset));
+                            readOffset += 2;
+                            int dumpOffset = (x + c) * 2 + (y + r) * 16 + offset;
+                            BinaryPrimitives.WriteUInt16LittleEndian(SNES.rom.AsSpan(dumpOffset), previousTileId);
+                        }
+                    }
+                }
                 MainWindow.window.layoutE.DrawLayout();
                 MainWindow.window.layoutE.DrawScreen();
                 MainWindow.window.enemyE.DrawLayout();
@@ -167,13 +223,12 @@ namespace TeheManX_Editor
 
                 if (type == 0)
                 {
-                    ushort previousTileId = BinaryPrimitives.ReadUInt16LittleEndian(this.data.AsSpan(4));
                     int offset = x * 2 + y * 32 + screen * 0x200;
+                    ushort previousTileId = BinaryPrimitives.ReadUInt16LittleEndian(this.data.AsSpan(4));
                     BinaryPrimitives.WriteUInt16LittleEndian(MainWindow.window.screenE.screenData16.AsSpan(offset), previousTileId);
                 }
-                else if (type == 1)
+                else
                 {
-                    int offset = x * 2 + y * 32 + screen * 0x200;
                     int readOffset = 6;
 
                     for (int r = 0; r < data[5]; r++)

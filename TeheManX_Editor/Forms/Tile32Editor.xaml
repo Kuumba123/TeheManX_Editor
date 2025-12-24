@@ -127,6 +127,7 @@
                 <Button Style="{StaticResource TileButton}" Click="Tile32Button_Click">2</Button>
                 <Button Style="{StaticResource TileButton}" Click="Tile32Button_Click">3</Button>
                 <Button Style="{StaticResource TileButton}" Click="Tile32Button_Click">4</Button>
+                <Button Style="{StaticResource TileButton}" Click="Tile32Button_Click">5</Button>
             </StackPanel>
             <!--Tile Image for Selected 32x32 Tile & Grid Buttons-->
             <WrapPanel Orientation="Horizontal">

@@ -23,8 +23,8 @@ namespace TeheManX_Editor.Forms
         WriteableBitmap tileBMP_S = new WriteableBitmap(32, 32, 96, 96, PixelFormats.Bgra32, null);
         Button past;
         bool screenDown = false; //used in both modes
-        public int page = 0;
-        public int selectedTile = 0; //32x
+        public int page;
+        public int selectedTile; //32x
         public int screenId = 1; //used in both modes
 
         /*16x16 Mode Properties*/
@@ -35,11 +35,11 @@ namespace TeheManX_Editor.Forms
         WriteableBitmap tileBMP16 = new WriteableBitmap(256, 256, 96, 96, PixelFormats.Bgra32, null);
         WriteableBitmap tileBMP_S16 = new WriteableBitmap(16, 16, 96, 96, PixelFormats.Bgra32, null);
         Button past16;
-        public int page16 = 0;
+        public int page16;
         public int screenSelect16 = -1;
-        public int startCol16 = 0;
-        public int startRow16 = 0;
-        public int selectedTile16 = 0; //16x
+        public int startCol16;
+        public int startRow16;
+        public int selectedTile16; //16x
         bool tilesDown16 = false;
         #endregion Properties
 
@@ -231,9 +231,48 @@ namespace TeheManX_Editor.Forms
         }
         public void DeleteScreen()
         {
+            if (Keyboard.IsKeyDown(Key.LeftShift))
+            {
+                var result = MessageBox.Show("Are you sure you want to delete all of the Screens in Layer " + (Level.BG + 1) + "?\nThis cant be un-done", "", MessageBoxButton.YesNo);
+                if (result != MessageBoxResult.Yes)
+                    return;
+
+                if (mode16)
+                    Array.Clear(screenData16, 0, screenData16.Length);
+                else
+                {
+                    int Id;
+                    if (Const.Id == Const.GameId.MegaManX3 && Level.Id == 0xE) Id = 0x10; //special case for MMX3 rekt version of dophler 2
+                    else if (Const.Id == Const.GameId.MegaManX3 && Level.Id > 0xE) Id = (Level.Id - 0xF) + 0xE; //Buffalo or Beetle
+                    else Id = Level.Id;
+
+                    int offset = SNES.CpuToOffset(BinaryPrimitives.ReadInt32LittleEndian(SNES.rom.AsSpan(Const.ScreenDataPointersOffset[Level.BG] + Id * 3)));
+                    Array.Clear(SNES.rom, offset, 0x80 * Const.ScreenCount[Level.Id, Level.BG]);
+                }
+                //Clear Screen Undos of 32x32
+                if (MainWindow.undos.Count != 0)
+                {
+                    for (int i = (MainWindow.undos.Count - 1); i != -1; i--)
+                    {
+                        if (MainWindow.undos[i].type == Undo.UndoType.Screen)
+                            MainWindow.undos.RemoveAt(i);
+                    }
+                }
+                MainWindow.window.layoutE.DrawLayout();
+                MainWindow.window.layoutE.DrawScreen();
+                MainWindow.window.enemyE.DrawLayout();
+                DrawScreen();
+                SNES.edit = true;
+                return;
+            }
             if (mode16)
             {
+                if (MainWindow.undos.Count == Const.MaxUndo)
+                    MainWindow.undos.RemoveAt(0);
+                MainWindow.undos.Add(Undo.CreateGroupScreenUndo16((byte)screenId, 0, 0, 16, 16));
                 Array.Clear(screenData16, screenId * 0x200, 0x200);
+                Update32x32TileList();
+                Update32x32TileCountText();
                 DrawScreen16();
             }
             else
@@ -242,6 +281,10 @@ namespace TeheManX_Editor.Forms
                 if (Const.Id == Const.GameId.MegaManX3 && Level.Id == 0xE) Id = 0x10; //special case for MMX3 rekt version of dophler 2
                 else if (Const.Id == Const.GameId.MegaManX3 && Level.Id > 0xE) Id = (Level.Id - 0xF) + 0xE; //Buffalo or Beetle
                 else Id = Level.Id;
+
+                if (MainWindow.undos.Count == Const.MaxUndo)
+                    MainWindow.undos.RemoveAt(0);
+                MainWindow.undos.Add(Undo.CreateGroupScreenUndo((byte)screenId, 0, 0, 8, 8));;
 
                 int offset = SNES.CpuToOffset(BinaryPrimitives.ReadInt32LittleEndian(SNES.rom.AsSpan(Const.ScreenDataPointersOffset[Level.BG] + Id * 3))) + screenId * 0x80;
                 Array.Clear(SNES.rom, offset, 0x80);
@@ -296,7 +339,7 @@ namespace TeheManX_Editor.Forms
             Grid.SetRowSpan(screenCursor16, 1);
             screenCursor16.Visibility = Visibility.Hidden;
         }
-        public void Update32x32TileList(bool allScreen = false) //Get the 16x16 Tile Screen Data and Create a list of 32x32 Tiles
+        public void Update32x32TileList() //Get the 16x16 Tile Screen Data and Create a list of 32x32 Tiles
         {
             tiles32.Clear();
 
@@ -548,13 +591,13 @@ namespace TeheManX_Editor.Forms
             {
                 for (int i = (MainWindow.undos.Count - 1); i != -1; i--)
                 {
-                    if (MainWindow.undos[i].type == TeheManX_Editor.Undo.UndoType.Screen)
+                    if (MainWindow.undos[i].type == Undo.UndoType.Screen)
                         MainWindow.undos.RemoveAt(i);
                 }
             }
 
             tiles32.Clear();
-            Update32x32TileList(true);
+            Update32x32TileList();
             Update32x32TileCountText();
 
             //Update 16x16 Mode UI before swapping Modes
@@ -968,6 +1011,7 @@ namespace TeheManX_Editor.Forms
 
             //Done
             screenInt.Value = screenId;
+            selectedTile = 0;
             MainWindow.window.layoutE.DrawLayout();
             MainWindow.window.layoutE.DrawScreen();
             MainWindow.window.enemyE.DrawLayout();
