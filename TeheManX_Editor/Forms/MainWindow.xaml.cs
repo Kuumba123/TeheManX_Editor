@@ -129,9 +129,9 @@ namespace TeheManX_Editor.Forms
                     Level.LoadLevelData();
                     //Setup Editor
                     Level.AssignPallete();
+                    window.tileE.CollectData();
                     Level.LoadLevelTiles();
                     window.camE.AssignBorderSettingsLimits();
-                    window.tileE.CollectData();
                     Update();
                     UnlockWindows();
                 }
@@ -143,7 +143,6 @@ namespace TeheManX_Editor.Forms
                 this.Title = "Tehe SubWindow";
             }
         }
-
         private void CompositionTarget_Rendering(object? sender, EventArgs e)
         {
             //Layout
@@ -582,9 +581,9 @@ namespace TeheManX_Editor.Forms
                     undos.Clear();
                     Level.Id = 0;
                     Level.AssignPallete();
+                    window.tileE.CollectData();
                     Level.LoadLevelTiles();
                     window.camE.AssignBorderSettingsLimits();
-                    window.tileE.CollectData();
                     Update();
                     UnlockWindows();
                 }

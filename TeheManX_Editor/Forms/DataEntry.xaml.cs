@@ -13,6 +13,7 @@ namespace TeheManX_Editor.Forms
         #region Properties
         public int slotCount;
         List<ObjectSetting> stageObjectSettings;
+        List<BGSetting> stageBGSettings;
         #endregion
 
         #region Constructors
@@ -24,6 +25,13 @@ namespace TeheManX_Editor.Forms
             {
                 stageObjectSettings = (List<ObjectSetting>)listObj;
                 int count = stageObjectSettings[index].Slots.Count;
+                slotCountInt.Value = count;
+                slotCount = count;
+            }
+            else if (typeof(List<BGSetting>) == listObj.GetType())
+            {
+                stageBGSettings = (List<BGSetting>)listObj;
+                int count = stageBGSettings[index].Slots.Count;
                 slotCountInt.Value = count;
                 slotCount = count;
             }
@@ -40,7 +48,8 @@ namespace TeheManX_Editor.Forms
 
             if (stageObjectSettings != null)
                 stageObjectSettings.RemoveAt(index);
-
+            else if (stageBGSettings != null)
+                stageBGSettings.RemoveAt(index);
 
             items.Children.RemoveAt(index);
         }

@@ -137,21 +137,7 @@ namespace TeheManX_Editor.Forms
 
 
             // Set Background Tile Values
-            if (BGSettings[0][0].Slots.Count != 0)
-            {
-                MainWindow.window.tileE.bgLengthInt.IsEnabled = true;
-                MainWindow.window.tileE.bgAddressInt.IsEnabled = true;
-                MainWindow.window.tileE.bgSrcBox.IsEnabled = true;
-                MainWindow.window.tileE.bgPalInt.IsEnabled = true;
-                SetBackgroundEntryValues();
-            }
-            else
-            {
-                MainWindow.window.tileE.bgLengthInt.IsEnabled = false;
-                MainWindow.window.tileE.bgAddressInt.IsEnabled = false;
-                MainWindow.window.tileE.bgSrcBox.IsEnabled = false;
-                MainWindow.window.tileE.bgPalInt.IsEnabled = false;
-            }
+            SetBackgroundEntryValues();
             // Enable Background Tile UI
             MainWindow.window.tileE.bgTileSetInt.IsEnabled = true;
 
@@ -188,7 +174,8 @@ namespace TeheManX_Editor.Forms
         }
         private void SetBackgroundEntryValues()
         {
-            if (BGSettings[0][0].Slots.Count == 0)
+            int id = Level.Id;
+            if (BGSettings[id][bgTileSetId].Slots.Count == 0)
             {
                 MainWindow.window.tileE.bgLengthInt.IsEnabled = false;
                 MainWindow.window.tileE.bgAddressInt.IsEnabled = false;
@@ -197,7 +184,6 @@ namespace TeheManX_Editor.Forms
                 return;
             }
 
-            int id = Level.Id;
             int length = BGSettings[id][bgTileSetId].Slots[bgEntrySlotId].Length;
             int dest = BGSettings[id][bgTileSetId].Slots[bgEntrySlotId].VramAddress;
             int srcAddr = BGSettings[id][bgTileSetId].Slots[bgEntrySlotId].CpuAddress;
@@ -237,7 +223,7 @@ namespace TeheManX_Editor.Forms
                     int specOffset = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(Const.CompressedTilesSwapInfoOffset + compressedTileId * 2)) + Const.CompressedTilesSwapInfoOffset;
                     int srcOffset = 0;
 
-                    Level.DecompressTiles2(compressedTileId, Bank7F, 0, Const.Id);
+                    Level.DecompressTiles2(compressedTileId, Bank7F, 0);
 
                     while (true)
                     {
@@ -919,19 +905,12 @@ namespace TeheManX_Editor.Forms
         #region Events
         private void RedrawBtn_Click(object sender, RoutedEventArgs e)
         {
-            if (Level.Id >= Const.PlayableLevelsCount || MainWindow.window.tileE.bgTileSetInt.Value == null)
+            if (Level.Id >= Const.PlayableLevelsCount || MainWindow.window.tileE.bgTileSetInt.Value == null || !MainWindow.window.tileE.bgTileSetInt.IsEnabled)
                 return;
-
-            int id;
-            if (Const.Id == Const.GameId.MegaManX3 && Level.Id > 0xE) id = (Level.Id - 0xF) + 2; //Buffalo or Beetle
-            else id = Level.Id;
-
-            int listOffset = BitConverter.ToUInt16(SNES.rom, Const.BackgroundTileInfoOffset + id * 2) + Const.BackgroundTileInfoOffset;
-            int offset = BitConverter.ToUInt16(SNES.rom, listOffset + (int)MainWindow.window.tileE.bgTileSetInt.Value * 2) + Const.BackgroundTileInfoOffset;
 
             Level.TileSet = (int)MainWindow.window.tileE.bgTileSetInt.Value;
 
-            if (BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset)) != 0)
+            if (bgLengthInt.IsEnabled)
             {
                 if (freshCheck.IsChecked == true)
                     Level.LoadLevelTiles();
@@ -964,8 +943,8 @@ namespace TeheManX_Editor.Forms
             if (e.NewValue == null || Level.Id >= Const.PlayableLevelsCount || SNES.rom == null || suppressInts)
                 return;
             suppressInts = true;
-            bgTileSetId = (byte)(int)MainWindow.window.tileE.bgTileSetInt.Value;
-            MainWindow.window.tileE.bgEntrySlotInt.Value = 0;
+            bgTileSetId = (int)MainWindow.window.tileE.bgTileSetInt.Value;
+            bgEntrySlotInt.Value = 0;
             bgEntrySlotId = 0;
             SetBackgroundEntryValues();
             suppressInts = false;
@@ -1079,7 +1058,110 @@ namespace TeheManX_Editor.Forms
         }
         private void EditBGSlotCountBtn_Click(object sender, RoutedEventArgs e)
         {
+            if (SNES.rom == null || !MainWindow.window.tileE.bgTileSetInt.IsEnabled || Level.Id >= Const.PlayableLevelsCount)
+                return;
 
+            List<BGSetting> trueCopy = BGSettings[Level.Id].Select(os => new BGSetting(os)).ToList();
+
+            Window window = new Window() { WindowStartupLocation = WindowStartupLocation.CenterScreen, Title = "BG Tiles Settings", ResizeMode = ResizeMode.CanMinimize };
+            window.Width = 310;
+            window.MinWidth = 310;
+            window.MaxWidth = 310;
+            window.Height = 760;
+
+            StackPanel stackPanel = new StackPanel();
+
+            for (int i = 0; i < trueCopy.Count; i++)
+            {
+                DataEntry entry = new DataEntry(trueCopy, i);
+                stackPanel.Children.Add(entry);
+            }
+
+            ScrollViewer scrollViewer = new ScrollViewer();
+            scrollViewer.Content = stackPanel;
+
+            Button confirmBtn = new Button() { Content = "Confirm" };
+            confirmBtn.Click += (s, ev) =>
+            {
+                for (int i = 0; i < trueCopy.Count; i++)
+                {
+                    int neededSlots = ((DataEntry)(stackPanel.Children[i])).slotCount;
+
+                    while (trueCopy[i].Slots.Count < neededSlots)
+                    {
+                        BGSlot slot = new BGSlot();
+                        slot.Length = 32;
+                        slot.VramAddress = 0x1100;
+                        int address = Const.Id == Const.GameId.MegaManX ? 0x808000 : 0x8000;
+                        slot.CpuAddress = address;
+                        slot.PaletteId = 0xC;
+                        trueCopy[i].Slots.Add(slot);
+                    }
+                    while (trueCopy[i].Slots.Count > neededSlots)
+                        trueCopy[i].Slots.RemoveAt(trueCopy[i].Slots.Count - 1);
+                }
+
+                List<BGSetting> uneditedList = BGSettings[Level.Id];
+                BGSettings[Level.Id] = trueCopy;
+
+                int bgStages = Const.Id == Const.GameId.MegaManX3 ? 0xF : Const.PlayableLevelsCount;
+
+                int[] maxAmount = new int[bgStages];
+                int[] shared = new int[bgStages];
+                GetMaxBGSettingsFromRom(maxAmount, shared);
+
+                if (false) //no stages share data when using json
+                {
+                    for (int i = 0; i < bgStages; i++)
+                        shared[i] = -1;
+                }
+
+                int length = CreateBGSettingsData(BGSettings, shared).Length;
+
+                if (length > Const.BackgroundTileInfoLength)
+                {
+                    BGSettings[Level.Id] = uneditedList;
+                    MessageBox.Show($"The new BG Tile Info length exceeds the maximum allowed space in the ROM (0x{length:X} vs max of 0x{Const.BackgroundTileInfoLength:X}). Please lower some counts for this or another stage.");
+                    return;
+                }
+
+                AssignLimits();
+                SNES.edit = true;
+                MessageBox.Show("BG Slot counts updated!");
+                window.Close();
+            };
+            Grid.SetRow(confirmBtn, 2);
+
+            Button addBtn = new Button() { Content = "Add Setting" };
+            addBtn.Click += (s, e) =>
+            {
+                int newIndex = trueCopy.Count;
+                BGSlot slot = new BGSlot();
+                slot.Length = 32;
+                slot.VramAddress = 0x1100;
+                int address = Const.Id == Const.GameId.MegaManX ? 0x808000 : 0x8000;
+                slot.CpuAddress = address;
+                slot.PaletteId = 0xC;
+
+                BGSetting bgSetting = new BGSetting();
+                bgSetting.Slots.Add(slot);
+                trueCopy.Add(bgSetting);
+
+                DataEntry entry = new DataEntry(trueCopy, newIndex);
+                stackPanel.Children.Add(entry);
+            };
+            Grid.SetRow(addBtn, 1);
+
+            Grid grid = new Grid();
+            grid.RowDefinitions.Add(new RowDefinition());
+            grid.RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
+            grid.RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
+            grid.Children.Add(scrollViewer);
+            grid.Children.Add(confirmBtn);
+            grid.Children.Add(addBtn);
+            grid.Background = Brushes.Black;
+            window.Content = grid;
+            window.ShowDialog();
         }
         private void LoadBtn_Click(object sender, RoutedEventArgs e)
         {
@@ -1216,6 +1298,8 @@ namespace TeheManX_Editor.Forms
 
             Window window = new Window() { WindowStartupLocation = WindowStartupLocation.CenterScreen, Title = "Object Tiles Settings" , ResizeMode = ResizeMode.CanMinimize};
             window.Width = 310;
+            window.MinWidth = 310;
+            window.MaxWidth = 310;
             window.Height = 760;
 
             StackPanel stackPanel = new StackPanel();
@@ -1258,16 +1342,18 @@ namespace TeheManX_Editor.Forms
                 int[] shared = new int[objectStages];
                 GetMaxObjectSettingsFromRom(maxAmount, shared);
 
-                if (false) //no stages share data when using json
+                if (false) //no stages share data when using json (NOTE: X1 should probably have some extra logic because of the non playable stages)
                 {
                     for (int i = 0; i < objectStages; i++)
                         shared[i] = -1;
                 }
 
-                if (CreateObjectSettingsData(ObjectSettings, shared).Length > Const.ObjectTileInfoLength)
+                int length = CreateObjectSettingsData(ObjectSettings, shared).Length;
+
+                if (length > Const.ObjectTileInfoLength)
                 {
                     ObjectSettings[Level.Id] = uneditedList;
-                    MessageBox.Show($"The new Object Tile Info length exceeds the maximum allowed space in the ROM (0x{Const.ObjectTileInfoLength:X}). Please lower some counts for this or another stage.");
+                    MessageBox.Show($"The new Object Tile Info length exceeds the maximum allowed space in the ROM (0x{length:X} vs max of 0x{Const.ObjectTileInfoLength:X}). Please lower some counts for this or another stage.");
                     return;
                 }
 

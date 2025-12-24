@@ -32,7 +32,7 @@ namespace TeheManX_Editor
             TileSet = 0;
             LoadLayouts();
             LoadEnemyData();
-            DefaultObjectTiles = DecompressTiles(0xA, Const.Id);
+            DefaultObjectTiles = DecompressTiles(0xA);
         }
         public static unsafe void Draw16xTile(int id, int x, int y, int stride, IntPtr dest)
         {
@@ -940,34 +940,34 @@ namespace TeheManX_Editor
             int id;
             if (Const.Id == Const.GameId.MegaManX3 && Id > 0xE) id = (Id & 1) + 2; //Buffalo or Beetle
             else id = Id;
-            
-            int stageOffset = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(Const.BackgroundTileInfoOffset + id * 2)) + Const.BackgroundTileInfoOffset;
-            int offset = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(stageOffset + TileSet * 2)) + Const.BackgroundTileInfoOffset;
 
-            ushort transferSize = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset));
+            int set = TileSet;
+            int slot = 0;
 
-            while (transferSize != 0)
+            while (slot != TileEditor.BGSettings[id][set].Slots.Count)
             {
-                ushort vramAddress = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + 2));
-                int srcOffset = SNES.CpuToOffset(BinaryPrimitives.ReadInt32LittleEndian(SNES.rom.AsSpan(offset + 4)));
+                //Transfer VRAM Tiles Data
+                ushort transferSize = TileEditor.BGSettings[id][set].Slots[slot].Length;
+                ushort vramAddress = TileEditor.BGSettings[id][set].Slots[slot].VramAddress;
+                int srcOffset = SNES.CpuToOffset(TileEditor.BGSettings[id][set].Slots[slot].CpuAddress);
 
-                try
+                int destOffset = (vramAddress * 2) - 0x2000;
+                int romSize = SNES.rom.Length;
+                int vramSize = Tiles.Length;
+                for (int i = 0; i < transferSize; i++)
                 {
-                    int dest = (vramAddress * 2) - 0x2000;
-                    Array.Copy(SNES.rom, srcOffset, Tiles, dest, transferSize);
+                    if (srcOffset < romSize && srcOffset > -1 && destOffset < vramSize && destOffset > -1)
+                        Tiles[destOffset] = SNES.rom[srcOffset];
+                    srcOffset++;
+                    destOffset++;
+                }
 
-                }
-                catch (Exception)
-                {
-                    MessageBox.Show($"Error happened when loading Tile Graphics from ROM offset 0x{srcOffset:X}\nCorrupted ROM ?", "ERROR");
-                    Application.Current.Shutdown();
-                }
                 //Now for the Pallete Data
-                int palInfoOffset = 0;
                 ushort palId = 0;
+                int palInfoOffset = 0;
                 try
                 {
-                    palId = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + 7));
+                    palId = TileEditor.BGSettings[id][set].Slots[slot].PaletteId;
                     palInfoOffset = SNES.CpuToOffset(BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(Const.PaletteInfoOffset + palId)), Const.PaletteBank);
 
                     while (SNES.rom[palInfoOffset] != 0)
@@ -998,8 +998,7 @@ namespace TeheManX_Editor
                 }
 
                 //Next Transfer
-                offset += 9;
-                transferSize = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset));
+                slot++;
             }
         }
         public static void DecompressLevelTiles() //also loads dynamic background tiles and pallete data for those tiles
@@ -1014,14 +1013,14 @@ namespace TeheManX_Editor
             if (SNES.rom[infoOffset] != 0xFF)
             {
                 int compressId = SNES.rom[infoOffset]; //which compressed tile Id to load
-                DecompressTiles2(compressId, Tiles, 0x200, Const.Id);
+                DecompressTiles2(compressId, Tiles, 0x200);
             }
         }
-        public static byte[] DecompressTiles(int compressedTileId, Const.GameId gameId)
+        public static byte[] DecompressTiles(int compressedTileId)
         {
             byte[] decompressed = null;
 
-            if (gameId == Const.GameId.MegaManX)
+            if (Const.Id == Const.GameId.MegaManX)
             {
                 int addr_W = 0;
                 int addr_R = SNES.CpuToOffset(BinaryPrimitives.ReadInt32LittleEndian(SNES.rom.AsSpan((compressedTileId * 5) + Const.CompressedTileInfoOffset + 2)));
@@ -1123,12 +1122,12 @@ namespace TeheManX_Editor
 
             return decompressed;
         }
-        public static byte[] DecompressTiles2(int compressedTileId, byte[] dest, int destOffset, Const.GameId gameId)
+        public static byte[] DecompressTiles2(int compressedTileId, byte[] dest, int destOffset)
         {
             byte[] decompressed = dest;
             int addr_W = destOffset;
 
-            if (gameId == Const.GameId.MegaManX)
+            if (Const.Id == Const.GameId.MegaManX)
             {
                 int addr_R = SNES.CpuToOffset(BinaryPrimitives.ReadInt32LittleEndian(SNES.rom.AsSpan((compressedTileId * 5) + Const.CompressedTileInfoOffset + 2)));
                 ushort size = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(compressedTileId * 5 + Const.CompressedTileInfoOffset));
