@@ -14,16 +14,24 @@ namespace TeheManX_Editor.Forms
         #region Properties
         List<NumInt> borderInts = new List<NumInt>();
         public bool triggersEnabled;
+        private bool suppressInts;
         #endregion Properties
 
         #region Fields
         private static bool raidoEnable;
         private static bool added;
+        public static List<List<CameraTrigger>> CameraTriggers = new List<List<CameraTrigger>>();
+        public static int[] CameraBorderSettings;
+
+        private static int cameraTriggerId;
+        private static int cameraBorderSettingId;
         #endregion Fields
 
         #region Constructors
         public CameraEditor()
         {
+            suppressInts = true;
+            raidoEnable = false;
             InitializeComponent();
 
             if (!added)
@@ -44,27 +52,37 @@ namespace TeheManX_Editor.Forms
                     borderPannel.Children.Add(num);
                 }
             }
+            suppressInts = false;
+            raidoEnable = true;
         }
         #endregion Constructors
 
         #region Methods
-        public void AssignBorderSettingsLimits()
+        public void CollectData()
         {
+            CameraBorderSettings = new int[Const.MaxTotalCameraSettings];
+            Buffer.BlockCopy(SNES.rom, Const.CameraSettingsOffset, CameraBorderSettings, 0, Const.MaxTotalCameraSettings * 4);
+
+            int cameraStages = Const.Id == Const.GameId.MegaManX3 ? 0xF : Const.PlayableLevelsCount;
+            int[] maxAmount = new int[cameraStages];
+            int[] shared = new int[cameraStages];
+            GetMaxCameraTriggersFromRom(maxAmount, shared);
+            CameraTriggers = CollectCameraTriggersFromRom(maxAmount, shared);
+
+            suppressInts = true;
             raidoEnable = false;
+
             int max = Const.MaxTotalCameraSettings - 1;
 
             MainWindow.window.camE.borderSettingInt.Maximum = max;
-
-            if (MainWindow.window.camE.borderSettingInt.Value > max)
-                MainWindow.window.camE.borderSettingInt.Value = max;
+            MainWindow.window.camE.borderSettingInt.Value = 0;
+            cameraBorderSettingId = 0;
 
             for (int i = 0; i < 4; i++)
                 borderInts[i].Maximum = max;
 
-            int offset = Const.CameraSettingsOffset + (int)MainWindow.window.camE.borderSettingInt.Value * 4;
-
-            ushort param = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + 0));
-            ushort value = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + 2));
+            ushort param = (ushort)(CameraBorderSettings[0]);
+            ushort value = (ushort)(CameraBorderSettings[0] >> 16);
 
             if (param == Const.CameraBorderLeftWRAM)
                 leftBtn.IsChecked = true;
@@ -75,13 +93,13 @@ namespace TeheManX_Editor.Forms
             else
                 bottomBtn.IsChecked = true;
 
-            raidoEnable = true;
-
             MainWindow.window.camE.valueInt.Value = value;
+            raidoEnable = true;
+            suppressInts = false;
         }
         public void AssignTriggerLimits()
         {
-            if (Level.Id >= Const.PlayableLevelsCount || (Const.Id == Const.GameId.MegaManX3 && Level.Id > 0xE) || BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(Const.CameraTriggersOffset + Level.Id * 2)) == 0)
+            if (Level.Id >= Const.PlayableLevelsCount || (Const.Id == Const.GameId.MegaManX3 && Level.Id > 0xE) || CameraTriggers[Level.Id].Count == 0)
             {
                 triggersEnabled = false;
                 MainWindow.window.camE.triggerInt.IsEnabled = false;
@@ -93,147 +111,230 @@ namespace TeheManX_Editor.Forms
                 MainWindow.window.camE.topInt.IsEnabled = false;
                 return;
             }
-
-            //Calculate the amount of Camera Triggers there are in the Stage
-            int maxTriggers = 0;
-            int maxLevels = (Const.Id == Const.GameId.MegaManX3) ? 0xF : Const.PlayableLevelsCount;
-
-            ushort[] offsetList = new ushort[maxLevels];
-            for (int i = 0; i < maxLevels; i++)
-                offsetList[i] = BitConverter.ToUInt16(SNES.rom, Const.CameraTriggersOffset + i * 2);
-
-            int maxIndex = 0;
-            for (int i = 0; i < offsetList.Length; i++)
-            {
-                if (offsetList[i] > offsetList[maxIndex])
-                    maxIndex = i;
-            }
-
-            int tempOffset = Const.CameraTriggersOffset + maxLevels * 2;
-            int endOffset = SNES.CpuToOffset(offsetList[maxIndex], Const.CameraSettingsBank);
-
-            int lowestPointer = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(tempOffset));
-
-            while (tempOffset != endOffset)
-            {
-                int addr = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(tempOffset));
-
-                if (addr < lowestPointer)
-                    lowestPointer = addr;
-                tempOffset += 2;
-            }
-
-            int introFirstOffset = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(Const.CameraTriggersOffset)); //just for X2...
-            ushort currentOffset = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(Const.CameraTriggersOffset + Level.Id * 2));
-            int currentIndex = Array.IndexOf(offsetList, currentOffset);
-
-            if (Level.Id == 0xC && Const.Id == Const.GameId.MegaManX2 && BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(SNES.CpuToOffset(introFirstOffset, Const.CameraSettingsBank))) == currentOffset)
-            {
-                triggersEnabled = false;
-                MainWindow.window.camE.triggerInt.IsEnabled = false;
-                for (int i = 0; i < 4; i++)
-                    MainWindow.window.camE.borderInts[i].IsEnabled = false;
-                MainWindow.window.camE.rightInt.IsEnabled = false;
-                MainWindow.window.camE.leftInt.IsEnabled = false;
-                MainWindow.window.camE.bottomInt.IsEnabled = false;
-                MainWindow.window.camE.topInt.IsEnabled = false;
-                return;
-            }
-            else if (currentIndex == maxIndex)
-                maxTriggers = ((lowestPointer - currentOffset) / 2) - 1;
-            else
-                maxTriggers = ((offsetList[currentIndex + 1] - currentOffset) / 2) - 1;
-
-            
-            if (MainWindow.window.camE.triggerInt.Value > maxTriggers)
-                MainWindow.window.camE.triggerInt.Value = maxTriggers;
-            MainWindow.window.camE.triggerInt.Maximum = maxTriggers;
-
-            int listOffset = BitConverter.ToUInt16(SNES.rom, Const.CameraTriggersOffset + Level.Id * 2);
-            int offset = SNES.CpuToOffset(BitConverter.ToUInt16(SNES.rom, SNES.CpuToOffset(listOffset + (int)MainWindow.window.camE.triggerInt.Value * 2, Const.CameraSettingsBank)), Const.CameraSettingsBank);
-            SetTriggerIntValues(offset);
+            suppressInts = true;
+            int max = CameraTriggers[Level.Id].Count - 1;
+            triggerInt.Maximum = max;
+            MainWindow.window.camE.triggerInt.Value = 0;
+            cameraTriggerId = 0;
+            SetTriggerIntValues();
+            suppressInts = false;
         }
-        private void SetTriggerIntValues(int offset)
+        private void SetTriggerIntValues()
         {
             triggersEnabled = true;
             MainWindow.window.camE.triggerInt.IsEnabled = true;
-
             for (int i = 0; i < 4; i++)
+                MainWindow.window.camE.borderInts[i].IsEnabled = true;
+
+            int id = Level.Id;
+
+            for (int i = 0; i < CameraTriggers[id][cameraTriggerId].BorderSettings.Count; i++)
             {
-                if (SNES.rom[offset + 8 + i] == 0)
-                {
-                    while (i < 4)
-                    {
-                        borderInts[i].IsEnabled = false;
-                        i++;
-                    }
-                    break;
-                }
                 //Get Camera Setting Ids
-                borderInts[i].Value = SNES.rom[offset + 8 + i] - 1;
+                borderInts[i].Value = CameraTriggers[id][cameraTriggerId].BorderSettings[i] - 1;
                 borderInts[i].IsEnabled = true;
             }
 
-            MainWindow.window.camE.rightInt.Value = BitConverter.ToUInt16(SNES.rom, offset);
-            MainWindow.window.camE.leftInt.Value = BitConverter.ToUInt16(SNES.rom, offset + 2);
-            MainWindow.window.camE.bottomInt.Value = BitConverter.ToUInt16(SNES.rom, offset + 4);
-            MainWindow.window.camE.topInt.Value = BitConverter.ToUInt16(SNES.rom, offset + 6);
+            MainWindow.window.camE.rightInt.Value = CameraTriggers[id][cameraTriggerId].RightSide;
+            MainWindow.window.camE.leftInt.Value = CameraTriggers[id][cameraTriggerId].LeftSide;
+            MainWindow.window.camE.bottomInt.Value = CameraTriggers[id][cameraTriggerId].BottomSide;
+            MainWindow.window.camE.topInt.Value = CameraTriggers[id][cameraTriggerId].TopSide;
 
             MainWindow.window.camE.rightInt.IsEnabled = true;
             MainWindow.window.camE.leftInt.IsEnabled = true;
             MainWindow.window.camE.bottomInt.IsEnabled = true;
             MainWindow.window.camE.topInt.IsEnabled = true;
         }
+        public static void GetMaxCameraTriggersFromRom(int[] destAmount, int[] shared = null)
+        {
+            int cameraStages = Const.Id == Const.GameId.MegaManX3 ? 0xF : Const.PlayableLevelsCount;
+
+            if (shared == null)
+                shared = new int[cameraStages];
+
+            for (int i = 0; i < cameraStages; i++)
+                shared[i] = -1;
+
+            ushort[] offsets = new ushort[cameraStages];
+            ushort[] sortedOffsets = new ushort[cameraStages];
+            Buffer.BlockCopy(SNES.rom, Const.CameraTriggersOffset, offsets, 0, cameraStages * 2);
+            Array.Copy(offsets, sortedOffsets, cameraStages);
+            Array.Sort(sortedOffsets);
+
+            for (int i = 0; i < cameraStages; i++)
+            {
+                if (i == 0) continue;
+
+                ushort stageOffset = offsets[i];
+
+                for (int j = i; j != 0; j--)
+                {
+                    if (i == j) continue;
+                    ushort currentOffset = offsets[j];
+                    if (stageOffset == currentOffset)
+                    {
+                        shared[i] = j;
+                        break;
+                    }
+                }
+            }
+
+            int[] maxAmounts = destAmount;
+
+            int maxIndex = 0;
+            for (int j = 0; j < offsets.Length; j++)
+            {
+                if (sortedOffsets[j] > sortedOffsets[maxIndex])
+                    maxIndex = j;
+            }
+
+            for (int i = 0; i < cameraStages; i++)
+            {
+                if (shared[i] != -1)
+                {
+                    maxAmounts[i] = maxAmounts[shared[i]];
+                    continue;
+                }
+
+                ushort toFindOffset = offsets[i];
+
+                if (Array.IndexOf(sortedOffsets, toFindOffset) != maxIndex)
+                {
+                    int index = Array.IndexOf(sortedOffsets, toFindOffset);
+
+                    while (sortedOffsets[index] == sortedOffsets[index + 1])
+                        index++;
+                    maxAmounts[i] = ((sortedOffsets[index + 1] - toFindOffset) / 2);
+                }
+                else //Last Stage
+                {
+                    int tempOffset = Const.CameraTriggersOffset + cameraStages * 2;
+                    int endOffset = SNES.CpuToOffset(offsets[maxIndex], Const.CameraSettingsBank);
+
+                    int lowestPointer = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(tempOffset));
+
+                    while (tempOffset != endOffset)
+                    {
+                        int addr = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(tempOffset));
+
+                        if (addr < lowestPointer)
+                            lowestPointer = addr;
+                        tempOffset += 2;
+                    }
+                    ushort currentOffset = offsets[i];
+                    int max = ((lowestPointer - currentOffset) / 2);
+
+                    for (int j = 0; j < max; j++)
+                    {
+                        if (BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(currentOffset + j * 2)) == 0)
+                        {
+                            max = j;
+                            break;
+                        }
+                    }
+
+                    maxAmounts[i] = max;
+                }
+            }
+        }
+        public static List<List<CameraTrigger>> CollectCameraTriggersFromRom(int[] destAmount, int[] shared)
+        {
+            List<List<CameraTrigger>> sourceSettings = new List<List<CameraTrigger>>();
+            int cameraStages = Const.Id == Const.GameId.MegaManX3 ? 0xF : Const.PlayableLevelsCount;
+
+            for (int i = 0; i < cameraStages; i++)
+            {
+                List<CameraTrigger> triggerSettings = new List<CameraTrigger>();
+                for (int j = 0; j < destAmount[i]; j++)
+                {
+                    int listOffset = SNES.CpuToOffset(BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(Const.CameraTriggersOffset + i * 2)), Const.CameraSettingsBank);
+                    int offset = SNES.CpuToOffset(BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(listOffset + j * 2)), Const.CameraSettingsBank);
+
+                    CameraTrigger setting = new CameraTrigger();
+                    setting.RightSide = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset));
+                    setting.LeftSide = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + 2));
+                    setting.BottomSide = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + 4));
+                    setting.TopSide = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + 6));
+                    offset += 8;
+
+                    while (true)
+                    {
+                        byte borderSetting = SNES.rom[offset];
+
+                        if (borderSetting == 0)
+                            break;
+                        offset++;
+                        setting.BorderSettings.Add(borderSetting);
+                    }
+                    triggerSettings.Add(setting);
+                }
+                sourceSettings.Add(triggerSettings);
+            }
+            return sourceSettings;
+        }
         #endregion Methods
 
         #region Events
         private void triggerInt_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            if (e.NewValue == null || SNES.rom == null) return;
-
-            int listOffset = BitConverter.ToUInt16(SNES.rom, Const.CameraTriggersOffset + Level.Id * 2);
-            int offset = SNES.CpuToOffset(BitConverter.ToUInt16(SNES.rom, SNES.CpuToOffset(listOffset + (int)MainWindow.window.camE.triggerInt.Value * 2, Const.CameraSettingsBank)), Const.CameraSettingsBank);
-            SetTriggerIntValues(offset);
+            if (e.NewValue == null || SNES.rom == null || suppressInts) return;
+            cameraTriggerId = (int)e.NewValue;
+            suppressInts = true;
+            SetTriggerIntValues();
+            suppressInts = false;
         }
         private void BorderSettingListInt_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e) //For Trigger Settings
         {
-            if (e.NewValue == null || SNES.rom == null) return;
+            if (e.NewValue == null || SNES.rom == null || suppressInts) return;
+            
+            int index = int.Parse(((NumInt)sender).Uid);
+            byte valueNew = (byte)(int)e.NewValue;
+            int id = Level.Id;
 
-            int listOffset = BitConverter.ToUInt16(SNES.rom, Const.CameraTriggersOffset + Level.Id * 2);
-            int offset = SNES.CpuToOffset(BitConverter.ToUInt16(SNES.rom, SNES.CpuToOffset(listOffset + (int)MainWindow.window.camE.triggerInt.Value * 2, Const.CameraSettingsBank)), Const.CameraSettingsBank);
+            if (CameraTriggers[id][cameraTriggerId].BorderSettings[index] == valueNew)
+                return;
 
-            offset += int.Parse(((NumInt)sender).Uid) + 8;
-
-            byte value = SNES.rom[offset];
-
-            if (value == (byte)(int)e.NewValue + 1) return;
-
-            SNES.rom[offset] = value;
+            CameraTriggers[id][cameraTriggerId].BorderSettings[index] = valueNew;
             SNES.edit = true;
         }
         private void SideInt_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e) //RLBT
         {
-            if (e.NewValue == null || SNES.rom == null) return;
+            if (e.NewValue == null || SNES.rom == null || suppressInts) return;
 
-            int listOffset = BitConverter.ToUInt16(SNES.rom, Const.CameraTriggersOffset + Level.Id * 2);
-            int offset = SNES.CpuToOffset(BitConverter.ToUInt16(SNES.rom, SNES.CpuToOffset(listOffset + (int)MainWindow.window.camE.triggerInt.Value * 2, Const.CameraSettingsBank)), Const.CameraSettingsBank);
+            int spec = int.Parse(((NumInt)sender).Uid);
+            ushort valueNew = (ushort)(int)e.NewValue;
+            int id = Level.Id;
 
-            offset += int.Parse(((NumInt)sender).Uid);
-
-            ushort value = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset));
-
-            if (value == (ushort)(int)e.NewValue) return;
-
-            BinaryPrimitives.WriteUInt16LittleEndian(SNES.rom.AsSpan(offset), (ushort)(int)e.NewValue);
+            if (spec == 0)
+            {
+                if (CameraTriggers[id][cameraTriggerId].RightSide == valueNew) return;
+                CameraTriggers[id][cameraTriggerId].RightSide = valueNew;
+            }
+            else if (spec == 2)
+            {
+                if (CameraTriggers[id][cameraTriggerId].LeftSide == valueNew) return;
+                CameraTriggers[id][cameraTriggerId].LeftSide = valueNew;
+            }
+            else if (spec == 4)
+            {
+                if (CameraTriggers[id][cameraTriggerId].BottomSide == valueNew) return;
+                CameraTriggers[id][cameraTriggerId].BottomSide = valueNew;
+            }
+            else
+            {
+                if (CameraTriggers[id][cameraTriggerId].TopSide == valueNew) return;
+                CameraTriggers[id][cameraTriggerId].TopSide = valueNew;
+            }
             SNES.edit = true;
-            MainWindow.window.enemyE.UpdateEnemyLabelPositions();
         }
         private void borderSettingInt_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            if (e.NewValue == null || SNES.rom == null) return;
+            if (e.NewValue == null || SNES.rom == null || suppressInts) return;
 
-            ushort param = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(Const.CameraSettingsOffset + (int)e.NewValue * 4 + 0));
-            ushort value = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(Const.CameraSettingsOffset + (int)e.NewValue * 4 + 2));
+            cameraBorderSettingId = (int)e.NewValue;
+
+            ushort param = (ushort)(CameraBorderSettings[cameraBorderSettingId]);
+            ushort value = (ushort)(CameraBorderSettings[cameraBorderSettingId] >> 16);
 
             raidoEnable = false;
 
@@ -247,36 +348,35 @@ namespace TeheManX_Editor.Forms
                 bottomBtn.IsChecked = true;
 
             raidoEnable = true;
-
             MainWindow.window.camE.valueInt.Value = value;
         }
         private void valueInt_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            if (e.NewValue == null || SNES.rom == null) return;
+            if (e.NewValue == null || SNES.rom == null || suppressInts) return;
 
-            int offset = Const.CameraSettingsOffset + (int)MainWindow.window.camE.borderSettingInt.Value * 4;
+            ushort param = (ushort)(CameraBorderSettings[cameraBorderSettingId]);
+            ushort value = (ushort)(CameraBorderSettings[cameraBorderSettingId] >> 16);
 
-            ushort param = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + 0));
-            ushort value = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + 2));
+            ushort valueNew = (ushort)(int)e.NewValue;
 
-            if ((ushort)(int)e.NewValue == value) return;
+            if (valueNew == value) return;
 
-            BinaryPrimitives.WriteUInt16LittleEndian(SNES.rom.AsSpan(offset + 2), (ushort)(int)e.NewValue);
+            CameraBorderSettings[cameraBorderSettingId] = param | (valueNew << 16);
             SNES.edit = true;
         }
         private void RadioBtn_Click(object sender, RoutedEventArgs e)
         {
             if (!raidoEnable) return;
 
-            int offset = Const.CameraSettingsOffset + (int)MainWindow.window.camE.borderSettingInt.Value * 4;
-
-            ushort param = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + 0));
+            ushort value = (ushort)(CameraBorderSettings[cameraBorderSettingId] >> 16);
 
             ushort setting = Convert.ToUInt16(((RadioButton)sender).Uid); //New Setting
 
-            int wram = setting == 0 ? Const.CameraBorderLeftWRAM : setting == 1 ? Const.CameraBorderRightWRAM : setting == 2 ? Const.CameraBorderTopWRAM : Const.CameraBorderBottomWRAM;
+            ushort param = setting == 0 ? Const.CameraBorderLeftWRAM : setting == 1 ? Const.CameraBorderRightWRAM : setting == 2 ? Const.CameraBorderTopWRAM : Const.CameraBorderBottomWRAM;
 
-            BinaryPrimitives.WriteUInt16LittleEndian(SNES.rom.AsSpan(offset + 0), (ushort)wram);
+            if ((CameraBorderSettings[cameraBorderSettingId] & 0xFFFF) == param) return;
+
+            CameraBorderSettings[cameraBorderSettingId] = param | (value << 16);
             SNES.edit = true;
         }
         #endregion Events

@@ -131,7 +131,7 @@ namespace TeheManX_Editor.Forms
                     Level.AssignPallete();
                     window.tileE.CollectData();
                     Level.LoadLevelTiles();
-                    window.camE.AssignBorderSettingsLimits();
+                    window.camE.CollectData();
                     Update();
                     UnlockWindows();
                 }
@@ -583,7 +583,7 @@ namespace TeheManX_Editor.Forms
                     Level.AssignPallete();
                     window.tileE.CollectData();
                     Level.LoadLevelTiles();
-                    window.camE.AssignBorderSettingsLimits();
+                    window.camE.CollectData();
                     Update();
                     UnlockWindows();
                 }
