@@ -377,10 +377,10 @@ namespace TeheManX_Editor.Forms
             // Snap to 16-pixel grid when holding SHIFT
             if (Keyboard.IsKeyDown(Key.LeftShift))
             {
-                locationX = (short)(locationX & 0xFFF0); // snap X to multiple of 16
-                locationY = (short)(locationY & 0xFFF0); // snap Y to multiple of 16
+                locationX = (short)(locationX & 0xFFF8); // snap X to multiple of 8
+                locationY = (short)(locationY & 0xFFF8); // snap Y to multiple of 8
 
-                // snap the visible label position so it moves visibly by 16px
+                // snap the visible label position so it moves visibly by 8px
                 x = locationX - viewerX;
                 y = locationY - viewerY;
             }
