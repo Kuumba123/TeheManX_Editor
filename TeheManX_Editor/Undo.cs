@@ -84,9 +84,9 @@ namespace TeheManX_Editor
             else if (Const.Id == Const.GameId.MegaManX3 && Level.Id > 0xE) Id = (Level.Id - 0xF) + 0xE; //Buffalo or Beetle
             else Id = Level.Id;
 
-            int offset = SNES.CpuToOffset(BitConverter.ToInt32(SNES.rom, Const.ScreenDataPointersOffset[Level.BG] + Id * 3));
+            int offset = SNES.CpuToOffset(BinaryPrimitives.ReadInt32LittleEndian(SNES.rom.AsSpan(Const.ScreenDataPointersOffset[Level.BG] + Id * 3)));
 
-            ushort tileId = BitConverter.ToUInt16(SNES.rom, offset + screen * 0x80 + x * 2 + y * 16);
+            ushort tileId = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + screen * 0x80 + x * 2 + y * 16));
             BinaryPrimitives.WriteUInt16LittleEndian(undoData.AsSpan(5), tileId);
 
             return new Undo() { data = undoData, type = UndoType.Screen};
@@ -107,7 +107,7 @@ namespace TeheManX_Editor
             else if (Const.Id == Const.GameId.MegaManX3 && Level.Id > 0xE) Id = (Level.Id - 0xF) + 0xE; //Buffalo or Beetle
             else Id = Level.Id;
 
-            int readBase = SNES.CpuToOffset(BitConverter.ToInt32(SNES.rom, Const.ScreenDataPointersOffset[Level.BG] + Id * 3)) + screen * 0x80;
+            int readBase = SNES.CpuToOffset(BinaryPrimitives.ReadInt32LittleEndian(SNES.rom.AsSpan(Const.ScreenDataPointersOffset[Level.BG] + Id * 3))) + screen * 0x80;
 
             int writeOffset = 7;
 
@@ -134,7 +134,7 @@ namespace TeheManX_Editor
             undoData[2] = y;
 
 
-            ushort tileId = BitConverter.ToUInt16(MainWindow.window.screenE.screenData16,screen * 0x200 + x * 2 + y * 32);
+            ushort tileId = BinaryPrimitives.ReadUInt16LittleEndian(MainWindow.window.screenE.screenData16.AsSpan(screen * 0x200 + x * 2 + y * 32));
             BinaryPrimitives.WriteUInt16LittleEndian(undoData.AsSpan(4), tileId);
 
             return new Undo() { data = undoData, type = UndoType.Screen };
@@ -159,7 +159,7 @@ namespace TeheManX_Editor
                         continue;
                     if (y + r > 15)
                         continue;
-                    ushort tileId = BitConverter.ToUInt16(MainWindow.window.screenE.screenData16, screen * 0x200 + (x + c) * 2 + (y + r) * 32);
+                    ushort tileId = BinaryPrimitives.ReadUInt16LittleEndian(MainWindow.window.screenE.screenData16.AsSpan(screen * 0x200 + (x + c) * 2 + (y + r) * 32));
                     BinaryPrimitives.WriteUInt16LittleEndian(undoData.AsSpan(writeOffset), tileId);
                     writeOffset += 2;
                 }
@@ -272,7 +272,7 @@ namespace TeheManX_Editor
             else if (Const.Id == Const.GameId.MegaManX3 && Level.Id > 0xE) Id = (Level.Id - 0xF) + 0xE; //Buffalo or Beetle
             else Id = Level.Id;
 
-            int offset = SNES.CpuToOffset(BitConverter.ToInt32(SNES.rom, Const.Tile32DataPointersOffset[layerBG] + Id * 3));
+            int offset = SNES.CpuToOffset(BinaryPrimitives.ReadInt32LittleEndian(SNES.rom.AsSpan(Const.Tile32DataPointersOffset[layerBG] + Id * 3)));
             BinaryPrimitives.WriteUInt64LittleEndian(SNES.rom.AsSpan(offset + tileId32 * 8), previousVal);
             SNES.edit = true;
 
@@ -315,7 +315,7 @@ namespace TeheManX_Editor
             else if (Const.Id == Const.GameId.MegaManX3 && Level.Id > 0xE) Id = (Level.Id - 0xF) + 0xE; //Buffalo or Beetle
             else Id = Level.Id;
 
-            int offset = SNES.CpuToOffset(BitConverter.ToInt32(SNES.rom, Const.Tile16DataPointersOffset[layerBG] + Id * 3));
+            int offset = SNES.CpuToOffset(BinaryPrimitives.ReadInt32LittleEndian(SNES.rom.AsSpan(Const.Tile16DataPointersOffset[layerBG] + Id * 3)));
             BinaryPrimitives.WriteUInt64LittleEndian(SNES.rom.AsSpan(offset + tileId16 * 8), previousVal);
             SNES.edit = true;
 
@@ -354,7 +354,7 @@ namespace TeheManX_Editor
             else if (Const.Id == Const.GameId.MegaManX3 && Level.Id > 0xE) Id = (Level.Id - 0xF) + 0xE; //Buffalo or Beetle
             else Id = Level.Id;
 
-            int offset = SNES.CpuToOffset(BitConverter.ToInt32(SNES.rom, Const.TileCollisionDataPointersOffset + Id * 3));
+            int offset = SNES.CpuToOffset(BinaryPrimitives.ReadInt32LittleEndian(SNES.rom.AsSpan(Const.TileCollisionDataPointersOffset + Id * 3)));
             ushort tileId16 = BinaryPrimitives.ReadUInt16LittleEndian(data.AsSpan(1));
             offset += tileId16;
             SNES.rom[offset] = data[0];
