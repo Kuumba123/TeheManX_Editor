@@ -130,7 +130,8 @@
             <StackPanel Orientation="Horizontal">
                 <RadioButton x:Name="oam1Btn" Checked="oamBtn_CheckChange" Unchecked="oamBtn_CheckChange" IsChecked="True" VerticalContentAlignment="Center"  Foreground="White" FontSize="18">OAM1</RadioButton>
                 <RadioButton x:Name="oam2Btn" Checked="oamBtn_CheckChange" Unchecked="oamBtn_CheckChange" VerticalContentAlignment="Center" Foreground="White" FontSize="18">OAM2</RadioButton>
-                <Button Click="ReDrawVramBtn_Click"  Width="25" Height="25" Padding="0" Margin="8,1,0,0" VerticalContentAlignment="Top" VerticalAlignment="Top">🔄</Button>
+                <Button Click="ReDrawVramBtn_Click"  Width="25" Height="25" Padding="0" Margin="8,1,0,0" >🔄</Button>
+                <Button Click="ObjectTileInfoBtn_Click" Width="25" Height="25" Padding="0" Margin="8,1,0,0" FontWeight="Bold">i</Button>
             </StackPanel>
             <CheckBox  x:Name="objectFreshCheck" FontSize="18" Foreground="White" FontFamily="Consolas">Fresh Rdraw</CheckBox>
             <ToggleButton Background="#101010" Foreground="White" FontSize="16" Margin="10" Padding="4" Name="vramSelectToggleBtn" Click="vramSelectToggleBtn_Click">Enable VRAM Select</ToggleButton>

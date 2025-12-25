@@ -1399,6 +1399,48 @@ namespace TeheManX_Editor.Forms
             window.Content = grid;
             window.ShowDialog();
         }
+        private void ObjectTileInfoBtn_Click(object sender, RoutedEventArgs e)
+        {
+            if (SNES.rom == null || suppressInts || !MainWindow.window.tileE.objTileSetInt.IsEnabled)
+                return;
+
+            int id;
+            if (Const.Id == Const.GameId.MegaManX3 && Level.Id > 0xE) id = (Level.Id - 0xF) + 2; //Buffalo or Beetle
+            else id = Level.Id;
+
+            if (ObjectSettings[id][objectTileSetId].Slots.Count != 0)
+            {
+                int i = objectTileSlotId;
+
+                byte compressedTileId = ObjectSettings[id][objectTileSetId].Slots[i].TileId;
+
+                int specOffset = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(Const.CompressedTilesSwapInfoOffset + compressedTileId * 2)) + Const.CompressedTilesSwapInfoOffset;
+
+                int totalLength = 0;
+
+                while (true)
+                {
+                    int length = SNES.rom[specOffset];
+                    if (length == 0)
+                        break;
+                    if (length == 0xFF)
+                    {
+                        specOffset++;
+                        continue;
+                    }
+                    totalLength += length * 16;
+
+
+                    byte vramBaseHigh = SNES.rom[specOffset + 1];
+
+
+                    if ((vramBaseHigh & 0x80) != 0)
+                        break;
+                    specOffset += 2;
+                }
+                MessageBox.Show($"The total amount of bytes this object slot transfers to VRAM is 0x{totalLength:X} bytes.");
+            }
+        }
         #endregion Events
     }
 }
