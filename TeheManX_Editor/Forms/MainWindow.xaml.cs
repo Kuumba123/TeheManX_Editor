@@ -381,6 +381,7 @@ namespace TeheManX_Editor.Forms
                     window.tile16E.DrawTile();
                     window.tile16E.Draw16xTiles();
                     window.tile16E.UpdateTileAttributeUI();
+                    window.tile16E.collisionInt.Value = 0;
                     window.layoutE.DrawLayout();
                     window.layoutE.DrawScreen();
                     window.enemyE.DrawLayout();
