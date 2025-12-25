@@ -93,13 +93,18 @@ namespace TeheManX_Editor.Forms
             GetMaxObjectSettingsFromRom(maxAmount, shared);
             ObjectSettings = CollecObjectSettingsFromRom(maxAmount, shared);
 
+            suppressInts = true;
+
             //Set Max Compressed Tiles
             if (Const.Id == Const.GameId.MegaManX)
-                compressTileInt.Maximum = Const.MegaManX.CompressedTilesAmount;
+                compressTileInt.Maximum = Const.MegaManX.CompressedTilesAmount - 1;
             else if (Const.Id == Const.GameId.MegaManX2)
-                compressTileInt.Maximum = Const.MegaManX2.CompressedTilesAmount;
+                compressTileInt.Maximum = Const.MegaManX2.CompressedTilesAmount - 1;
             else
-                compressTileInt.Maximum = Const.MegaManX3.CompressedTilesAmount;
+                compressTileInt.Maximum = Const.MegaManX3.CompressedTilesAmount - 1;
+            compressTileInt.Value = 0;
+
+            suppressInts = false;
         }
         public void AssignLimits()
         {
@@ -617,7 +622,7 @@ namespace TeheManX_Editor.Forms
              * Step 1. Create a dictionary of unique object settings data & keep track of stage keys
              */
 
-            int nextKey = 0; //used as an offset into the object settings data table
+            int nextKey = 0; //used as an offset into the background settings data table
 
             List<List<int>> keyList = new List<List<int>>(sourceSettings.Count);
 
@@ -701,7 +706,7 @@ namespace TeheManX_Editor.Forms
                     BinaryPrimitives.WriteUInt16LittleEndian(exportData.AsSpan(i * 2), writeOffset);
                 }
             }
-            //Fix the object setting pointers
+            //Fix the background setting pointers
             nextOffset = stagePointersLength;
             for (int i = 0; i < sourceSettings.Count; i++)
             {
@@ -713,7 +718,7 @@ namespace TeheManX_Editor.Forms
                 nextOffset += sourceSettings[i].Count * 2;
             }
             /*
-             * Step 4. Copy the unique object settings data
+             * Step 4. Copy the unique background settings data
              */
             nextOffset = totalPointersLength;
             foreach (var kvp in dict)
