@@ -14,6 +14,7 @@ namespace TeheManX_Editor.Forms
         public int slotCount;
         List<ObjectSetting> stageObjectSettings;
         List<BGSetting> stageBGSettings;
+        List<CameraTrigger> stageCameraTriggerSettings;
         #endregion
 
         #region Constructors
@@ -35,6 +36,14 @@ namespace TeheManX_Editor.Forms
                 slotCountInt.Value = count;
                 slotCount = count;
             }
+            else
+            {
+                stageCameraTriggerSettings = (List<CameraTrigger>)listObj;
+                int count = stageCameraTriggerSettings[index].BorderSettings.Count;
+                slotCountInt.Value = count;
+                slotCount = count;
+                slotCountInt.Maximum = 4;
+            }
         }
         #endregion Constructors
 
@@ -50,6 +59,8 @@ namespace TeheManX_Editor.Forms
                 stageObjectSettings.RemoveAt(index);
             else if (stageBGSettings != null)
                 stageBGSettings.RemoveAt(index);
+            else
+                stageCameraTriggerSettings.RemoveAt(index);
 
             items.Children.RemoveAt(index);
         }

@@ -71,6 +71,8 @@
             </Border>
         </StackPanel>
 
+        <Button Margin="10" Height="35" Grid.Row="1" Click="EditTriggerCountBtn_Click"> Edit Camera Triggers Count</Button>
+        
         <!--Border Settings-->
         <StackPanel Grid.Column="1">
             <TextBlock HorizontalAlignment="Center" FontSize="16" FontFamily="Consolas" Padding="3,5,1,5">Border Settings</TextBlock>

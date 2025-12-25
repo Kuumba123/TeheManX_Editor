@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 
 namespace TeheManX_Editor.Forms
 {
@@ -125,7 +126,7 @@ namespace TeheManX_Editor.Forms
             triggersEnabled = true;
             MainWindow.window.camE.triggerInt.IsEnabled = true;
             for (int i = 0; i < 4; i++)
-                MainWindow.window.camE.borderInts[i].IsEnabled = true;
+                MainWindow.window.camE.borderInts[i].IsEnabled = false;
 
             int id = Level.Id;
 
@@ -397,7 +398,7 @@ namespace TeheManX_Editor.Forms
             if (e.NewValue == null || SNES.rom == null || suppressInts) return;
             
             int index = int.Parse(((NumInt)sender).Uid);
-            byte valueNew = (byte)(int)e.NewValue;
+            byte valueNew = (byte)((int)e.NewValue + 1);
             int id = Level.Id;
 
             if (CameraTriggers[id][cameraTriggerId].BorderSettings[index] == valueNew)
@@ -487,6 +488,100 @@ namespace TeheManX_Editor.Forms
 
             CameraBorderSettings[cameraBorderSettingId] = param | (value << 16);
             SNES.edit = true;
+        }
+        private void EditTriggerCountBtn_Click(object sender, RoutedEventArgs e)
+        {
+            if (SNES.rom == null || !triggersEnabled)
+                return;
+
+            List<CameraTrigger> trueCopy = CameraTriggers[Level.Id].Select(os => new CameraTrigger(os)).ToList();
+
+            Window window = new Window() { WindowStartupLocation = WindowStartupLocation.CenterScreen, Title = "Camera Triggers Settings", ResizeMode = ResizeMode.CanMinimize };
+            window.Width = 310;
+            window.MinWidth = 310;
+            window.MaxWidth = 310;
+            window.Height = 760;
+
+            StackPanel stackPanel = new StackPanel();
+
+            for (int i = 0; i < trueCopy.Count; i++)
+            {
+                DataEntry entry = new DataEntry(trueCopy, i);
+                stackPanel.Children.Add(entry);
+            }
+
+            ScrollViewer scrollViewer = new ScrollViewer();
+            scrollViewer.Content = stackPanel;
+
+            Button confirmBtn = new Button() { Content = "Confirm" };
+            confirmBtn.Click += (s, ev) =>
+            {
+                for (int i = 0; i < trueCopy.Count; i++)
+                {
+                    int neededSlots = ((DataEntry)(stackPanel.Children[i])).slotCount;
+
+                    while (trueCopy[i].BorderSettings.Count < neededSlots)
+                        trueCopy[i].BorderSettings.Add(1);
+
+                    while (trueCopy[i].BorderSettings.Count > neededSlots)
+                        trueCopy[i].BorderSettings.RemoveAt(trueCopy[i].BorderSettings.Count - 1);
+                }
+
+                List<CameraTrigger> uneditedList = CameraTriggers[Level.Id];
+                CameraTriggers[Level.Id] = trueCopy;
+
+                int cameraStages = Const.Id == Const.GameId.MegaManX3 ? 0xF : Const.PlayableLevelsCount;
+
+                int[] maxAmount = new int[cameraStages];
+                int[] shared = new int[cameraStages];
+                GetMaxCameraTriggersFromRom(maxAmount, shared);
+
+                if (false) //no stages share data when using json
+                {
+                    for (int i = 0; i < cameraStages; i++)
+                        shared[i] = -1;
+                }
+
+                int length = CreateCameraTriggersData(CameraTriggers, shared, 0).Length;
+
+                if (length > Const.CameraTriggersLength)
+                {
+                    CameraTriggers[Level.Id] = uneditedList;
+                    MessageBox.Show($"The new Camera Triggers length exceeds the maximum allowed space in the ROM (0x{length:X} vs max of 0x{Const.CameraTriggersLength:X}). Please lower some counts for this or another stage.");
+                    return;
+                }
+
+                AssignTriggerLimits();
+                SNES.edit = true;
+                MessageBox.Show("Camera Trigger counts updated!");
+                window.Close();
+            };
+            Grid.SetRow(confirmBtn, 2);
+
+            Button addBtn = new Button() { Content = "Add Setting" };
+            addBtn.Click += (s, e) =>
+            {
+                int newIndex = trueCopy.Count;
+                CameraTrigger camTrigger = new CameraTrigger();
+                camTrigger.BorderSettings.Add(1);
+
+                trueCopy.Add(camTrigger);
+
+                DataEntry entry = new DataEntry(trueCopy, newIndex);
+                stackPanel.Children.Add(entry);
+            };
+            Grid.SetRow(addBtn, 1);
+
+            Grid grid = new Grid();
+            grid.RowDefinitions.Add(new RowDefinition());
+            grid.RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
+            grid.RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
+            grid.Children.Add(scrollViewer);
+            grid.Children.Add(confirmBtn);
+            grid.Children.Add(addBtn);
+            grid.Background = Brushes.Black;
+            window.Content = grid;
+            window.ShowDialog();
         }
         #endregion Events
     }
