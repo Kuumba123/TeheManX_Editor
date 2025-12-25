@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Buffers.Binary;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -347,6 +348,48 @@ namespace TeheManX_Editor.Forms
                     if (Tile16Editor.scale != 1)
                         Tile16Editor.scale--;
                     window.tile16E.vramTileImage.Width = Tile16Editor.scale * 128;
+                }
+            }
+            if (key == "Delete")
+            {
+                var result = MessageBox.Show("Are you sure you want to delete all of the 16x16 Tiles?\nThis cant be un-done", "", MessageBoxButton.YesNo);
+                if (result == MessageBoxResult.Yes)
+                {
+                    int Id;
+                    if (Const.Id == Const.GameId.MegaManX3 && Level.Id == 0xE) Id = 0x10; //special case for MMX3 rekt version of dophler 2
+                    else if (Const.Id == Const.GameId.MegaManX3 && Level.Id > 0xE) Id = (Level.Id - 0xF) + 0xE; //Buffalo or Beetle
+                    else Id = Level.Id;
+
+                    int collisionOffset = SNES.CpuToOffset(BinaryPrimitives.ReadInt32LittleEndian(SNES.rom.AsSpan(Const.TileCollisionDataPointersOffset + Id * 3)));
+                    Array.Clear(SNES.rom, collisionOffset, Const.Tile16Count[Level.Id, Level.BG]);
+
+                    int tileDat16Offset = SNES.CpuToOffset(BinaryPrimitives.ReadInt32LittleEndian(SNES.rom.AsSpan(Const.Tile16DataPointersOffset[Level.BG] + Id * 3)));
+                    Array.Clear(SNES.rom, tileDat16Offset, Const.Tile16Count[Level.Id, Level.BG] * 8);
+
+                    SNES.edit = true;
+
+                    //Clear Screen Undos of 16x16 Tile Tab
+                    if (undos.Count != 0)
+                    {
+                        for (int i = (undos.Count - 1); i != -1; i--)
+                        {
+                            if (undos[i].type == Undo.UndoType.X16)
+                                undos.RemoveAt(i);
+                        }
+                    }
+
+                    window.tile16E.DrawTile();
+                    window.tile16E.Draw16xTiles();
+                    window.tile16E.UpdateTileAttributeUI();
+                    window.layoutE.DrawLayout();
+                    window.layoutE.DrawScreen();
+                    window.enemyE.DrawLayout();
+                    window.screenE.DrawScreen();
+                    window.screenE.DrawTiles();
+                    window.screenE.DrawTile();
+                    window.tile32E.DrawTiles();
+                    window.tile32E.Draw16xTiles();
+                    window.tile32E.DrawTile();
                 }
             }
         }
