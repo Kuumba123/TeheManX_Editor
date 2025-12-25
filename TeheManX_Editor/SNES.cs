@@ -49,9 +49,8 @@ namespace TeheManX_Editor
         }
         public static int GetSelectedTile(int c, double width, int d)
         {
-            int i = (int)width;
-            int e = i / d;
-            return c / e;
+            int tileSize = (int)(width / d);
+            return Math.Min(c / tileSize, d - 1);
         }
         public static int CpuToOffset(int cpu)
         {
