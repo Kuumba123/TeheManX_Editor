@@ -874,6 +874,36 @@ namespace TeheManX_Editor
             else //Using data in json project file
             {
             }
+
+            /*
+             * Camera Data Export
+             */
+
+            int cameraStages = Const.Id == Const.GameId.MegaManX3 ? 0xF : Const.PlayableLevelsCount;
+            int cameraBorderSettingsOffset;
+            int[] sourceBorderSettings;
+
+            if (true) //Using data in game
+            {
+                //Get the Max Amount of Camera Triggers
+                int[] maxAmount = new int[bgStages];
+                int[] shared = new int[bgStages];
+                CameraEditor.GetMaxCameraTriggersFromRom(maxAmount, shared);
+
+                List<List<CameraTrigger>> sourceSettings = CameraEditor.CameraTriggers;
+
+                //Export Camera Triggers
+                byte[] exportData = CameraEditor.CreateCameraTriggersData(sourceSettings, shared, SNES.OffsetToCpu(Const.CameraTriggersOffset));
+                Array.Copy(exportData, 0, SNES.rom, Const.CameraTriggersOffset, exportData.Length);
+
+                cameraBorderSettingsOffset = Const.CameraSettingsOffset;
+                sourceBorderSettings = CameraEditor.CameraBorderSettings;
+            }
+            else //Using data in json project file
+            {
+
+            }
+            Buffer.BlockCopy(sourceBorderSettings, 0, SNES.rom, cameraBorderSettingsOffset, sourceBorderSettings.Length * 4);
             return true;
         }
         public static void AssignPallete()

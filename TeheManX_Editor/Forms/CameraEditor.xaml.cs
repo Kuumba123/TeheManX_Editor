@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Buffers.Binary;
 using System.Collections.Generic;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -144,6 +145,114 @@ namespace TeheManX_Editor.Forms
             MainWindow.window.camE.leftInt.IsEnabled = true;
             MainWindow.window.camE.bottomInt.IsEnabled = true;
             MainWindow.window.camE.topInt.IsEnabled = true;
+        }
+        public static byte[] CreateCameraTriggersData(List<List<CameraTrigger>> sourceSettings, int[] sharedList, int baseCpu)
+        {
+            baseCpu &= 0xFFFF;
+
+            Dictionary<byte[], int> dict = new Dictionary<byte[], int>(ByteArrayComparer.Default);
+
+            /*
+             * Step 1. Create a dictionary of unique camera trigger settings data & keep track of stage keys
+             */
+
+            int nextKey = 0; //used as an offset into the camera trigger settings data table
+
+            List<List<int>> keyList = new List<List<int>>(sourceSettings.Count);
+
+            foreach (var innerList in sourceSettings)
+                keyList.Add(Enumerable.Repeat(0, innerList.Count).ToList());
+
+
+            for (int id = 0; id < sourceSettings.Count; id++)
+            {
+                if (sharedList[id] != -1)
+                    continue;
+                for (int s = 0; s < sourceSettings[id].Count; s++)
+                {
+                    byte[] slotsData = new byte[sourceSettings[id][s].BorderSettings.Count + 9];
+                    BinaryPrimitives.WriteUInt16LittleEndian(slotsData.AsSpan(0), sourceSettings[id][s].RightSide);
+                    BinaryPrimitives.WriteUInt16LittleEndian(slotsData.AsSpan(2), sourceSettings[id][s].LeftSide);
+                    BinaryPrimitives.WriteUInt16LittleEndian(slotsData.AsSpan(4), sourceSettings[id][s].BottomSide);
+                    BinaryPrimitives.WriteUInt16LittleEndian(slotsData.AsSpan(6), sourceSettings[id][s].TopSide);
+
+                    if (slotsData.Length != 9)
+                    {
+                        for (int t = 0; t < sourceSettings[id][s].BorderSettings.Count; t++)
+                            slotsData[8 + t] = sourceSettings[id][s].BorderSettings[t];
+                    }
+                    if (!dict.ContainsKey(slotsData))
+                    {
+                        dict.Add(slotsData, nextKey);
+                        nextKey += slotsData.Length;
+                    }
+                    int value = dict[slotsData];
+                    keyList[id][s] = value;
+                }
+            }
+
+            /*
+            * Step 2. Get the length of all the pointers
+             */
+
+            int totalPointersLength = 0;
+
+            for (int id = 0; id < sourceSettings.Count; id++)
+            {
+                totalPointersLength += 2;
+
+                if (sharedList[id] != -1)
+                    continue;
+
+                for (int s = 0; s < sourceSettings[id].Count; s++)
+                    totalPointersLength += 2;
+            }
+
+            /*
+            * Step 3. Create the byte array and setup the pointers
+            */
+
+            int stagePointersLength = sourceSettings.Count * 2;
+            int nextOffset = stagePointersLength + baseCpu;
+
+            byte[] exportData = new byte[nextKey + totalPointersLength];
+
+            //Fix the stage pointers
+            for (int i = 0; i < sourceSettings.Count; i++)
+            {
+                if (sharedList[i] == -1)
+                {
+                    BinaryPrimitives.WriteUInt16LittleEndian(exportData.AsSpan(i * 2), (ushort)nextOffset);
+                    nextOffset += sourceSettings[i].Count * 2;
+                }
+                else
+                {
+                    ushort writeOffset = BinaryPrimitives.ReadUInt16LittleEndian(exportData.AsSpan(sharedList[i] * 2));
+                    BinaryPrimitives.WriteUInt16LittleEndian(exportData.AsSpan(i * 2), writeOffset);
+                }
+            }
+            //Fix the camera triggers setting pointers
+            nextOffset = stagePointersLength;
+            for (int i = 0; i < sourceSettings.Count; i++)
+            {
+                if (sharedList[i] != -1)
+                    continue;
+
+                for (int st = 0; st < sourceSettings[i].Count; st++)
+                    BinaryPrimitives.WriteUInt16LittleEndian(exportData.AsSpan(nextOffset + st * 2), (ushort)(keyList[i][st] + totalPointersLength + baseCpu));
+                nextOffset += sourceSettings[i].Count * 2;
+            }
+
+            /*
+            * Step 4. Copy the unique camera trigger settings data
+            */
+            nextOffset = totalPointersLength;
+            foreach (var kvp in dict)
+            {
+                kvp.Key.CopyTo(exportData.AsSpan(nextOffset));
+                nextOffset += kvp.Key.Length;
+            }
+            return exportData;
         }
         public static void GetMaxCameraTriggersFromRom(int[] destAmount, int[] shared = null)
         {
