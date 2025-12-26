@@ -1032,6 +1032,36 @@ namespace TeheManX_Editor.Forms
             selectedTile16 = (int)e.NewValue;
             DrawTile16();
         }
+        private void Help_Click(object sender, RoutedEventArgs e)
+        {
+            //HelpWindow h = new HelpWindow(2);
+            //h.ShowDialog();
+        }
+        private void SnapButton_Click(object sender, RoutedEventArgs e)
+        {
+            var sfd = new Ookii.Dialogs.Wpf.VistaFolderBrowserDialog();
+            sfd.Description = "Select Screens Save Location";
+            sfd.UseDescriptionForTitle = true;
+
+            if ((bool)sfd.ShowDialog())
+            {
+                WriteableBitmap bitmap = new WriteableBitmap(256, 256, 96, 96, PixelFormats.Bgra32, null);
+                for (int i = 0; i < Const.ScreenCount[Level.Id, Level.BG]; i++)
+                {
+                    bitmap.Lock();
+                    Level.DrawScreen(i, 0, 0, 256 * 4, bitmap.BackBuffer);
+                    bitmap.AddDirtyRect(new Int32Rect(0, 0, 256, 256));
+                    bitmap.Unlock();
+
+                    PngBitmapEncoder encoder = new PngBitmapEncoder();
+                    encoder.Frames.Add(BitmapFrame.Create(bitmap));
+                    System.IO.FileStream fs = System.IO.File.Create($"{sfd.SelectedPath}/SCREEN_{i:X2}.PNG");
+                    encoder.Save(fs);
+                    fs.Close();
+                }
+                MessageBox.Show("All Screens have been exported !!!");
+            }
+        }
         #endregion Events
     }
 }
