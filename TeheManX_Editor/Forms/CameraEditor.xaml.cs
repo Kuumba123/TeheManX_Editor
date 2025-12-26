@@ -491,7 +491,7 @@ namespace TeheManX_Editor.Forms
         }
         private void EditTriggerCountBtn_Click(object sender, RoutedEventArgs e)
         {
-            if (SNES.rom == null || !triggersEnabled)
+            if (SNES.rom == null || Level.Id >= Const.PlayableLevelsCount || (Const.Id == Const.GameId.MegaManX3 && Level.Id > 0xE))
                 return;
 
             List<CameraTrigger> trueCopy = CameraTriggers[Level.Id].Select(os => new CameraTrigger(os)).ToList();
