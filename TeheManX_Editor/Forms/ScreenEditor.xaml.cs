@@ -943,6 +943,20 @@ namespace TeheManX_Editor.Forms
                 return;
             }
 
+            int Id;
+            if (Const.Id == Const.GameId.MegaManX3 && Level.Id == 0xE) Id = 0x10; //special case for MMX3 rekt version of dophler 2
+            else if (Const.Id == Const.GameId.MegaManX3 && Level.Id > 0xE) Id = (Level.Id - 0xF) + 0xE; //Buffalo or Beetle
+            else Id = Level.Id;
+
+            int tile32DestBase = SNES.CpuToOffset(BinaryPrimitives.ReadInt32LittleEndian(SNES.rom.AsSpan(Const.Tile32DataPointersOffset[Level.BG] + Id * 3)));
+
+            if (tiles32.Count < Const.Tile32Count[Level.Id, Level.BG]) //Clearing Un-Needed 32x32 Tiles
+            {
+                int writeOffset = tile32DestBase + tiles32.Count * 8;
+                int length = (Const.Tile32Count[Level.Id, Level.BG] - tiles32.Count) * 8;
+                Array.Clear(SNES.rom, writeOffset, length);
+            }
+
             //Save Level as 32x32 Tiles
             Dictionary<ulong, ushort> tileDictionary = new Dictionary<ulong, ushort>();
 
@@ -956,12 +970,7 @@ namespace TeheManX_Editor.Forms
 
             byte[] data = screenData16;
 
-            int Id;
-            if (Const.Id == Const.GameId.MegaManX3 && Level.Id == 0xE) Id = 0x10; //special case for MMX3 rekt version of dophler 2
-            else if (Const.Id == Const.GameId.MegaManX3 && Level.Id > 0xE) Id = (Level.Id - 0xF) + 0xE; //Buffalo or Beetle
-            else Id = Level.Id;
-
-            int screenDestBase = SNES.CpuToOffset(BitConverter.ToInt32(SNES.rom, Const.ScreenDataPointersOffset[Level.BG] + Id * 3));
+            int screenDestBase = SNES.CpuToOffset(BinaryPrimitives.ReadInt32LittleEndian(SNES.rom.AsSpan(Const.ScreenDataPointersOffset[Level.BG] + Id * 3)));
 
             //Create the Screen Data
             for (int screen = 0; screen < Const.ScreenCount[Level.Id, Level.BG]; screen++)
@@ -992,7 +1001,6 @@ namespace TeheManX_Editor.Forms
                 }
             }
 
-            int tile32DestBase = SNES.CpuToOffset(BitConverter.ToInt32(SNES.rom, Const.Tile32DataPointersOffset[Level.BG] + Id * 3));
             foreach (var tile in tileDictionary)
             {
                 int offset = tile.Value * 8 + tile32DestBase;
