@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Buffers.Binary;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -19,6 +19,11 @@ namespace TeheManX_Editor.Forms
     {
         #region Fields
         public static double scale = 1;
+        public static List<List<BGPalette>> BGPalettes;
+
+        public static int paletteSetId;
+        public static int bgPalIdId;
+        public static int colorIndexId;
         #endregion Fields
 
         #region Properties
@@ -26,15 +31,15 @@ namespace TeheManX_Editor.Forms
         WriteableBitmap vramTiles = new WriteableBitmap(128, 512, 96, 96, PixelFormats.Bgra32, null);
         Rectangle selectSetRect = new Rectangle() { IsHitTestVisible = false, StrokeThickness = 2.5, StrokeDashArray = new DoubleCollection() { 2.2 }, CacheMode = null, Stroke = Brushes.PapayaWhip };
         public int selectedSet = 0;
-        bool suspendSetInt;
-        bool suspendColorInt;
-        bool suspendAddrBox;
+        bool supressInts;
         #endregion Properties
 
         #region Constructors
         public PaletteEditor()
         {
+            supressInts = true;
             InitializeComponent();
+            supressInts = false;
 
             for (int col = 0; col < 16; col++)
                 paletteGrid.ColumnDefinitions.Add(new ColumnDefinition());
@@ -85,9 +90,17 @@ namespace TeheManX_Editor.Forms
         #endregion Constructors
 
         #region Methods
+        public void CollectData()
+        {
+            int bgStages = Const.Id == Const.GameId.MegaManX3 ? 0xF : Const.PlayableLevelsCount;
+            int[] maxAmount = new int[bgStages];
+            int[] shared = new int[bgStages];
+            GetMaxPalettesFromRom(maxAmount, shared);
+            BGPalettes = CollecBGPalettesFromRom(maxAmount, shared);
+        }
         public void AssignLimits()
         {
-            if (Level.PaletteColorAddress != -1)
+            if (Level.PaletteColorAddress != -1) //Also surves as a non playable level check
             {
                 if (Const.Id != Const.GameId.MegaManX)
                     MainWindow.window.paletteE.colorAddressTxt.Text = $"Color Address: {Level.PaletteColorAddress:X}";
@@ -100,6 +113,10 @@ namespace TeheManX_Editor.Forms
             DrawVramTiles();
             DrawPalette();
 
+            /*
+             * Now to take care of the Swapable BG Palette
+             */
+
             if (Level.Id >= Const.PlayableLevelsCount || (Const.Id == Const.GameId.MegaManX3 && Level.Id > 0xE))
             {
                 MainWindow.window.paletteE.bgPalIdInt.IsEnabled = false;
@@ -109,62 +126,17 @@ namespace TeheManX_Editor.Forms
                 return;
             }
 
-            //Calculate the amount of Background Palette Swaps there are in the Stage
-            int maxSwaps = 0;
-            int maxLevels = (Const.Id == Const.GameId.MegaManX3) ? 0xF : Const.PlayableLevelsCount;
 
-            ushort[] offsetList = new ushort[maxLevels];
-            for (int i = 0; i < maxLevels; i++)
-                offsetList[i] = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(Const.BackgroundPaletteOffset + i * 2));
-
-            int maxIndex = 0;
-            for (int i = 0; i < offsetList.Length; i++)
-            {
-                if (offsetList[i] > offsetList[maxIndex])
-                    maxIndex = i;
-            }
-
-            int tempOffset = Const.BackgroundPaletteOffset + maxLevels * 2;
-            int endOffset = offsetList[maxIndex] + Const.BackgroundPaletteOffset;
-
-            int lowestPointer = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(tempOffset));
-
-            while (tempOffset != endOffset)
-            {
-                int addr = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(tempOffset));
-
-                if (addr < lowestPointer)
-                    lowestPointer = addr;
-                tempOffset += 2;
-            }
-            suspendSetInt = true;
-            suspendColorInt = true;
-            suspendAddrBox = true;
-
-            ushort currentOffset = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(Const.BackgroundPaletteOffset + Level.Id * 2));
-            Array.Sort(offsetList);
-            int currentIndex = Array.IndexOf(offsetList, currentOffset);
-
-            maxSwaps = 0; //TODO: Fix this calculation since it doesnt work for MegaMan X3
-            /*if (currentIndex == maxIndex)
-                maxSwaps = ((lowestPointer - currentOffset) / 2) - 1;
-            else
-                maxSwaps = ((offsetList[currentIndex + 1] - currentOffset) / 2) - 1;*/
-
-            bgPalIdInt.Maximum = maxSwaps;
-            if (MainWindow.window.paletteE.bgPalIdInt.Value > maxSwaps)
-                MainWindow.window.paletteE.bgPalIdInt.Value = maxSwaps;
-
+            supressInts = true;
+            bgPalIdId = 0;
+            bgPalIdInt.Value = 0;
+            bgPalIdInt.Maximum = BGPalettes[Level.Id].Count - 1;
+            paletteSetId = 0;
             paletteSetInt.Value = 0;
             SetupSwappablePaletteUI();
-            suspendSetInt = false;
-            suspendColorInt = false;
-            suspendAddrBox = false;
+            supressInts = false;
 
             MainWindow.window.paletteE.bgPalIdInt.IsEnabled = true;
-            MainWindow.window.paletteE.paletteSetInt.IsEnabled = true;
-            MainWindow.window.paletteE.colorIndexInt.IsEnabled = true;
-            MainWindow.window.paletteE.dumpPalBtn.IsEnabled = true;
         }
         private void DrawSwappablePalette(int offset)
         {
@@ -182,39 +154,27 @@ namespace TeheManX_Editor.Forms
         }
         private void SetupSwappablePaletteUI()
         {
-            int listOffset = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(Const.BackgroundPaletteOffset + Level.Id * 2)) + Const.BackgroundPaletteOffset;
-            int offset = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(listOffset + (int)MainWindow.window.paletteE.bgPalIdInt.Value * 2)) + Const.BackgroundPaletteOffset;
+            int id = Level.Id;
 
-            ushort pointer = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset));
-
-            if (pointer == 0xFFFF)
+            if (BGPalettes[id][bgPalIdId].Slots.Count == 0)
             {
+                MainWindow.window.paletteE.paletteSetInt.IsEnabled = false;
+                MainWindow.window.paletteE.colorIndexInt.IsEnabled = false;
+                MainWindow.window.paletteE.colorAddressInt.IsEnabled = false;
+                MainWindow.window.paletteE.dumpPalBtn.IsEnabled = false;
                 return;
             }
+            MainWindow.window.paletteE.paletteSetInt.IsEnabled = true;
+            MainWindow.window.paletteE.colorIndexInt.IsEnabled = true;
+            MainWindow.window.paletteE.colorAddressInt.IsEnabled = true;
+            MainWindow.window.paletteE.dumpPalBtn.IsEnabled = true;
 
-            int colorIndex = SNES.rom[offset + 2];
-            int set = 0;
-            int destSet = (int)paletteSetInt.Value;
-            ushort lastPointer = 0;
-            do
-            {
-                lastPointer = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset));
-                if (lastPointer == 0xFFFF)
-                    break;
-                
-                set++;
-
-                if ((set - 1) == destSet)
-                {
-                    pointer = lastPointer;
-                    colorIndex = SNES.rom[offset + 2];
-                }
-                offset += 3;
-            } while (true);
+            byte colorIndex = BGPalettes[id][bgPalIdId].Slots[paletteSetId].ColorIndex;
+            ushort pointer = BGPalettes[id][bgPalIdId].Slots[paletteSetId].Address;
 
             colorIndexInt.Value = colorIndex;
-            colorAddressBox.Text = $"{pointer:X4}";
-            paletteSetInt.Maximum = set - 1;
+            colorAddressInt.Value = pointer;
+            paletteSetInt.Maximum = BGPalettes[id][bgPalIdId].Slots.Count - 1;
             DrawSwappablePalette(SNES.CpuToOffset(pointer, Const.PaletteColorBank));
         }
         public unsafe void PaintVramTiles()
@@ -289,36 +249,245 @@ namespace TeheManX_Editor.Forms
         {
             Grid.SetRow(selectSetRect, selectedSet);
         }
-        private void EditPaletteSetProperty(bool updateAddr = true)
+        public static void GetMaxPalettesFromRom(int[] destAmount, int[] shared = null)
         {
-            int listOffset = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(Const.BackgroundPaletteOffset + Level.Id * 2)) + Const.BackgroundPaletteOffset;
-            int offset = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(listOffset + (int)MainWindow.window.paletteE.bgPalIdInt.Value * 2)) + Const.BackgroundPaletteOffset;
-            int savedOffset = offset;
+            int bgStages = Const.Id == Const.GameId.MegaManX3 ? 0xF : Const.PlayableLevelsCount;
 
-            int colorIndex = SNES.rom[offset + 2];
-            int set = 0;
-            int destSet = (int)paletteSetInt.Value;
-            ushort lastPointer = 0;
-            do
+            if (shared == null)
+                shared = new int[bgStages];
+
+            for (int i = 0; i < bgStages; i++)
+                shared[i] = -1;
+
+            ushort[] offsets = new ushort[bgStages];
+            ushort[] sortedOffsets = new ushort[bgStages];
+            Buffer.BlockCopy(SNES.rom, Const.BackgroundPaletteOffset, offsets, 0, bgStages * 2);
+            Array.Copy(offsets, sortedOffsets, bgStages);
+            Array.Sort(sortedOffsets);
+
+            for (int i = 0; i < bgStages; i++)
             {
-                lastPointer = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset));
-                if (lastPointer == 0xFFFF)
-                    break;
+                if (i == 0) continue;
 
-                set++;
+                ushort stageOffset = offsets[i];
 
-                if ((set - 1) == destSet)
+                for (int j = i; j != 0; j--)
                 {
-                    if (updateAddr)
-                        BinaryPrimitives.WriteUInt16LittleEndian(SNES.rom.AsSpan(offset), (ushort)int.Parse(colorAddressBox.Text, NumberStyles.HexNumber));
-                    else
-                        SNES.rom[offset + 2] = (byte)(int)colorIndexInt.Value;
-                    return;
+                    if (i == j) continue;
+                    ushort currentOffset = offsets[j];
+                    if (stageOffset == currentOffset)
+                    {
+                        shared[i] = j;
+                        break;
+                    }
                 }
-                offset += 3;
-            } while (true);
-            SNES.edit = true;
-            DrawSwappablePalette(savedOffset);
+            }
+
+            int[] maxAmounts = destAmount;
+
+            int maxIndex = 0;
+            for (int j = 0; j < offsets.Length; j++)
+            {
+                if (sortedOffsets[j] > sortedOffsets[maxIndex])
+                    maxIndex = j;
+            }
+
+            for (int i = 0; i < bgStages; i++)
+            {
+                if (shared[i] != -1)
+                {
+                    maxAmounts[i] = maxAmounts[shared[i]];
+                    continue;
+                }
+
+                ushort toFindOffset = offsets[i];
+
+                if (Array.IndexOf(sortedOffsets, toFindOffset) != maxIndex)
+                {
+                    int index = Array.IndexOf(sortedOffsets, toFindOffset);
+
+                    while (sortedOffsets[index] == sortedOffsets[index + 1])
+                        index++;
+                    maxAmounts[i] = ((sortedOffsets[index + 1] - toFindOffset) / 2);
+                }
+                else //Last Stage
+                {
+                    int tempOffset = Const.BackgroundPaletteOffset + bgStages * 2;
+                    int endOffset = offsets[maxIndex] + Const.BackgroundPaletteOffset;
+
+                    int lowestPointer = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(tempOffset));
+
+                    while (tempOffset != endOffset)
+                    {
+                        int addr = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(tempOffset));
+
+                        if (addr < lowestPointer)
+                            lowestPointer = addr;
+                        tempOffset += 2;
+                    }
+                    ushort currentOffset = offsets[i];
+                    int max = ((lowestPointer - currentOffset) / 2);
+
+                    for (int j = 0; j < max; j++)
+                    {
+                        if (BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(currentOffset + j * 2)) == 0)
+                        {
+                            max = j;
+                            break;
+                        }
+                    }
+
+                    maxAmounts[i] = max;
+                }
+            }
+        }
+        public static byte[] CreateBGPalettesData(List<List<BGPalette>> sourceSettings, int[] sharedList)
+        {
+            Dictionary<byte[], int> dict = new Dictionary<byte[], int>(ByteArrayComparer.Default);
+
+            /*
+             * Step 1. Create a dictionary of unique object settings data & keep track of stage keys
+             */
+
+            int nextKey = 0; //used as an offset into the background settings data table
+
+            List<List<int>> keyList = new List<List<int>>(sourceSettings.Count);
+
+            foreach (var innerList in sourceSettings)
+                keyList.Add(Enumerable.Repeat(0, innerList.Count).ToList());
+
+
+            for (int id = 0; id < sourceSettings.Count; id++)
+            {
+                if (sharedList[id] != -1)
+                    continue;
+                for (int s = 0; s < sourceSettings[id].Count; s++)
+                {
+                    byte[] slotsData = new byte[sourceSettings[id][s].Slots.Count * 3 + 2];
+                    if (slotsData.Length == 2)
+                        BinaryPrimitives.WriteUInt16LittleEndian(slotsData.AsSpan(0), 0xFFFF);
+                    else
+                    {
+                        BinaryPrimitives.WriteUInt16LittleEndian(slotsData.AsSpan(slotsData.Length - 2), 0xFFFF);
+                        for (int slot = 0; slot < sourceSettings[id][s].Slots.Count; slot++)
+                        {
+                            BinaryPrimitives.WriteUInt16LittleEndian(slotsData.AsSpan(slot * 3 + 0), sourceSettings[id][s].Slots[slot].Address);
+                            SNES.rom[slot * 3 + 2] = sourceSettings[id][s].Slots[slot].ColorIndex;
+                        }
+                    }
+                    if (!dict.ContainsKey(slotsData))
+                    {
+                        dict.Add(slotsData, nextKey);
+                        nextKey += slotsData.Length;
+                    }
+                    int value = dict[slotsData];
+                    keyList[id][s] = value;
+                }
+            }
+
+            /*
+             * Step 2. Get the length of all the pointers
+             */
+
+            int totalPointersLength = 0;
+
+            for (int id = 0; id < sourceSettings.Count; id++)
+            {
+                totalPointersLength += 2;
+
+                if (sharedList[id] != -1)
+                    continue;
+
+                for (int s = 0; s < sourceSettings[id].Count; s++)
+                    totalPointersLength += 2;
+            }
+
+            /*
+             * Step 3. Create the byte array and setup the pointers
+             */
+
+            int stagePointersLength = sourceSettings.Count * 2;
+            int nextOffset = stagePointersLength;
+
+            byte[] exportData = new byte[nextKey + totalPointersLength];
+
+            //Fix the stage pointers
+            for (int i = 0; i < sourceSettings.Count; i++)
+            {
+                if (sharedList[i] == -1)
+                {
+                    BinaryPrimitives.WriteUInt16LittleEndian(exportData.AsSpan(i * 2), (ushort)nextOffset);
+                    nextOffset += sourceSettings[i].Count * 2;
+                }
+                else
+                {
+                    ushort writeOffset = BinaryPrimitives.ReadUInt16LittleEndian(exportData.AsSpan(sharedList[i] * 2));
+                    BinaryPrimitives.WriteUInt16LittleEndian(exportData.AsSpan(i * 2), writeOffset);
+                }
+            }
+            //Fix the background setting pointers
+            nextOffset = stagePointersLength;
+            for (int i = 0; i < sourceSettings.Count; i++)
+            {
+                if (sharedList[i] != -1)
+                    continue;
+
+                for (int st = 0; st < sourceSettings[i].Count; st++)
+                    BinaryPrimitives.WriteUInt16LittleEndian(exportData.AsSpan(nextOffset + st * 2), (ushort)(keyList[i][st] + totalPointersLength));
+                nextOffset += sourceSettings[i].Count * 2;
+            }
+            /*
+             * Step 4. Copy the unique background settings data
+             */
+            nextOffset = totalPointersLength;
+            foreach (var kvp in dict)
+            {
+                kvp.Key.CopyTo(exportData.AsSpan(nextOffset));
+                nextOffset += kvp.Key.Length;
+            }
+
+            // Done
+            return exportData;
+        }
+        public static List<List<BGPalette>> CollecBGPalettesFromRom(int[] destAmount, int[] shared)
+        {
+            List<List<BGPalette>> sourceSettings = new List<List<BGPalette>>();
+            int bgStages = Const.Id == Const.GameId.MegaManX3 ? 0xF : Const.PlayableLevelsCount;
+
+            for (int i = 0; i < bgStages; i++)
+            {
+                List<BGPalette> bgSettings = new List<BGPalette>();
+
+                for (int j = 0; j < destAmount[i]; j++)
+                {
+                    int listOffset = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(Const.BackgroundPaletteOffset + i * 2)) + Const.BackgroundPaletteOffset;
+                    int settingOffset = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(listOffset + j * 2));
+                    if (settingOffset == 0xFFFF) //Dump X1 Offset non sense (Sigam 4)
+                        continue;
+
+                    int offset = settingOffset + Const.BackgroundPaletteOffset;
+
+                    BGPalette setting = new BGPalette();
+
+                    while (true)
+                    {
+                        ushort addr = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset));
+
+                        if (addr == 0xFFFF)
+                            break;
+
+                        BGPaletteSlot slot = new BGPaletteSlot();
+
+                        slot.Address = addr;
+                        slot.ColorIndex = SNES.rom[offset + 2];
+                        setting.Slots.Add(slot);
+                        offset += 3;
+                    }
+                    bgSettings.Add(setting);
+                }
+                sourceSettings.Add(bgSettings);
+            }
+            return sourceSettings;
         }
         #endregion Methods
 
@@ -551,46 +720,55 @@ namespace TeheManX_Editor.Forms
         {
             if (e.NewValue == null || SNES.rom == null) return;
 
-            suspendSetInt = true;
+            supressInts = true;
+            bgPalIdId = (int)e.NewValue;
             paletteSetInt.Value = 0;
+            paletteSetId = 0;
             SetupSwappablePaletteUI();
-            suspendSetInt = false;
+            supressInts = false;
         }
         private void paletteSetInt_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            if (e.NewValue == null || SNES.rom == null || suspendSetInt) return;
-
+            if (e.NewValue == null || SNES.rom == null || supressInts) return;
+            paletteSetId = (int)e.NewValue;
             SetupSwappablePaletteUI();
         }
         private void colorIndexInt_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            if (e.NewValue == null || SNES.rom == null || suspendColorInt) return;
+            if (e.NewValue == null || SNES.rom == null || supressInts) return;
 
-            EditPaletteSetProperty(false);
+            int id = Level.Id;
+
+            byte valueNew = (byte)(int)e.NewValue;
+
+            if (BGPalettes[id][bgPalIdId].Slots[paletteSetId].ColorIndex == valueNew) return;
+
+            BGPalettes[Level.Id][bgPalIdId].Slots[paletteSetId].ColorIndex = valueNew;
+            SNES.edit = true;
         }
-        private void colorAddressBox_TextChanged(object sender, TextChangedEventArgs e)
+        private void colorAddressInt_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            if (suspendAddrBox || !int.TryParse(colorAddressBox.Text, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out int result)) return;
+            if (e.NewValue == null || SNES.rom == null || supressInts) return;
 
-            EditPaletteSetProperty();
+            int id = Level.Id;
+
+            ushort valueNew = (byte)(int)e.NewValue;
+
+            if (BGPalettes[id][bgPalIdId].Slots[paletteSetId].ColorIndex == valueNew) return;
+
+            BGPalettes[Level.Id][bgPalIdId].Slots[paletteSetId].Address = valueNew;
+            SNES.edit = true;
         }
         private void DumpPaletteBtn_Click(object sender, RoutedEventArgs e)
         {
             if (!paletteSetInt.IsEnabled) return;
 
-            int listOffset = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(Const.BackgroundPaletteOffset + Level.Id * 2)) + Const.BackgroundPaletteOffset;
-            int offset = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(listOffset + (int)MainWindow.window.paletteE.bgPalIdInt.Value * 2)) + Const.BackgroundPaletteOffset;
+            int id = Level.Id;
 
-            ushort lastPointer = 0;
-
-            do
+            for (int i = 0; i < BGPalettes[id][bgPalIdId].Slots.Count; i++)
             {
-                lastPointer = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset));
-                if (lastPointer == 0xFFFF)
-                    break;
-
-                int colorIndex = SNES.rom[offset + 2];
-                int colorOffset = SNES.CpuToOffset(lastPointer, Const.PaletteColorBank);
+                int colorIndex = BGPalettes[id][bgPalIdId].Slots[i].ColorIndex;
+                int colorOffset = SNES.CpuToOffset(BGPalettes[id][bgPalIdId].Slots[i].Address, Const.PaletteColorBank);
 
                 for (int c = 0; c < 16; c++)
                 {
@@ -601,9 +779,7 @@ namespace TeheManX_Editor.Forms
 
                     Level.Palette[((colorIndex + c) >> 4) & 0xF, (colorIndex + c) & 0xF] = Color.FromRgb(R, G, B);
                 }
-
-                offset += 3;
-            } while (true);
+            }
 
             DrawVramTiles();
             DrawPalette();
@@ -623,6 +799,107 @@ namespace TeheManX_Editor.Forms
             MainWindow.window.tile16E.DrawVramTiles();
 
             MainWindow.window.enemyE.DrawLayout();
+        }
+        private void EditPaletteCountBtn_Click(object sender, RoutedEventArgs e)
+        {
+            if (Level.Id >= Const.PlayableLevelsCount || (Const.Id == Const.GameId.MegaManX3 && Level.Id > 0xE))
+                return;
+
+            List<BGPalette> trueCopy = BGPalettes[Level.Id].Select(os => new BGPalette(os)).ToList();
+
+            Window window = new Window() { WindowStartupLocation = WindowStartupLocation.CenterScreen, Title = "Palette Swap Settings", ResizeMode = ResizeMode.CanMinimize };
+            window.Width = 310;
+            window.MinWidth = 310;
+            window.MaxWidth = 310;
+            window.Height = 760;
+
+            StackPanel stackPanel = new StackPanel();
+
+            for (int i = 0; i < trueCopy.Count; i++)
+            {
+                DataEntry entry = new DataEntry(trueCopy, i);
+                stackPanel.Children.Add(entry);
+            }
+
+            ScrollViewer scrollViewer = new ScrollViewer();
+            scrollViewer.Content = stackPanel;
+
+            Button confirmBtn = new Button() { Content = "Confirm" };
+            confirmBtn.Click += (s, ev) =>
+            {
+                for (int i = 0; i < trueCopy.Count; i++)
+                {
+                    int neededSlots = ((DataEntry)(stackPanel.Children[i])).slotCount;
+
+                    while (trueCopy[i].Slots.Count < neededSlots)
+                    {
+                        BGPaletteSlot slot = new BGPaletteSlot();
+                        slot.Address = 0x8000;
+                        slot.ColorIndex = 0;
+                        trueCopy[i].Slots.Add(slot);
+                    }
+                    while (trueCopy[i].Slots.Count > neededSlots)
+                        trueCopy[i].Slots.RemoveAt(trueCopy[i].Slots.Count - 1);
+                }
+
+                List<BGPalette> uneditedList = BGPalettes[Level.Id];
+                BGPalettes[Level.Id] = trueCopy;
+
+                int bgStages = Const.Id == Const.GameId.MegaManX3 ? 0xF : Const.PlayableLevelsCount;
+
+                int[] maxAmount = new int[bgStages];
+                int[] shared = new int[bgStages];
+                GetMaxPalettesFromRom(maxAmount, shared);
+
+                if (false) //no stages share data when using json
+                {
+                    for (int i = 0; i < bgStages; i++)
+                        shared[i] = -1;
+                }
+
+                int length = CreateBGPalettesData(BGPalettes, shared).Length;
+
+                if (length > 0) //TODO: get max for each
+                {
+                    BGPalettes[Level.Id] = uneditedList;
+                    MessageBox.Show($"The new BG Tile Info length exceeds the maximum allowed space in the ROM (0x{length:X} vs max of 0x{0:X}). Please lower some counts for this or another stage.");
+                    return;
+                }
+
+                AssignLimits();
+                SNES.edit = true;
+                MessageBox.Show("Palette Swap counts updated!");
+                window.Close();
+            };
+            Grid.SetRow(confirmBtn, 2);
+
+            Button addBtn = new Button() { Content = "Add Setting" };
+            addBtn.Click += (s, e) =>
+            {
+                int newIndex = trueCopy.Count;
+                BGPaletteSlot slot = new BGPaletteSlot();
+                slot.Address = 0x8000;
+                slot.ColorIndex = 0;
+
+                BGPalette bgSetting = new BGPalette();
+                bgSetting.Slots.Add(slot);
+                trueCopy.Add(bgSetting);
+
+                DataEntry entry = new DataEntry(trueCopy, newIndex);
+                stackPanel.Children.Add(entry);
+            };
+            Grid.SetRow(addBtn, 1);
+
+            Grid grid = new Grid();
+            grid.RowDefinitions.Add(new RowDefinition());
+            grid.RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
+            grid.RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
+            grid.Children.Add(scrollViewer);
+            grid.Children.Add(confirmBtn);
+            grid.Children.Add(addBtn);
+            grid.Background = Brushes.Black;
+            window.Content = grid;
+            window.ShowDialog();
         }
         #endregion Events
     }

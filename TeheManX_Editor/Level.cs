@@ -921,6 +921,24 @@ namespace TeheManX_Editor
             {
 
             }
+
+            /*
+             * Palette Swap Export
+             */
+
+            if (true) //Using data in game
+            {
+                //Get the Max Amount of BG Tile Settings
+                int[] maxAmount = new int[bgStages];
+                int[] shared = new int[bgStages];
+                PaletteEditor.GetMaxPalettesFromRom(maxAmount, shared);
+
+                List<List<BGPalette>> sourceSettings = PaletteEditor.BGPalettes;
+
+                //Export Checkpoints
+                byte[] exportData = PaletteEditor.CreateBGPalettesData(sourceSettings, shared);
+                Array.Copy(exportData, 0, SNES.rom, Const.BackgroundPaletteOffset, exportData.Length);
+            }
             return true;
         }
         public static void AssignPallete()

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -15,6 +16,7 @@ namespace TeheManX_Editor.Forms
         List<ObjectSetting> stageObjectSettings;
         List<BGSetting> stageBGSettings;
         List<CameraTrigger> stageCameraTriggerSettings;
+        List<BGPalette> stagePaletteSettings;
         #endregion
 
         #region Constructors
@@ -22,24 +24,34 @@ namespace TeheManX_Editor.Forms
         {
             InitializeComponent();
 
-            if (typeof(List<ObjectSetting>) == listObj.GetType())
+            Type type = listObj.GetType();
+
+            if (typeof(List<ObjectSetting>) == type)
             {
                 stageObjectSettings = (List<ObjectSetting>)listObj;
                 int count = stageObjectSettings[index].Slots.Count;
                 slotCountInt.Value = count;
                 slotCount = count;
             }
-            else if (typeof(List<BGSetting>) == listObj.GetType())
+            else if (typeof(List<BGSetting>) == type)
             {
                 stageBGSettings = (List<BGSetting>)listObj;
                 int count = stageBGSettings[index].Slots.Count;
                 slotCountInt.Value = count;
                 slotCount = count;
             }
-            else
+            else if (typeof(List<CameraTrigger>) == type)
             {
                 stageCameraTriggerSettings = (List<CameraTrigger>)listObj;
                 int count = stageCameraTriggerSettings[index].BorderSettings.Count;
+                slotCountInt.Value = count;
+                slotCount = count;
+                slotCountInt.Maximum = 4;
+            }
+            else
+            {
+                stagePaletteSettings = (List<BGPalette>)listObj;
+                int count = stagePaletteSettings[index].Slots.Count;
                 slotCountInt.Value = count;
                 slotCount = count;
                 slotCountInt.Maximum = 4;
@@ -59,8 +71,10 @@ namespace TeheManX_Editor.Forms
                 stageObjectSettings.RemoveAt(index);
             else if (stageBGSettings != null)
                 stageBGSettings.RemoveAt(index);
-            else
+            else if (stageCameraTriggerSettings != null)
                 stageCameraTriggerSettings.RemoveAt(index);
+            else
+                stagePaletteSettings.RemoveAt(index);
 
             items.Children.RemoveAt(index);
         }

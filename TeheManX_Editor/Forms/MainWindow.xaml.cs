@@ -132,6 +132,7 @@ namespace TeheManX_Editor.Forms
                     Level.AssignPallete();
                     window.tileE.CollectData();
                     Level.LoadLevelTiles();
+                    window.paletteE.CollectData();
                     window.spawnE.CollectData();
                     window.camE.CollectData();
                     Update();
@@ -575,6 +576,7 @@ namespace TeheManX_Editor.Forms
                     Level.AssignPallete();
                     window.tileE.CollectData();
                     Level.LoadLevelTiles();
+                    window.paletteE.CollectData();
                     window.spawnE.CollectData();
                     window.camE.CollectData();
                     Update();

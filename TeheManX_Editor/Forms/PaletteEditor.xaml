@@ -12,8 +12,13 @@
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
 
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+
         <!--VRAM Tiles-->
-        <ScrollViewer VerticalAlignment="Top">
+        <ScrollViewer VerticalAlignment="Top" Grid.RowSpan="2">
             <Image x:Name="vramTileImage" Width="256"/>
         </ScrollViewer>
         
@@ -49,11 +54,13 @@
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Width="201" FontSize="17" Foreground="White" FontFamily="Consolas">16 bit Color Address:</TextBlock>
-                        <TextBox Width="50" FontSize="18" Foreground="White" Background="Black" x:Name="colorAddressBox" TextChanged="colorAddressBox_TextChanged"></TextBox>
+                        <local:NumInt Width="50" ButtonSpinnerWidth="0" FontSize="18" Foreground="White" Background="Black" x:Name="colorAddressInt" ValueChanged="colorAddressInt_ValueChanged"></local:NumInt>
                     </StackPanel>
                     <Button x:Name="dumpPalBtn" Click="DumpPaletteBtn_Click">Dump Palettes</Button>
                 </StackPanel>
             </Border>
         </StackPanel>
+
+        <Button Margin="5" Click="EditPaletteCountBtn_Click" Width="250" Height="35" HorizontalAlignment="Left" Grid.Column="1" Grid.Row="1">Edit Palette Swap Counts</Button>
     </Grid>
 </UserControl>
