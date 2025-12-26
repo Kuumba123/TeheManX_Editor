@@ -372,7 +372,7 @@ namespace TeheManX_Editor.Forms
                         for (int slot = 0; slot < sourceSettings[id][s].Slots.Count; slot++)
                         {
                             BinaryPrimitives.WriteUInt16LittleEndian(slotsData.AsSpan(slot * 3 + 0), sourceSettings[id][s].Slots[slot].Address);
-                            SNES.rom[slot * 3 + 2] = sourceSettings[id][s].Slots[slot].ColorIndex;
+                            slotsData[slot * 3 + 2] = sourceSettings[id][s].Slots[slot].ColorIndex;
                         }
                     }
                     if (!dict.ContainsKey(slotsData))
@@ -859,10 +859,10 @@ namespace TeheManX_Editor.Forms
 
                 int length = CreateBGPalettesData(BGPalettes, shared).Length;
 
-                if (length > 0) //TODO: get max for each
+                if (length > Const.BackgroundPaletteInfoLength) //TODO: get max for each
                 {
                     BGPalettes[Level.Id] = uneditedList;
-                    MessageBox.Show($"The new BG Tile Info length exceeds the maximum allowed space in the ROM (0x{length:X} vs max of 0x{0:X}). Please lower some counts for this or another stage.");
+                    MessageBox.Show($"The new BG Tile Info length exceeds the maximum allowed space in the ROM (0x{length:X} vs max of 0x{Const.BackgroundPaletteInfoLength:X}). Please lower some counts for this or another stage.");
                     return;
                 }
 

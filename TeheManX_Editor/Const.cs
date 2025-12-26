@@ -46,6 +46,7 @@ namespace TeheManX_Editor
         public static int PaletteStageBase; //Base Id for Stage Palettes
 
         public static int BackgroundPaletteOffset;
+        public static int BackgroundPaletteInfoLength;
 
         public static int LoadTileSetBank;
         public static int LoadTileSetInfoOffset;
@@ -180,6 +181,8 @@ namespace TeheManX_Editor
 
             public const int ObjectTileInfoLength = 0xCC3; //size includes all the pointers & the un-playable stages
             public const int BackgroundTileInfoLength = 0x8B;
+
+            public const int BackgroundPaletteInfoLength = 0x2F2; //size includes all pointers
 
             public const int MegaManTilesOffset = 0x170000; //Offset to MegaMan X sprite tiles
             public static readonly int[] MegaManGreenChargeShotTilesOffset = { 0x178400, 0x178500 }; //Offset to MegaMan X Pink Green Shot sprite tiles
@@ -394,6 +397,8 @@ namespace TeheManX_Editor
             public const int ObjectTileInfoOffset = 0x1532D4;
             public const int CompressedTilesSwapInfoOffset = 0x157B02;
 
+            public const int BackgroundPaletteInfoLength = 0x382; //size includes all pointers
+
             public const int MegaManTilesOffset = 0x168000; //Offset to MegaMan X sprite tiles
 
             public static readonly int[] LayoutPointersOffset = { 0x030888, 0x30AB3 };
@@ -524,6 +529,8 @@ namespace TeheManX_Editor
 
             public const int ObjectTileInfoLength = 0xBCF; //size includes all the pointers & the un-playable stages
             public const int BackgroundTileInfoLength = 0xED; //size includes all pointers
+
+            public const int BackgroundPaletteInfoLength = 0x334; //size includes all pointers
 
             public const int MegaManTilesOffset = 0x168000; //Offset to MegaMan X sprite tiles
             public static readonly int[] MegaManGreenChargeShotTilesOffset = { 0x1E0400, 0x1E0500 }; //Offset to MegaMan X Pink Green Shot sprite tiles
@@ -666,6 +673,8 @@ namespace TeheManX_Editor
                 BackgroundTileInfoLength = MegaManX.BackgroundTileInfoLength;
                 ObjectTileInfoLength = MegaManX.ObjectTileInfoLength;
 
+                BackgroundPaletteInfoLength = MegaManX.BackgroundPaletteInfoLength;
+
                 LayoutPointersOffset = MegaManX.LayoutPointersOffset;
                 ScreenDataPointersOffset = MegaManX.ScreenDataPointersOffset;
                 Tile32DataPointersOffset = MegaManX.Tile32DataPointersOffset;
@@ -738,6 +747,8 @@ namespace TeheManX_Editor
 
                 BackgroundTileInfoLength = MegaManX2.BackgroundTileInfoLength;
                 ObjectTileInfoLength = MegaManX2.ObjectTileInfoLength;
+
+                BackgroundPaletteInfoLength = MegaManX2.BackgroundPaletteInfoLength;
 
                 CameraTriggersOffset = MegaManX2.CameraTriggersOffset;
                 CameraSettingsOffset = MegaManX2.CameraSettingsOffset;
@@ -814,6 +825,8 @@ namespace TeheManX_Editor
 
                 BackgroundTileInfoLength = MegaManX3.BackgroundTileInfoLength;
                 ObjectTileInfoLength = MegaManX3.ObjectTileInfoLength;
+
+                BackgroundPaletteInfoLength = MegaManX3.BackgroundPaletteInfoLength;
 
                 LayoutPointersOffset = MegaManX3.LayoutPointersOffset;
                 ScreenDataPointersOffset = MegaManX3.ScreenDataPointersOffset;
