@@ -904,6 +904,23 @@ namespace TeheManX_Editor
 
             }
             Buffer.BlockCopy(sourceBorderSettings, 0, SNES.rom, cameraBorderSettingsOffset, sourceBorderSettings.Length * 4);
+
+            /*
+             * Checkpoint Export
+             */
+
+            if (true) //Using data in game
+            {
+                List<List<Checkpoint>> sourceSettings = SpawnWindow.Checkpoints;
+
+                //Export Checkpoints
+                byte[] exportData = SpawnWindow.CreateCheckpointData(sourceSettings);
+                Array.Copy(exportData, 0, SNES.rom, Const.CheckpointOffset, exportData.Length);
+            }
+            else //Using data in json project file
+            {
+
+            }
             return true;
         }
         public static void AssignPallete()
