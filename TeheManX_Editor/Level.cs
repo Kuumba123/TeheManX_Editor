@@ -863,7 +863,7 @@ namespace TeheManX_Editor
 
             int cameraStages = Const.Id == Const.GameId.MegaManX3 ? 0xF : Const.PlayableLevelsCount;
             int cameraBorderSettingsOffset;
-            int[] sourceBorderSettings;
+            int[] sourceBorderSettings = null;
 
             if (true) //Using data in game
             {
@@ -891,7 +891,7 @@ namespace TeheManX_Editor
              * Checkpoint Export
              */
 
-            if (true) //Using data in game
+            if (false) //Using data in game (TODO: this is not working for X3)
             {
                 List<List<Checkpoint>> sourceSettings = SpawnWindow.Checkpoints;
 
