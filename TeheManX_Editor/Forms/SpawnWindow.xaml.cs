@@ -117,8 +117,8 @@ namespace TeheManX_Editor.Forms
                         point.BG2X_Base = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + 0x18));
                         point.BG2Y_Base = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + 0x1A));
                         point.WramFlag = SNES.rom[offset + 0x1C];
-                        point.MegaFlip = SNES.rom[offset + 0x1D];
-                        point.CollisionTimer = SNES.rom[offset + 0x1E];
+                        point.MegaFlip = SNES.rom[offset + 0x1E];
+                        point.CollisionTimer = SNES.rom[offset + 0x1D];
                     }
                     list.Add(point);
                 }
@@ -286,8 +286,8 @@ namespace TeheManX_Editor.Forms
                         BinaryPrimitives.WriteUInt16LittleEndian(pointData.AsSpan(0x1A), point.BG2Y_Base);
 
                         pointData[0x1C] = point.WramFlag;
-                        pointData[0x1D] = point.MegaFlip;
-                        pointData[0x1E] = point.CollisionTimer;
+                        pointData[0x1E] = point.MegaFlip;
+                        pointData[0x1D] = point.CollisionTimer;
 
                     }
 

@@ -891,7 +891,7 @@ namespace TeheManX_Editor
              * Checkpoint Export
              */
 
-            if (false) //Using data in game (TODO: this is not working for X3)
+            if (true) //Using data in game (TODO: this is not working for X3, different checkpoint format?)
             {
                 List<List<Checkpoint>> sourceSettings = SpawnWindow.Checkpoints;
 
