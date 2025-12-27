@@ -36,66 +36,18 @@ namespace TeheManX_Editor.Forms
 
             int dumpOffset;
             int addrMask = 0;
-            int bankCount;
+
             if (Const.Id == Const.GameId.MegaManX)
             {
                 dumpOffset = Const.MegaManX.BankCount * 0x8000;
                 addrMask = 0x800000;
-                bankCount = Const.MegaManX.BankCount;
             }
             else if (Const.Id == Const.GameId.MegaManX2)
-            {
                 dumpOffset = Const.MegaManX2.BankCount * 0x8000;
-                bankCount = Const.MegaManX2.BankCount;
-            }
             else
-            {
-                dumpOffset = Const.MegaManX3.BankCount * 0x8000;
-                bankCount = Const.MegaManX3.BankCount;
-            }
+                dumpOffset = Const.MegaManX3.FreeBanks[0] * 0x8000;
 
             int dumpAddr = 0;
-
-            {
-                int pointerBase = (SNES.OffsetToCpu(Const.EnemyPointersOffset) & 0x7FFF) + bankCount * 0x8000;
-                int startWrite;
-
-                //for X1 actual enemy data should be at end of bank other games should have it at start
-                if (Const.Id == Const.GameId.MegaManX)
-                    startWrite = pointerBase;
-                else
-                    startWrite = bankCount * 0x8000;
-
-                //Assign 16-bit Enemy Data Pointers
-                for (int i = 0; i < Const.PlayableLevelsCount; i++)
-                {
-                    if (Const.Id == Const.GameId.MegaManX3 && i > 0xE) break;
-
-                    int writeOffset = pointerBase + i * 2;
-
-                    if (Const.Id == Const.GameId.MegaManX3 && i >= 0xC)
-                        dumpAddr = pointerBase + (Const.MegaManX3.LevelsCount - 2) * 2 + (i - 0xC) * 0xCC + 1 * (i - 0xC);
-                    else
-                        dumpAddr = SNES.OffsetToCpu(i * 0xCC * 8 + 1 * i + startWrite + Const.PlayableLevelsCount * 2);
-
-                    BinaryPrimitives.WriteUInt16LittleEndian(SNES.rom.AsSpan(writeOffset), (ushort)(dumpAddr & 0xFFFF));
-                }
-                //Update Enemy Pointer
-                Const.EnemyPointersOffset = (SNES.OffsetToCpu(Const.EnemyPointersOffset) & 0x7FFF) + bankCount * 0x8000;
-            }
-
-            //Write Enemy Data Banks
-            byte oraBank = (byte)(bankCount | (addrMask >> 16));
-            SNES.rom[Const.EnemyBankAsmOffsets[0]] = oraBank;
-            SNES.rom[Const.EnemyBankAsmOffsets[1]] = oraBank;
-            SNES.rom[Const.EnemyBankAsmOffsets[2]] = oraBank;
-
-
-            //Set Dump Offset for Start of 16x16 Tile Data & Layout Data
-            if (Const.Id == Const.GameId.MegaManX3)
-                dumpOffset = Const.MegaManX3.FreeBanks[0] * 0x8000;
-            else
-                dumpOffset += 0x8000 - (dumpOffset % 0x8000); //Increament Dump Offset to Next Bank Unconditionally
 
             //Dump 16x16 Tile Data and the Layout Data 1st!
 
@@ -209,7 +161,7 @@ namespace TeheManX_Editor.Forms
 
             //Then Dump the rest of the Data
             if (Const.Id == Const.GameId.MegaManX3)
-                dumpOffset = (Const.MegaManX3.BankCount + 1) * 0x8000;
+                dumpOffset = Const.MegaManX3.BankCount * 0x8000;
             else // MegaMan X1 & X2
             {
                 //Just in case we are not at the start of a bank
@@ -295,7 +247,8 @@ namespace TeheManX_Editor.Forms
             MainWindow.window.screenE.AssignLimits();
             MainWindow.window.tile32E.AssignLimits();
             MainWindow.window.tile16E.AssignLimits();
-            MessageBox.Show("Expansion Applied for Layout , Screen , 32x32 , 16x16 Enemy tabs!");
+            MessageBox.Show($"4MB expansion complete! Every bank after 0x{((dumpOffset / 0x8000) | (addrMask >> 16)):X} is availble for use!");
+            MessageBox.Show("The expansion was applied for Layout , Screen , 32x32 , 16x16 tabs!");
             expandMB4Grid.Visibility = Visibility.Collapsed;
         }
         #endregion Events

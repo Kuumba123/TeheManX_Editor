@@ -885,15 +885,6 @@ namespace TeheManX_Editor
                 Tile16Count[i, 0] = ExpandMaxTiles16;
                 Tile16Count[i, 0] = ExpandMaxTiles16;
             }
-
-            if (Id == GameId.MegaManX)
-                EnemyDataBank = MegaManX.BankCount;
-            else if (Id == GameId.MegaManX2)
-                EnemyDataBank = MegaManX2.BankCount;
-            else
-                EnemyDataBank = MegaManX3.BankCount;
-
-            EnemyPointersOffset = (SNES.OffsetToCpu(EnemyPointersOffset) & 0x7FFF) + EnemyDataBank * 0x8000;
         }
     }
 }

@@ -761,69 +761,51 @@ namespace TeheManX_Editor
                 }
             }
 
-            if (!SNES.expanded) // Normal Export
+            int totalSize = 0;
+            int allowedSize = (Const.Id == Const.GameId.MegaManX) ? Const.TotalEnemyDataLength + Const.MegaManX.ExtraTotalEnemyDataLength : Const.TotalEnemyDataLength;
+
+            //Size Check in case enemy data is too long
+            for (int id = 0; id < totalStages; id++)
+                totalSize += GetEnemyDataLength(Enemies[id]);
+
+            if (totalSize > allowedSize)
             {
-                int totalSize = 0;
-                int allowedSize = (Const.Id == Const.GameId.MegaManX) ? Const.TotalEnemyDataLength + Const.MegaManX.ExtraTotalEnemyDataLength : Const.TotalEnemyDataLength;
-
-                //Size Check in case enemy data is too long
-                for (int id = 0; id < totalStages; id++)
-                    totalSize += GetEnemyDataLength(Enemies[id]);
-
-                if (totalSize > allowedSize)
-                {
-                    MessageBox.Show($"Enemy Data is too large to be saved to the game ({totalSize:X} vs allowed size of {allowedSize:X}).", "ERROR");
-                    return false;
-                }
-
-                ushort[] pointerData = new ushort[totalStages];
-
-                int dumpOffset = Const.EnemyPointersOffset + totalStages * 2;
-                int dumpAmount = 0;
-
-                if (Const.Id != Const.GameId.MegaManX3)
-                    dumpOffset += 6; //X1 & X2 have 3 dummy entries for some reason...
-                else
-                    dumpOffset += 2; //X3 has 1 dummy entry...
-
-                bool extraData = false;
-
-                for (int id = 0; id < totalStages; id++)
-                {
-                    byte[] data = CreateEnemyData(Enemies[id]);
-
-                    if (Const.Id == Const.GameId.MegaManX && !extraData && (dumpAmount + data.Length) > Const.MegaManX.TotalEnemyDataLength)
-                    {
-                        extraData = true;
-                        dumpOffset = Const.MegaManX.ExtraTotalEnemyDataOffset;
-                    }
-
-                    //copy actual enemy data and save location
-                    Array.Copy(data, 0, SNES.rom, dumpOffset, data.Length);
-                    pointerData[id] = (ushort)(SNES.OffsetToCpu(dumpOffset) & 0xFFFF);
-
-                    //Increament Offset
-                    dumpOffset += data.Length;
-                    dumpAmount += data.Length;
-                }
-                //Now Write 16-bit Pointers
-                Buffer.BlockCopy(pointerData, 0, SNES.rom, Const.EnemyPointersOffset, totalStages * 2);
+                MessageBox.Show($"Enemy Data is too large to be saved to the game ({totalSize:X} vs allowed size of {allowedSize:X}).", "ERROR");
+                return false;
             }
-            else // Expanded Export
+
+            ushort[] pointerData = new ushort[totalStages];
+
+            int dumpOffset = Const.EnemyPointersOffset + totalStages * 2;
+            int dumpAmount = 0;
+
+            if (Const.Id != Const.GameId.MegaManX3)
+                dumpOffset += 6; //X1 & X2 have 3 dummy entries for some reason...
+            else
+                dumpOffset += 2; //X3 has 1 dummy entry...
+
+            bool extraData = false;
+
+            for (int id = 0; id < totalStages; id++)
             {
-                for (int id = 0; id < totalStages; id++)
+                byte[] data = CreateEnemyData(Enemies[id]);
+
+                if (Const.Id == Const.GameId.MegaManX && !extraData && (dumpAmount + data.Length) > Const.MegaManX.TotalEnemyDataLength)
                 {
-                    byte[] data = CreateEnemyData(Enemies[id]);
-
-                    // Get offset from ROM
-                    int offset = SNES.CpuToOffset(
-                        BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(Const.EnemyPointersOffset + (id * 2))),
-                        Const.EnemyDataBank
-                    );
-
-                    Array.Copy(data, 0, SNES.rom, offset, data.Length);
+                    extraData = true;
+                    dumpOffset = Const.MegaManX.ExtraTotalEnemyDataOffset;
                 }
+
+                //copy actual enemy data and save location
+                Array.Copy(data, 0, SNES.rom, dumpOffset, data.Length);
+                pointerData[id] = (ushort)(SNES.OffsetToCpu(dumpOffset) & 0xFFFF);
+
+                //Increament Offset
+                dumpOffset += data.Length;
+                dumpAmount += data.Length;
             }
+            //Now Write 16-bit Pointers
+            Buffer.BlockCopy(pointerData, 0, SNES.rom, Const.EnemyPointersOffset, totalStages * 2);
 
             return true;
         }
