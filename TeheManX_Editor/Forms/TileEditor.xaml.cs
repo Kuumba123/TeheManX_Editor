@@ -112,12 +112,14 @@ namespace TeheManX_Editor.Forms
             {
                 // Disable UI
                 MainWindow.window.tileE.bgTileSetInt.IsEnabled = false;
+                MainWindow.window.tileE.bgEntrySlotInt.IsEnabled = false;
                 MainWindow.window.tileE.bgLengthInt.IsEnabled = false;
                 MainWindow.window.tileE.bgAddressInt.IsEnabled = false;
                 MainWindow.window.tileE.bgSrcBox.IsEnabled = false;
                 MainWindow.window.tileE.bgPalInt.IsEnabled = false;
 
                 MainWindow.window.tileE.objTileSetInt.IsEnabled = false;
+                MainWindow.window.tileE.objectSlotInt.IsEnabled = false;
                 MainWindow.window.tileE.compressTileInt.IsEnabled = false;
                 MainWindow.window.tileE.vramLocationInt.IsEnabled = false;
                 MainWindow.window.tileE.palSetInt.IsEnabled = false;
@@ -182,6 +184,7 @@ namespace TeheManX_Editor.Forms
             int id = Level.Id;
             if (BGSettings[id][bgTileSetId].Slots.Count == 0)
             {
+                MainWindow.window.tileE.bgEntrySlotInt.IsEnabled = false;
                 MainWindow.window.tileE.bgLengthInt.IsEnabled = false;
                 MainWindow.window.tileE.bgAddressInt.IsEnabled = false;
                 MainWindow.window.tileE.bgSrcBox.IsEnabled = false;
@@ -196,6 +199,8 @@ namespace TeheManX_Editor.Forms
 
             if (MainWindow.window.tileE.romOffsetCheck.IsChecked == true)
                 srcAddr = SNES.CpuToOffset(srcAddr);
+
+            MainWindow.window.tileE.bgEntrySlotInt.IsEnabled = true;
 
             MainWindow.window.tileE.bgLengthInt.Value = length;
             MainWindow.window.tileE.bgAddressInt.Value = dest;
@@ -360,6 +365,7 @@ namespace TeheManX_Editor.Forms
             int id = Level.Id;
             if (ObjectSettings[id][objectTileSetId].Slots.Count == 0)
             {
+                MainWindow.window.tileE.objectSlotInt.IsEnabled = false;
                 MainWindow.window.tileE.compressTileInt.IsEnabled = false;
                 MainWindow.window.tileE.vramLocationInt.IsEnabled = false;
                 MainWindow.window.tileE.palSetInt.IsEnabled = false;
@@ -371,6 +377,7 @@ namespace TeheManX_Editor.Forms
             MainWindow.window.tileE.palSetInt.Value = ObjectSettings[id][objectTileSetId].Slots[objectTileSlotId].PaletteId;
             MainWindow.window.tileE.dumpInt.Value = ObjectSettings[id][objectTileSetId].Slots[objectTileSlotId].PaletteDestination;
 
+            MainWindow.window.tileE.objectSlotInt.IsEnabled = true;
             MainWindow.window.tileE.compressTileInt.IsEnabled = true;
             MainWindow.window.tileE.vramLocationInt.IsEnabled = true;
             MainWindow.window.tileE.palSetInt.IsEnabled = true;
