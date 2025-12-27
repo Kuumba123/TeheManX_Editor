@@ -1549,6 +1549,13 @@ namespace TeheManX_Editor.Forms
             menu.PlacementTarget = stagesBtn;
             menu.IsOpen = true;
         }
+        private void projectBtn_Click(object sender, RoutedEventArgs e)
+        {
+            if (SNES.rom == null)
+                return;
+            ProjectWindow project = new ProjectWindow();
+            project.ShowDialog();
+        }
         private void helpBtn_Click(object sender, RoutedEventArgs e)
         {
 

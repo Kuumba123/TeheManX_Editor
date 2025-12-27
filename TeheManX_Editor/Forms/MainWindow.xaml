@@ -26,6 +26,7 @@
             <Button Name="testBtn" Style="{StaticResource ToolButton}" HorizontalAlignment="Left" Click="testBtn_Click">Test</Button>
             <Button Name="settingsBtn" Style="{StaticResource ToolButton}" HorizontalAlignment="Left" Click="settingsBtn_Click">Settings</Button>
             <Button Name="stagesBtn" Style="{StaticResource ToolButton}" HorizontalAlignment="Left" Click="stagesBtn_Click">Stages</Button>
+            <Button Name="projectBtn" Style="{StaticResource ToolButton}" Click="projectBtn_Click">Project</Button>
             <Button Name="helpBtn" Style="{StaticResource ToolButton}" HorizontalAlignment="Left" Click="helpBtn_Click">Help</Button>
             <Button Name="undoBtn" Style="{StaticResource ToolButton}" HorizontalAlignment="Left" Click="undoBtn_Click">Undo</Button>
         </DockPanel>
