@@ -27,6 +27,8 @@ namespace TeheManX_Editor.Forms
         public static int objectTileSetId;
         public static int objectTileSlotId;
         public static int palId = 1;
+
+        public static double scale = 4;
         #endregion Fields
 
         #region Properties
@@ -214,7 +216,7 @@ namespace TeheManX_Editor.Forms
             MainWindow.window.tileE.bgSrcBox.IsEnabled = true;
             MainWindow.window.tileE.bgPalInt.IsEnabled = true;
         }
-        private unsafe void DrawObjectTiles()
+        public unsafe void DrawObjectTiles()
         {
             int id;
             if (Const.Id == Const.GameId.MegaManX3 && Level.Id > 0xE) id = (Level.Id - 0xF) + 2; //Buffalo or Beetle
@@ -347,7 +349,7 @@ namespace TeheManX_Editor.Forms
             vramTiles.AddDirtyRect(new Int32Rect(0, 0, 128, 128));
             vramTiles.Unlock();
         }
-        private void DrawPalette()
+        public void DrawPalette()
         {
             for (int y = 0; y < 8; y++)
             {
@@ -1300,6 +1302,18 @@ namespace TeheManX_Editor.Forms
                 objectTileGrid.ShowGridLines = false;
             else
                 objectTileGrid.ShowGridLines = true;
+        }
+        private void zoomInBtn_Click(object sender, RoutedEventArgs e)
+        {
+            scale = Math.Clamp(scale + 1, 1, Const.MaxScaleUI);
+            objectTilesImage.Width = scale * 128;
+            objectTilesImage.Height = scale * 128;
+        }
+        private void zoomOutBtn_Click(object sender, RoutedEventArgs e)
+        {
+            scale = Math.Clamp(scale - 1, 1, Const.MaxScaleUI);
+            objectTilesImage.Width = scale * 128;
+            objectTilesImage.Height = scale * 128;
         }
         private void EditObjectSlotCountBtn_Click(object sender, RoutedEventArgs e)
         {

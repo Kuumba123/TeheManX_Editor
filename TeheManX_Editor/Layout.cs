@@ -26,6 +26,8 @@ namespace TeheManX_Editor
         public double ScaleVram2 { get; set; }
         //Enemy Viewer
         public double ScaleEnemy { get; set; }
+        //VRAM Tiles Viewer
+        public double ScaleObjectVram { get; set ; }
         public class WindowLayout
         {
             public double Left { get; set; }

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Buffers.Binary;
 using System.Collections.Generic;
-using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -19,7 +18,7 @@ namespace TeheManX_Editor.Forms
         #region Fields
         static List<Rectangle> triggerRects = new List<Rectangle>();
         static List<EnemyLabel> enemyLabels = new List<EnemyLabel>();
-        public static double scale = 1;
+        public static double scale = 2;
         #endregion Fields
 
         #region Properties

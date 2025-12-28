@@ -45,7 +45,7 @@
         </Grid.RowDefinitions>
         
         <StackPanel>
-            <TextBlock FontSize="18" Foreground="White" FontFamily="Consolas" HorizontalAlignment="Center">Background Tiles</TextBlock>
+            <TextBlock FontSize="18" Foreground="White" FontFamily="Consolas" HorizontalAlignment="Center">Background Tile Settings</TextBlock>
             <Border BorderBrush="White" BorderThickness="2">
                 <StackPanel>
                     <StackPanel Orientation="Horizontal">
@@ -93,14 +93,24 @@
 
         <!--Object Tile Display Area -->
         <StackPanel Grid.Column="1">
-            <Grid x:Name="objectTileGrid">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <Button Style="{StaticResource TileButton}" x:Name="zoomInBtn" Click="zoomInBtn_Click" Width="25" Height="25" Margin="0" Padding="0" VerticalAlignment="Center" HorizontalAlignment="Left">+</Button>
+                <Button Style="{StaticResource TileButton}" x:Name="zoomOutBtn" Click="zoomOutBtn_Click" Width="25" Height="25" Margin="0" Padding="0" FontSize="15" Grid.Column="1">-</Button>
+                <TextBlock Grid.Column="2" HorizontalAlignment="Center">VRAM Tiles</TextBlock>
+            </Grid>
+            <Grid x:Name="objectTileGrid" HorizontalAlignment="Left" VerticalAlignment="Top">
                 <Image x:Name="objectTilesImage" Width="512" Height="512" Grid.ColumnSpan="16" Grid.RowSpan="16" MouseUp="objectTilesImage_MouseUp"></Image>
             </Grid>
         </StackPanel>
         
         <!--Object Tile Swapping Related Info-->
         <StackPanel Grid.Column="2">
-            <TextBlock FontSize="18" Foreground="White" FontFamily="Consolas" HorizontalAlignment="Center">Object Tiles</TextBlock>
+            <TextBlock FontSize="18" Foreground="White" FontFamily="Consolas" HorizontalAlignment="Center">Object Tile Settings</TextBlock>
             <StackPanel Orientation="Horizontal">
                 <TextBlock Width="160">OBJ Setting</TextBlock>
                 <local:NumInt x:Name="objTileSetInt" Value="0" Minimum="0" ValueChanged="objectTileSetInt_ValueChanged"></local:NumInt>

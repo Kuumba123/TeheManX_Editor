@@ -83,13 +83,13 @@
                     <StackPanel Orientation="Horizontal">
                         <TextBlock FontSize="33" Foreground="White" FontFamily="Consolas" Padding="3,3,0,3">X:</TextBlock>
                         <local:NumInt x:Name="xInt" ButtonSpinnerWidth="20" Width="100" Height="40" FontSize="33" Value="0" Maximum="#1FFF" Minimum="0" MaxLength="3" IsEnabled="False" ValueChanged="xInt_ValueChanged"/>
-                        <Button x:Name="zoomInBtn" Click="zoomInBtn_Click" Margin="15,0,0,0" Padding="0" Width="25" Height="25">+</Button>
+                        <Button Style="{StaticResource TileButton}" x:Name="zoomInBtn" Click="zoomInBtn_Click" Margin="15,0,0,0" Padding="0" Width="25" Height="25">+</Button>
                     </StackPanel>
                     <!--Y-->
                     <StackPanel Orientation="Horizontal">
                         <TextBlock FontSize="33" Foreground="White" FontFamily="Consolas" Padding="3,3,0,3">Y:</TextBlock>
                         <local:NumInt x:Name="yInt" ButtonSpinnerWidth="20" Width="100" Height="40" FontSize="33" Value="0" Maximum="#1FFF" Minimum="0" MaxLength="3" IsEnabled="False" ValueChanged="yInt_ValueChanged"/>
-                        <Button x:Name="zoomOutBtn" Click="zoomOutBtn_Click" Margin="15,0,0,0" Padding="0" Width="25" Height="25">-</Button>
+                        <Button Style="{StaticResource TileButton}" x:Name="zoomOutBtn" Click="zoomOutBtn_Click" Margin="15,0,0,0" Padding="0" Width="25" Height="25">-</Button>
                     </StackPanel>
                 </StackPanel>
                 <WrapPanel Orientation="Horizontal" Grid.Row="1" Grid.ColumnSpan="2">

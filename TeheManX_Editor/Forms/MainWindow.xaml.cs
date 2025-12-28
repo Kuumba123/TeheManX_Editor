@@ -83,19 +83,18 @@ namespace TeheManX_Editor.Forms
                     ToolsWindow.mmx2Open = layout.MegaManX2Open;
                     ToolsWindow.mmx3Open = layout.MegaManX3Open;
 
-                    Tile16Editor.scale = layout.ScaleVram;
-                    if (Tile16Editor.scale < 1)
-                        Tile16Editor.scale = 1;
-                    PaletteEditor.scale = layout.ScaleVram;
-                    if (PaletteEditor.scale < 1)
-                        PaletteEditor.scale = 1;
+                    Tile16Editor.scale = Math.Clamp(layout.ScaleVram, 1, Const.MaxScaleUI);
+
+                    PaletteEditor.scale = Math.Clamp(layout.ScaleVram2, 1, Const.MaxScaleUI);
+
+                    TileEditor.scale = Math.Clamp(layout.ScaleObjectVram, 1, Const.MaxScaleUI);
 
                     window.tile16E.vramTileImage.Width = Tile16Editor.scale * 128;
                     window.paletteE.vramTileImage.Width = PaletteEditor.scale * 128;
+                    window.tileE.objectTilesImage.Width = TileEditor.scale * 128;
+                    window.tileE.objectTilesImage.Height = TileEditor.scale * 128;
 
-                    EnemyEditor.scale = layout.ScaleEnemy;
-                    if (EnemyEditor.scale < 1)
-                        EnemyEditor.scale = 1;
+                    EnemyEditor.scale = Math.Clamp(layout.ScaleEnemy, 1, Const.MaxEnemyScale);
                 }
 
                 DefineSizing();
@@ -339,17 +338,15 @@ namespace TeheManX_Editor.Forms
         {
             if (Keyboard.IsKeyDown(Key.LeftShift))
             {
+                bool update = false;
                 if (key == "OemPlus")
-                {
-                    if (Tile16Editor.scale != Const.MaxVramScale)
-                        Tile16Editor.scale++;
-                    window.tile16E.vramTileImage.Width = Tile16Editor.scale * 128;
-                }
+                    Tile16Editor.scale = Math.Clamp(Tile16Editor.scale + 1, 1, Const.MaxScaleUI);
                 else if (key == "OemMinus")
+                    Tile16Editor.scale = Math.Clamp(Tile16Editor.scale - 1, 1, Const.MaxScaleUI);
+                if (update)
                 {
-                    if (Tile16Editor.scale != 1)
-                        Tile16Editor.scale--;
                     window.tile16E.vramTileImage.Width = Tile16Editor.scale * 128;
+                    window.tile16E.vramTileImage.Height = Tile16Editor.scale * 128;
                 }
             }
             if (key == "Delete")
@@ -414,17 +411,21 @@ namespace TeheManX_Editor.Forms
             }
             else if (Keyboard.IsKeyDown(Key.LeftShift))
             {
+                bool updateS = false;
                 if (key == "OemPlus")
                 {
-                    if (PaletteEditor.scale != Const.MaxVramScale)
-                        PaletteEditor.scale++;
-                    window.paletteE.vramTileImage.Width = PaletteEditor.scale * 128;
+                    updateS = true;
+                    PaletteEditor.scale = Math.Clamp(PaletteEditor.scale + 1, 1, Const.MaxScaleUI);
                 }
                 else if (key == "OemMinus")
                 {
-                    if (PaletteEditor.scale != 1)
-                        PaletteEditor.scale--;
+                    updateS = true;
+                    PaletteEditor.scale = Math.Clamp(PaletteEditor.scale - 1, 1, Const.MaxScaleUI);
+                }
+                if (updateS)
+                {
                     window.paletteE.vramTileImage.Width = PaletteEditor.scale * 128;
+                    window.paletteE.vramTileImage.Height = PaletteEditor.scale * 128;
                 }
             }
 
@@ -513,6 +514,44 @@ namespace TeheManX_Editor.Forms
                     window.enemyE.ZoomTransform.ScaleX = EnemyEditor.scale;
                     window.enemyE.ZoomTransform.ScaleY = EnemyEditor.scale;
                 }
+            }
+        }
+        private void TileKeyCheck(string key, bool notFocus)
+        {
+            if (!notFocus) //Check if num int is focused
+                return;
+
+            bool update = false;
+            if (key == "W")
+            {
+                TileEditor.palId--;
+                update = true;
+            }
+            else if (key == "S")
+            {
+                TileEditor.palId++;
+                update = true;
+            }
+            else if (Keyboard.IsKeyDown(Key.LeftShift))
+            {
+                bool updateS = false;
+                if (key == "OemPlus")
+                    TileEditor.scale = Math.Clamp(TileEditor.scale + 1, 1, Const.MaxScaleUI);
+                else if (key == "OemMinus")
+                    TileEditor.scale = Math.Clamp(TileEditor.scale - 1, 1, Const.MaxScaleUI);
+                if (updateS)
+                {
+                    window.tileE.objectTilesImage.Width = TileEditor.scale * 128;
+                    window.tileE.objectTilesImage.Height = TileEditor.scale * 128;
+                }
+            }
+
+            if (update)
+            {
+                TileEditor.palId &= 7;
+                window.tileE.DrawPalette();
+                window.tileE.UpdateCursor();
+                window.tileE.DrawObjectTiles();
             }
         }
         private int GetHubIndex()
@@ -686,6 +725,8 @@ namespace TeheManX_Editor.Forms
             layout.ScaleVram2 = PaletteEditor.scale;
 
             layout.ScaleEnemy = EnemyEditor.scale;
+
+            layout.ScaleObjectVram = TileEditor.scale;
 
             foreach (Window childWind in Application.Current.Windows)
             {
@@ -1398,6 +1439,11 @@ namespace TeheManX_Editor.Forms
                 case "enemyTab":
                     {
                         EnemyKeyCheck(key, nonNumInt);
+                        break;
+                    }
+                case "tileTab":
+                    {
+                        TileKeyCheck(key, nonNumInt);
                         break;
                     }
             }

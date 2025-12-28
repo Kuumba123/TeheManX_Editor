@@ -78,6 +78,8 @@
                 <Button Style="{StaticResource TileButton}" Click="Clut_Click">5</Button>
                 <Button Style="{StaticResource TileButton}" Click="Clut_Click">6</Button>
                 <Button Style="{StaticResource TileButton}" Click="Clut_Click">7</Button>
+                <Button x:Name="zoomInBtn" Click="zoomInBtn_Click" Style="{StaticResource TileButton}" Width="25">+</Button>
+                <Button x:Name="zoomOutBtn" Click="zoomOutBtn_Click" Style="{StaticResource TileButton}" Width="25">-</Button>
             </StackPanel>
 
             <!--GPU Tiles-->

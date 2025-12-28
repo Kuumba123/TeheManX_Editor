@@ -62,5 +62,10 @@
         </StackPanel>
 
         <Button Margin="5" Click="EditPaletteCountBtn_Click" Width="250" Height="35" HorizontalAlignment="Left" Grid.Column="1" Grid.Row="1">Edit Palette Swap Counts</Button>
+
+        <StackPanel Orientation="Horizontal" Grid.Column="1" Grid.Row="1" HorizontalAlignment="Right" VerticalAlignment="Bottom">
+            <Button x:Name="zoomInBtn" Click="zoomInBtn_Click" Style="{StaticResource TileButton}" Margin="5" Width="25" Height="30">+</Button>
+            <Button x:Name="zoomOutBtn" Click="zoomOutBtn_Click" Style="{StaticResource TileButton}" Margin="5" Width="25" Height="30">-</Button>
+        </StackPanel>
     </Grid>
 </UserControl>

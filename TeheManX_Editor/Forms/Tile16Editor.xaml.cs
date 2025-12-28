@@ -600,6 +600,16 @@ namespace TeheManX_Editor.Forms
             MainWindow.window.tile32E.Draw16xTiles();
             MainWindow.window.tile32E.DrawTile();
         }
+        private void zoomInBtn_Click(object sender, RoutedEventArgs e)
+        {
+            scale = Math.Clamp(scale + 1, 1, Const.MaxScaleUI);
+            vramTileImage.Width = scale * 128;
+        }
+        private void zoomOutBtn_Click(object sender, RoutedEventArgs e)
+        {
+            scale = Math.Clamp(scale - 1, 1, Const.MaxScaleUI);
+            vramTileImage.Width = scale * 128;
+        }
         #endregion Events
     }
 }

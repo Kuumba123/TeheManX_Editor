@@ -716,6 +716,16 @@ namespace TeheManX_Editor.Forms
             window.Content = stackPanel;
             window.ShowDialog();
         }
+        private void zoomInBtn_Click(object sender, RoutedEventArgs e)
+        {
+            scale = Math.Clamp(scale + 1, 1, Const.MaxScaleUI);
+            vramTileImage.Width = scale * 128;
+        }
+        private void zoomOutBtn_Click(object sender, RoutedEventArgs e)
+        {
+            scale = Math.Clamp(scale - 1, 1, Const.MaxScaleUI);
+            vramTileImage.Width = scale * 128;
+        }
         private void bgPalIdInt_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
             if (e.NewValue == null || SNES.rom == null) return;
