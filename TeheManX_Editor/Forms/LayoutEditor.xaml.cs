@@ -201,7 +201,7 @@ namespace TeheManX_Editor.Forms
                 {
                     if (sfd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                     {
-                        WriteableBitmap fileBmp = new WriteableBitmap(256 * 32, 256 * 32, 96, 96, PixelFormats.Rgb24, null);
+                        WriteableBitmap fileBmp = new WriteableBitmap(256 * 32, 256 * 32, 96, 96, PixelFormats.Bgra32, null);
                         int stride = fileBmp.BackBufferStride;
                         fileBmp.Lock();
                         IntPtr ptr = fileBmp.BackBuffer;
