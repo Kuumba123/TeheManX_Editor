@@ -22,6 +22,7 @@ namespace TeheManX_Editor
         public static int PaletteId;
         public static int PaletteColorAddress;
         public static List<Enemy>[] Enemies = new List<Enemy>[Const.MaxLevels];
+        public static GameProject Project;
         #endregion Fields
 
         #region Methods

@@ -1,6 +1,6 @@
 ﻿namespace TeheManX_Editor
 {
-    class Enemy
+    public class Enemy
     {
         #region Properties
         public short X;
