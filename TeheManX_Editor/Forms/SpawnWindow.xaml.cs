@@ -119,20 +119,47 @@ namespace TeheManX_Editor.Forms
                         point.WramFlag = SNES.rom[offset + 0x1C];
                         point.MegaFlip = SNES.rom[offset + 0x1E];
                         point.CollisionTimer = SNES.rom[offset + 0x1D];
+
+                        if (Const.Id == Const.GameId.MegaManX3)
+                            point.ScrollType = SNES.rom[offset + 0x1F];
                     }
                     list.Add(point);
                 }
                 Checkpoints.Add(list);
+            }
+            if (Const.Id != Const.GameId.MegaManX)
+            {
+                silkShotInt.Visibility = Visibility.Visible;
+                silkShotTxt.Visibility = Visibility.Visible;
+                wramInt.Visibility = Visibility.Visible;
+                wramTxt.Visibility = Visibility.Visible;
+
+                if (Const.Id == Const.GameId.MegaManX3)
+                {
+                    scrollInt.Visibility = Visibility.Visible;
+                    scrollTypeText.Visibility = Visibility.Visible;
+                }
+            }
+            else
+            {
+                silkShotInt.Visibility = Visibility.Collapsed;
+                silkShotTxt.Visibility = Visibility.Collapsed;
+                wramInt.Visibility = Visibility.Collapsed;
+                wramTxt.Visibility = Visibility.Collapsed;
+                scrollInt.Visibility = Visibility.Collapsed;
+                scrollTypeText.Visibility = Visibility.Collapsed;
             }
         }
         public void SetSpawnSettings()
         {
             if (Level.Id >= Const.PlayableLevelsCount || (Const.Id == Const.GameId.MegaManX3 && Level.Id > 0xE))
             {
-                MainWindow.window.spawnE.spawnInt.IsEnabled = false;
+                spawnInt.IsEnabled = false;
                 objectTileInt.IsEnabled = false;
                 backgroundTileInt.IsEnabled = false;
                 backgroundPalInt.IsEnabled = false;
+                silkShotInt.IsEnabled = false;
+                wramInt.IsEnabled = false;
                 megaIntX.IsEnabled = false;
                 megaIntY.IsEnabled = false;
                 camIntX.IsEnabled = false;
@@ -147,32 +174,15 @@ namespace TeheManX_Editor.Forms
                 bg2IntBaseY.IsEnabled = false;
                 megaFlipInt.IsEnabled = false;
                 collisionInt.IsEnabled = false;
-
-                silkShotInt.IsEnabled = false;
-                wramInt.IsEnabled = false;
+                scrollInt.IsEnabled = false;
                 return;
             }
 
-            if (Const.Id != Const.GameId.MegaManX)
-            {
-                silkShotInt.IsEnabled = true;
-                wramInt.IsEnabled = true;
-                silkShotInt.Visibility = Visibility.Visible;
-                wramInt.Visibility = Visibility.Visible;
-                silkShotTxt.Visibility = Visibility.Visible;
-                wramTxt.Visibility = Visibility.Visible;
-            }
-            else
-            {
-                silkShotInt.Visibility = Visibility.Collapsed;
-                wramInt.Visibility = Visibility.Collapsed;
-                silkShotTxt.Visibility = Visibility.Collapsed;
-                wramTxt.Visibility = Visibility.Collapsed;
-            }
             spawnInt.IsEnabled = true;
             objectTileInt.IsEnabled = true;
             backgroundTileInt.IsEnabled = true;
             backgroundPalInt.IsEnabled = true;
+            silkShotInt.IsEnabled = true;
             megaIntX.IsEnabled = true;
             megaIntY.IsEnabled = true;
             camIntX.IsEnabled = true;
@@ -187,6 +197,8 @@ namespace TeheManX_Editor.Forms
             bg2IntBaseY.IsEnabled = true;
             megaFlipInt.IsEnabled = true;
             collisionInt.IsEnabled = true;
+            wramInt.IsEnabled = true;
+            scrollInt.IsEnabled = true;
 
             supressInts = true;
             checkpointId = 0;
@@ -202,7 +214,10 @@ namespace TeheManX_Editor.Forms
             objectTileInt.Value = point.ObjectTileSetting;
             backgroundTileInt.Value = point.BackgroundTileSetting;
             backgroundPalInt.Value = point.BackgroundPaletteSetting;
-            silkShotInt.Value = point.SilkShotType;
+
+            if (Const.Id != Const.GameId.MegaManX)
+                silkShotInt.Value = point.SilkShotType;
+
             megaIntX.Value = point.MegaX;
             megaIntY.Value = point.MegaY;
             camIntX.Value = point.CameraX;
@@ -218,6 +233,9 @@ namespace TeheManX_Editor.Forms
             wramInt.Value = point.WramFlag;
             megaFlipInt.Value = point.MegaFlip;
             collisionInt.Value = point.CollisionTimer;
+
+            if (Const.Id == Const.GameId.MegaManX3)
+                scrollInt.Value = point.ScrollType;
         }
         public static byte[] CreateCheckpointData(List<List<Checkpoint>> sourceSettings)
         {
@@ -236,7 +254,7 @@ namespace TeheManX_Editor.Forms
             foreach (var innerList in sourceSettings)
                 keyList.Add(Enumerable.Repeat(0, innerList.Count).ToList());
 
-            int checkpointSize = Const.Id == Const.GameId.MegaManX ? 0x1D : 0x1F;
+            int checkpointSize = Const.Id == Const.GameId.MegaManX ? 0x1D : Const.Id == Const.GameId.MegaManX2 ? 0x1F : 0x20;
 
             for (int id = 0; id < sourceSettings.Count; id++)
             {
@@ -289,6 +307,8 @@ namespace TeheManX_Editor.Forms
                         pointData[0x1E] = point.MegaFlip;
                         pointData[0x1D] = point.CollisionTimer;
 
+                        if (Const.Id == Const.GameId.MegaManX3)
+                            pointData[0x1F] = point.ScrollType;
                     }
 
                     if (!dict.ContainsKey(pointData))
@@ -646,6 +666,21 @@ namespace TeheManX_Editor.Forms
             if (Checkpoints[id][p].CollisionTimer == valueNew) return;
 
             Checkpoints[id][p].CollisionTimer = valueNew;
+            SNES.edit = true;
+        }
+        private void scrollInt_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        {
+            if (e.NewValue == null || SNES.rom == null || Level.Id >= Const.PlayableLevelsCount || supressInts)
+                return;
+
+            int id = Level.Id;
+            int p = checkpointId;
+
+            byte valueNew = (byte)(int)e.NewValue;
+
+            if (Checkpoints[id][p].ScrollType == valueNew) return;
+
+            Checkpoints[id][p].ScrollType = valueNew;
             SNES.edit = true;
         }
         private void EditCheckpointBtn_Click(object sender, RoutedEventArgs e) // Configure Max Checkpoints in the current stage

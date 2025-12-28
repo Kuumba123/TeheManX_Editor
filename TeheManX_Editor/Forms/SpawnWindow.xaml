@@ -41,15 +41,15 @@
         <StackPanel HorizontalAlignment="Right" Grid.Row="1">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                 <TextBlock>Object Tiles Set</TextBlock>
-                <local:NumInt Minimum="0" Maximum="#FF" Uid="0 1" x:Name="objectTileInt" ValueChanged="objectTileInt_ValueChanged"></local:NumInt>
+                <local:NumInt Minimum="0" Maximum="#FF" x:Name="objectTileInt" ValueChanged="objectTileInt_ValueChanged"></local:NumInt>
             </StackPanel>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                 <TextBlock>Background Tiles Set</TextBlock>
-                <local:NumInt Minimum="0" Maximum="#FF" Uid="1 1" x:Name="backgroundTileInt" ValueChanged="backgroundTileInt_ValueChanged"></local:NumInt>
+                <local:NumInt Minimum="0" Maximum="#FF" x:Name="backgroundTileInt" ValueChanged="backgroundTileInt_ValueChanged"></local:NumInt>
             </StackPanel>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                 <TextBlock>Background Palette Set</TextBlock>
-                <local:NumInt Minimum="0" Maximum="#FF" Uid="2 1" x:Name="backgroundPalInt" ValueChanged="backgroundPalInt_ValueChanged"></local:NumInt>
+                <local:NumInt Minimum="0" Maximum="#FF" x:Name="backgroundPalInt" ValueChanged="backgroundPalInt_ValueChanged"></local:NumInt>
             </StackPanel>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                 <TextBlock x:Name="silkShotTxt">Silk Shot Type</TextBlock>
@@ -57,63 +57,67 @@
             </StackPanel>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                 <TextBlock>Mega-X</TextBlock>
-                <local:NumInt Minimum="0" Maximum="#FFFF" Uid="3" x:Name="megaIntX" ValueChanged="megaIntX_ValueChanged"></local:NumInt>
+                <local:NumInt Minimum="0" Maximum="#FFFF" x:Name="megaIntX" ValueChanged="megaIntX_ValueChanged"></local:NumInt>
             </StackPanel>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                 <TextBlock>Mega-Y</TextBlock>
-                <local:NumInt Minimum="0" Maximum="#FFFF" Uid="5" x:Name="megaIntY" ValueChanged="megaIntY_ValueChanged"></local:NumInt>
+                <local:NumInt Minimum="0" Maximum="#FFFF" x:Name="megaIntY" ValueChanged="megaIntY_ValueChanged"></local:NumInt>
             </StackPanel>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                 <TextBlock>Cam-X</TextBlock>
-                <local:NumInt Minimum="0" Maximum="#FFFF" Uid="7" x:Name="camIntX" ValueChanged="camIntX_ValueChanged"></local:NumInt>
+                <local:NumInt Minimum="0" Maximum="#FFFF" x:Name="camIntX" ValueChanged="camIntX_ValueChanged"></local:NumInt>
             </StackPanel>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                 <TextBlock>Cam-Y</TextBlock>
-                <local:NumInt Minimum="0" Maximum="#FFFF" Uid="9" x:Name="camIntY" ValueChanged="camIntY_ValueChanged"></local:NumInt>
+                <local:NumInt Minimum="0" Maximum="#FFFF" x:Name="camIntY" ValueChanged="camIntY_ValueChanged"></local:NumInt>
             </StackPanel>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                 <TextBlock>BG2-X</TextBlock>
-                <local:NumInt Minimum="0" Maximum="#FFFF" Uid="11" x:Name="bg2IntX" ValueChanged="bg2IntX_ValueChanged"></local:NumInt>
+                <local:NumInt Minimum="0" Maximum="#FFFF" x:Name="bg2IntX" ValueChanged="bg2IntX_ValueChanged"></local:NumInt>
             </StackPanel>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                 <TextBlock>BG2-Y</TextBlock>
-                <local:NumInt Minimum="0" Maximum="#FFFF" Uid="13" x:Name="bg2IntY" ValueChanged="bg2IntY_ValueChanged"></local:NumInt>
+                <local:NumInt Minimum="0" Maximum="#FFFF" x:Name="bg2IntY" ValueChanged="bg2IntY_ValueChanged"></local:NumInt>
             </StackPanel>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                 <TextBlock>Cam BD-L</TextBlock>
-                <local:NumInt Minimum="0" Maximum="#FFFF" Uid="15" x:Name="camBorderIntL" ValueChanged="camBorderIntL_ValueChanged"></local:NumInt>
+                <local:NumInt Minimum="0" Maximum="#FFFF" x:Name="camBorderIntL" ValueChanged="camBorderIntL_ValueChanged"></local:NumInt>
             </StackPanel>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                 <TextBlock>Cam BD-R</TextBlock>
-                <local:NumInt Minimum="0" Maximum="#FFFF" Uid="17" x:Name="camBorderIntR" ValueChanged="camBorderIntR_ValueChanged"></local:NumInt>
+                <local:NumInt Minimum="0" Maximum="#FFFF" x:Name="camBorderIntR" ValueChanged="camBorderIntR_ValueChanged"></local:NumInt>
             </StackPanel>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                 <TextBlock>Cam BD-T</TextBlock>
-                <local:NumInt Minimum="0" Maximum="#FFFF" Uid="19" x:Name="camBorderIntT" ValueChanged="camBorderIntT_ValueChanged"></local:NumInt>
+                <local:NumInt Minimum="0" Maximum="#FFFF" x:Name="camBorderIntT" ValueChanged="camBorderIntT_ValueChanged"></local:NumInt>
             </StackPanel>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                 <TextBlock>Cam BD-B</TextBlock>
-                <local:NumInt Minimum="0" Maximum="#FFFF" Uid="21" x:Name="camBorderIntB" ValueChanged="camBorderIntB_ValueChanged"></local:NumInt>
+                <local:NumInt Minimum="0" Maximum="#FFFF" x:Name="camBorderIntB" ValueChanged="camBorderIntB_ValueChanged"></local:NumInt>
             </StackPanel>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                 <TextBlock>BG2 Base X</TextBlock>
-                <local:NumInt Minimum="0" Maximum="#FFFF" Uid="23" x:Name="bg2IntBaseX" ValueChanged="bg2IntBaseX_ValueChanged"></local:NumInt>
+                <local:NumInt Minimum="0" Maximum="#FFFF" x:Name="bg2IntBaseX" ValueChanged="bg2IntBaseX_ValueChanged"></local:NumInt>
             </StackPanel>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                 <TextBlock>BG2 Base Y</TextBlock>
-                <local:NumInt Minimum="0" Maximum="#FFFF" Uid="25" x:Name="bg2IntBaseY" ValueChanged="bg2IntBaseY_ValueChanged"></local:NumInt>
+                <local:NumInt Minimum="0" Maximum="#FFFF" x:Name="bg2IntBaseY" ValueChanged="bg2IntBaseY_ValueChanged"></local:NumInt>
             </StackPanel>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                 <TextBlock x:Name="wramTxt">WRAM Flag???</TextBlock>
-                <local:NumInt Minimum="0" Maximum="#FF" Uid="255 1" x:Name="wramInt" ValueChanged="wramIntInt_ValueChanged"></local:NumInt>
+                <local:NumInt Minimum="0" Maximum="#FF" x:Name="wramInt" ValueChanged="wramIntInt_ValueChanged"></local:NumInt>
             </StackPanel>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                 <TextBlock>Mega Flip</TextBlock>
-                <local:NumInt Minimum="0" Maximum="#FF" Uid="27 1" x:Name="megaFlipInt" ValueChanged="megaFlipInt_ValueChanged"></local:NumInt>
+                <local:NumInt Minimum="0" Maximum="#FF" x:Name="megaFlipInt" ValueChanged="megaFlipInt_ValueChanged"></local:NumInt>
             </StackPanel>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                 <TextBlock>Collision Timer</TextBlock>
-                <local:NumInt Minimum="0" Maximum="#FF" Uid="28 1" x:Name="collisionInt" ValueChanged="collisionInt_ValueChanged"></local:NumInt>
+                <local:NumInt Minimum="0" Maximum="#FF" x:Name="collisionInt" ValueChanged="collisionInt_ValueChanged"></local:NumInt>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <TextBlock x:Name="scrollTypeText">Scroll Type</TextBlock>
+                <local:NumInt Minimum="0" Maximum="#FF" x:Name="scrollInt" ValueChanged="scrollInt_ValueChanged"></local:NumInt>
             </StackPanel>
         </StackPanel>
     </Grid>

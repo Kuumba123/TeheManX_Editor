@@ -21,5 +21,6 @@
         public byte WramFlag { get; set; }
         public byte MegaFlip { get; set; }
         public byte CollisionTimer { get; set; }
+        public byte ScrollType { get; set; }
     }
 }
