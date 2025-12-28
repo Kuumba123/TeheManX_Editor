@@ -594,15 +594,13 @@ namespace TeheManX_Editor.Forms
         }
         private void zoomInBtn_Click(object sender, RoutedEventArgs e)
         {
-            if (scale != 8)
-                scale++;
+            scale = Math.Clamp(scale + 1, 1, Const.MaxScaleUI);
             MainWindow.window.enemyE.ZoomTransform.ScaleX = scale;
             MainWindow.window.enemyE.ZoomTransform.ScaleY = scale;
         }
         private void zoomOutBtn_Click(object sender, RoutedEventArgs e)
         {
-            if (scale != 1)
-                scale--;
+            scale = Math.Clamp(scale - 1, 1, Const.MaxScaleUI);
             MainWindow.window.enemyE.ZoomTransform.ScaleX = scale;
             MainWindow.window.enemyE.ZoomTransform.ScaleY = scale;
         }

@@ -94,7 +94,7 @@ namespace TeheManX_Editor.Forms
                     window.tileE.objectTilesImage.Width = TileEditor.scale * 128;
                     window.tileE.objectTilesImage.Height = TileEditor.scale * 128;
 
-                    EnemyEditor.scale = Math.Clamp(layout.ScaleEnemy, 1, Const.MaxEnemyScale);
+                    EnemyEditor.scale = Math.Clamp(layout.ScaleEnemy, 1, Const.MaxScaleUI);
                 }
 
                 DefineSizing();
@@ -340,14 +340,17 @@ namespace TeheManX_Editor.Forms
             {
                 bool update = false;
                 if (key == "OemPlus")
-                    Tile16Editor.scale = Math.Clamp(Tile16Editor.scale + 1, 1, Const.MaxScaleUI);
-                else if (key == "OemMinus")
-                    Tile16Editor.scale = Math.Clamp(Tile16Editor.scale - 1, 1, Const.MaxScaleUI);
-                if (update)
                 {
-                    window.tile16E.vramTileImage.Width = Tile16Editor.scale * 128;
-                    window.tile16E.vramTileImage.Height = Tile16Editor.scale * 128;
+                    Tile16Editor.scale = Math.Clamp(Tile16Editor.scale + 1, 1, Const.MaxScaleUI);
+                    update = true;
                 }
+                else if (key == "OemMinus")
+                {
+                    Tile16Editor.scale = Math.Clamp(Tile16Editor.scale - 1, 1, Const.MaxScaleUI);
+                    update = true;
+                }
+                if (update)
+                    window.tile16E.vramTileImage.Width = Tile16Editor.scale * 128;
             }
             if (key == "Delete")
             {
@@ -423,10 +426,7 @@ namespace TeheManX_Editor.Forms
                     PaletteEditor.scale = Math.Clamp(PaletteEditor.scale - 1, 1, Const.MaxScaleUI);
                 }
                 if (updateS)
-                {
                     window.paletteE.vramTileImage.Width = PaletteEditor.scale * 128;
-                    window.paletteE.vramTileImage.Height = PaletteEditor.scale * 128;
-                }
             }
 
             if (update)
@@ -502,15 +502,13 @@ namespace TeheManX_Editor.Forms
             {
                 if (key == "OemPlus")
                 {
-                    if (EnemyEditor.scale != 8)
-                        EnemyEditor.scale++;
+                    EnemyEditor.scale = Math.Clamp(EnemyEditor.scale + 1, 1, Const.MaxScaleUI);
                     window.enemyE.ZoomTransform.ScaleX = EnemyEditor.scale;
                     window.enemyE.ZoomTransform.ScaleY = EnemyEditor.scale;
                 }
                 else if (key == "OemMinus")
                 {
-                    if (EnemyEditor.scale != 1)
-                        EnemyEditor.scale--;
+                    EnemyEditor.scale = Math.Clamp(EnemyEditor.scale - 1, 1, Const.MaxScaleUI);
                     window.enemyE.ZoomTransform.ScaleX = EnemyEditor.scale;
                     window.enemyE.ZoomTransform.ScaleY = EnemyEditor.scale;
                 }
@@ -536,9 +534,15 @@ namespace TeheManX_Editor.Forms
             {
                 bool updateS = false;
                 if (key == "OemPlus")
+                {
                     TileEditor.scale = Math.Clamp(TileEditor.scale + 1, 1, Const.MaxScaleUI);
+                    updateS = true;
+                }
                 else if (key == "OemMinus")
+                {
                     TileEditor.scale = Math.Clamp(TileEditor.scale - 1, 1, Const.MaxScaleUI);
+                    updateS = true;
+                }
                 if (updateS)
                 {
                     window.tileE.objectTilesImage.Width = TileEditor.scale * 128;

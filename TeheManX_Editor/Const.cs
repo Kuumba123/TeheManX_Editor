@@ -12,7 +12,6 @@ namespace TeheManX_Editor
         public const int MaxUndo = 512;
         public const double MaxVramScale = 6;
         public const double MaxScaleUI = 8;
-        public const double MaxEnemyScale = 8;
         public enum GameId
         {
             MegaManX,
