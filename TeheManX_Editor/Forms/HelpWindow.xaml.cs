@@ -12,7 +12,7 @@ namespace TeheManX_Editor.Forms
             //0
             "Using the editor is pretty straight forward. " +
             "just click open to your MegaMan X1/X2/X3 SFC Rom!\n" +
-            "The japanese version of the games also work but most of the testing was done the north american version. " +
+            "The japanese version of the games also work but most of the testing was done on the north american versions of the games (and 1.0 speficly for X1). " +
             "There are also some general purpose tools for the games witch you can acsess by clicking Tools " +
             "(keep in mind nothing in the tools tab is connected to the rest of the editor)",
             //1
