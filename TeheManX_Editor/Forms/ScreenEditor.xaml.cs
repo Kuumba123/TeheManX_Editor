@@ -271,8 +271,6 @@ namespace TeheManX_Editor.Forms
                     MainWindow.undos.RemoveAt(0);
                 MainWindow.undos.Add(Undo.CreateGroupScreenUndo16((byte)screenId, 0, 0, 16, 16));
                 Array.Clear(screenData16, screenId * 0x200, 0x200);
-                Update32x32TileList();
-                Update32x32TileCountText();
                 DrawScreen16();
             }
             else
@@ -372,12 +370,6 @@ namespace TeheManX_Editor.Forms
                     }
                 }
             }
-        }
-        public void Update32x32TileCountText()
-        {
-            if (tiles32.Count == pastTiles32Count) return;
-            tile32CountTextBlock.Text = $"32x32 Tile Count:{tiles32.Count:X3}";
-            pastTiles32Count = tiles32.Count;
         }
         #endregion Methods
 
@@ -597,8 +589,6 @@ namespace TeheManX_Editor.Forms
             }
 
             tiles32.Clear();
-            Update32x32TileList();
-            Update32x32TileCountText();
 
             //Update 16x16 Mode UI before swapping Modes
             DrawTiles16();
@@ -710,8 +700,6 @@ namespace TeheManX_Editor.Forms
                         }
                         //End of Loops
                         SNES.edit = true;
-                        Update32x32TileList();
-                        Update32x32TileCountText();
                         MainWindow.window.layoutE.DrawScreen();
                         MainWindow.window.layoutE.DrawLayout();
                         MainWindow.window.enemyE.DrawLayout();
@@ -751,8 +739,6 @@ namespace TeheManX_Editor.Forms
                     }
                     //End of Loops
                     SNES.edit = true;
-                    Update32x32TileList();
-                    Update32x32TileCountText();
                     MainWindow.window.layoutE.DrawScreen();
                     MainWindow.window.layoutE.DrawLayout();
                     MainWindow.window.enemyE.DrawLayout();
@@ -765,8 +751,6 @@ namespace TeheManX_Editor.Forms
                 MainWindow.undos.Add(Undo.CreateScreenUndo16((byte)screenId, (byte)cX, (byte)cY));
                 BinaryPrimitives.WriteUInt16LittleEndian(screenData16.AsSpan(cord + screenId * 0x200), (ushort)selectedTile16);
                 SNES.edit = true;
-                Update32x32TileList();
-                Update32x32TileCountText();
                 MainWindow.window.layoutE.DrawScreen();
                 MainWindow.window.layoutE.DrawLayout();
                 MainWindow.window.enemyE.DrawLayout();
@@ -799,8 +783,6 @@ namespace TeheManX_Editor.Forms
                     MainWindow.undos.Add(Undo.CreateScreenUndo16((byte)screenId, (byte)cX, (byte)cY));
                     BinaryPrimitives.WriteUInt16LittleEndian(screenData16.AsSpan(screenId * 0x200 + cord), (ushort)selectedTile16);
                     SNES.edit = true;
-                    Update32x32TileList();
-                    Update32x32TileCountText();
                     MainWindow.window.layoutE.DrawScreen();
                     MainWindow.window.layoutE.DrawLayout();
                     MainWindow.window.enemyE.DrawLayout();
@@ -937,9 +919,10 @@ namespace TeheManX_Editor.Forms
         }
         private void Confirm16Button_Click(object sender, RoutedEventArgs e)
         {
+            Update32x32TileList();
             if (tiles32.Count > Const.Tile32Count[Level.Id, Level.BG])
             {
-                MessageBox.Show($"Max amount of 32x32 is: {Const.Tile32Count[Level.Id, Level.BG]:X}");
+                MessageBox.Show($"Max amount of 32x32 is: 0x{Const.Tile32Count[Level.Id, Level.BG]:X} compared to your 0x{tiles32.Count:X}!","ERROR");
                 return;
             }
 

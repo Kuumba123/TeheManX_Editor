@@ -246,8 +246,6 @@ namespace TeheManX_Editor
                         }
                     }
                 }
-                MainWindow.window.screenE.Update32x32TileList();
-                MainWindow.window.screenE.Update32x32TileCountText();
                 MainWindow.window.screenE.DrawScreen16();
             }
         }

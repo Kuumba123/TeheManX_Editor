@@ -249,8 +249,6 @@
                     <local:NumInt Margin="3,0,0,0" Width="80" Height="40" Value="0" FontSize="33" MinHeight="0" x:Name="tile16Int" ValueChanged="tile16Int_ValueChanged" Minimum="0"/>
                 </StackPanel>
             </StackPanel>
-
-            <TextBlock x:Name="tile32CountTextBlock" FontSize="18" Foreground="White" FontFamily="Consolas" Grid.Column="1" VerticalAlignment="Bottom" HorizontalAlignment="Right">32x32 Tile Count:</TextBlock>
         </Grid>
     </Grid>
 </UserControl>
