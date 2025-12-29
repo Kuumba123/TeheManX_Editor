@@ -31,102 +31,108 @@ namespace TeheManX_Editor.Forms
         #region Methods
         public void CollectData()
         {
-            int maxLevels = Const.Id == Const.GameId.MegaManX3 ? maxLevels = 0xF : Const.PlayableLevelsCount;
-
-            Checkpoints.Clear();
-
-            int[] checkpointAmount = new int[maxLevels];
-
-            for (int Id = 0; Id < maxLevels; Id++)
+            if (Level.Project.Checkpoints == null)
             {
-                //calculate the max amount of checkpoints for the level
-                int maxCheckpoints = 0;
+                int maxLevels = Const.Id == Const.GameId.MegaManX3 ? maxLevels = 0xF : Const.PlayableLevelsCount;
 
-                if (Id != (maxLevels - 1))
+                Checkpoints.Clear();
+
+                int[] checkpointAmount = new int[maxLevels];
+
+                for (int Id = 0; Id < maxLevels; Id++)
                 {
-                    //get the start of the next level's checkpoint list
-                    int nextOffset = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(Const.CheckpointOffset + (Id + 1) * 2));
-                    int currentOffset = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(Const.CheckpointOffset + Id * 2));
+                    //calculate the max amount of checkpoints for the level
+                    int maxCheckpoints = 0;
 
-                    if (Const.Id != Const.GameId.MegaManX)
+                    if (Id != (maxLevels - 1))
                     {
-                        //Note: MegaMan X2 does not keep the offsets in order
-                        ushort[] offsetList = new ushort[maxLevels];
-                        for (int i = 0; i < maxLevels; i++)
-                            offsetList[i] = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(Const.CheckpointOffset + i * 2));
-                        Array.Sort(offsetList);
-                        nextOffset = offsetList[Array.IndexOf(offsetList, (ushort)currentOffset) + 1];
-                    }
-                    maxCheckpoints = ((nextOffset - currentOffset) / 2);
-                }
-                else
-                {
-                    //use the first levels offsets to determine the last level's max checkpoints
-                    int firstOffset = BinaryPrimitives.ReadInt16LittleEndian(SNES.rom.AsSpan(Const.CheckpointOffset)) + Const.CheckpointOffset;
-                    int firstDataOffset = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(firstOffset));
-                    ushort lastOffset = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(Id * 2 + Const.CheckpointOffset));
-                    maxCheckpoints = ((firstDataOffset - lastOffset) / 2);
-                }
-                checkpointAmount[Id] = maxCheckpoints;
-            }
-            for (int Id = 0; Id < maxLevels; Id++)
-            {
-                List<Checkpoint> list = new List<Checkpoint>();
-                int listOffset = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(Const.CheckpointOffset + Id * 2)) + Const.CheckpointOffset;
-                for (int i = 0; i < checkpointAmount[Id]; i++)
-                {
-                    int offset = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(listOffset)) + Const.CheckpointOffset;
-                    listOffset += 2;
+                        //get the start of the next level's checkpoint list
+                        int nextOffset = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(Const.CheckpointOffset + (Id + 1) * 2));
+                        int currentOffset = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(Const.CheckpointOffset + Id * 2));
 
-                    Checkpoint point = new Checkpoint();
-
-                    point.ObjectTileSetting = SNES.rom[offset];
-                    point.BackgroundTileSetting = SNES.rom[offset + 1];
-                    point.BackgroundPaletteSetting = SNES.rom[offset + 2];
-
-                    if (Const.Id == Const.GameId.MegaManX)
-                    {
-                        point.MegaX = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + 3));
-                        point.MegaY = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + 5));
-                        point.CameraX = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + 7));
-                        point.CameraY = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + 9));
-                        point.BG2X = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + 0xB));
-                        point.BG2Y = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + 0xD));
-                        point.BorderLeft = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + 0xF));
-                        point.BorderRight = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + 0x11));
-                        point.BorderTop = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + 0x13));
-                        point.BorderBottom = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + 0x15));
-                        point.BG2X_Base = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + 0x17));
-                        point.BG2Y_Base = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + 0x19));
-                        point.MegaFlip = SNES.rom[offset + 0x1B];
-                        point.CollisionTimer = SNES.rom[offset + 0x1C];
+                        if (Const.Id != Const.GameId.MegaManX)
+                        {
+                            //Note: MegaMan X2 does not keep the offsets in order
+                            ushort[] offsetList = new ushort[maxLevels];
+                            for (int i = 0; i < maxLevels; i++)
+                                offsetList[i] = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(Const.CheckpointOffset + i * 2));
+                            Array.Sort(offsetList);
+                            nextOffset = offsetList[Array.IndexOf(offsetList, (ushort)currentOffset) + 1];
+                        }
+                        maxCheckpoints = ((nextOffset - currentOffset) / 2);
                     }
                     else
                     {
-                        point.SilkShotType = SNES.rom[offset + 3];
-                        point.MegaX = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + 4));
-                        point.MegaY = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + 6));
-                        point.CameraX = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + 8));
-                        point.CameraY = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + 0xA));
-                        point.BG2X = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + 0xC));
-                        point.BG2Y = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + 0xE));
-                        point.BorderLeft = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + 0x10));
-                        point.BorderRight = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + 0x12));
-                        point.BorderTop = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + 0x14));
-                        point.BorderBottom = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + 0x16));
-                        point.BG2X_Base = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + 0x18));
-                        point.BG2Y_Base = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + 0x1A));
-                        point.WramFlag = SNES.rom[offset + 0x1C];
-                        point.MegaFlip = SNES.rom[offset + 0x1E];
-                        point.CollisionTimer = SNES.rom[offset + 0x1D];
-
-                        if (Const.Id == Const.GameId.MegaManX3)
-                            point.ScrollType = SNES.rom[offset + 0x1F];
+                        //use the first levels offsets to determine the last level's max checkpoints
+                        int firstOffset = BinaryPrimitives.ReadInt16LittleEndian(SNES.rom.AsSpan(Const.CheckpointOffset)) + Const.CheckpointOffset;
+                        int firstDataOffset = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(firstOffset));
+                        ushort lastOffset = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(Id * 2 + Const.CheckpointOffset));
+                        maxCheckpoints = ((firstDataOffset - lastOffset) / 2);
                     }
-                    list.Add(point);
+                    checkpointAmount[Id] = maxCheckpoints;
                 }
-                Checkpoints.Add(list);
+                for (int Id = 0; Id < maxLevels; Id++)
+                {
+                    List<Checkpoint> list = new List<Checkpoint>();
+                    int listOffset = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(Const.CheckpointOffset + Id * 2)) + Const.CheckpointOffset;
+                    for (int i = 0; i < checkpointAmount[Id]; i++)
+                    {
+                        int offset = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(listOffset)) + Const.CheckpointOffset;
+                        listOffset += 2;
+
+                        Checkpoint point = new Checkpoint();
+
+                        point.ObjectTileSetting = SNES.rom[offset];
+                        point.BackgroundTileSetting = SNES.rom[offset + 1];
+                        point.BackgroundPaletteSetting = SNES.rom[offset + 2];
+
+                        if (Const.Id == Const.GameId.MegaManX)
+                        {
+                            point.MegaX = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + 3));
+                            point.MegaY = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + 5));
+                            point.CameraX = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + 7));
+                            point.CameraY = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + 9));
+                            point.BG2X = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + 0xB));
+                            point.BG2Y = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + 0xD));
+                            point.BorderLeft = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + 0xF));
+                            point.BorderRight = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + 0x11));
+                            point.BorderTop = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + 0x13));
+                            point.BorderBottom = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + 0x15));
+                            point.BG2X_Base = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + 0x17));
+                            point.BG2Y_Base = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + 0x19));
+                            point.MegaFlip = SNES.rom[offset + 0x1B];
+                            point.CollisionTimer = SNES.rom[offset + 0x1C];
+                        }
+                        else
+                        {
+                            point.SilkShotType = SNES.rom[offset + 3];
+                            point.MegaX = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + 4));
+                            point.MegaY = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + 6));
+                            point.CameraX = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + 8));
+                            point.CameraY = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + 0xA));
+                            point.BG2X = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + 0xC));
+                            point.BG2Y = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + 0xE));
+                            point.BorderLeft = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + 0x10));
+                            point.BorderRight = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + 0x12));
+                            point.BorderTop = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + 0x14));
+                            point.BorderBottom = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + 0x16));
+                            point.BG2X_Base = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + 0x18));
+                            point.BG2Y_Base = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + 0x1A));
+                            point.WramFlag = SNES.rom[offset + 0x1C];
+                            point.MegaFlip = SNES.rom[offset + 0x1E];
+                            point.CollisionTimer = SNES.rom[offset + 0x1D];
+
+                            if (Const.Id == Const.GameId.MegaManX3)
+                                point.ScrollType = SNES.rom[offset + 0x1F];
+                        }
+                        list.Add(point);
+                    }
+                    Checkpoints.Add(list);
+                }
             }
+            else
+                Checkpoints = Level.Project.Checkpoints;
+
             if (Const.Id != Const.GameId.MegaManX)
             {
                 silkShotInt.Visibility = Visibility.Visible;
@@ -723,7 +729,7 @@ namespace TeheManX_Editor.Forms
                         total += Checkpoints[i].Count;
                 }
 
-                if (total > Const.MaxTotalCheckpoints)
+                if (total > Const.MaxTotalCheckpoints && Level.Project.Checkpoints == null)
                 {
                     MessageBox.Show($"The total amount of checkpoints across all levels cannot exceed {Const.MaxTotalCheckpoints}.\nCurrent Total: {total}", "ERROR");
                     return;

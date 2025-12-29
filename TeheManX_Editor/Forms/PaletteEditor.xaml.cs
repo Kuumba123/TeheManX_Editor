@@ -92,11 +92,20 @@ namespace TeheManX_Editor.Forms
         #region Methods
         public void CollectData()
         {
-            int bgStages = Const.Id == Const.GameId.MegaManX3 ? 0xF : Const.PlayableLevelsCount;
-            int[] maxAmount = new int[bgStages];
-            int[] shared = new int[bgStages];
-            GetMaxPalettesFromRom(maxAmount, shared);
-            BGPalettes = CollecBGPalettesFromRom(maxAmount, shared);
+            if (Level.Project.BGPalettes == null)
+            {
+                int bgStages = Const.Id == Const.GameId.MegaManX3 ? 0xF : Const.PlayableLevelsCount;
+                int[] maxAmount = new int[bgStages];
+                int[] shared = new int[bgStages];
+                GetMaxPalettesFromRom(maxAmount, shared);
+                BGPalettes = CollecBGPalettesFromRom(maxAmount, shared);
+                Const.SwapPaletteColorBank = Const.PaletteColorBank;
+            }
+            else
+            {
+                BGPalettes = Level.Project.BGPalettes;
+                Const.SwapPaletteColorBank = Level.Project.PaletteColorBank;
+            }
         }
         public void AssignLimits()
         {
@@ -175,7 +184,7 @@ namespace TeheManX_Editor.Forms
             colorIndexInt.Value = colorIndex;
             colorAddressInt.Value = pointer;
             paletteSetInt.Maximum = BGPalettes[id][bgPalIdId].Slots.Count - 1;
-            DrawSwappablePalette(SNES.CpuToOffset(pointer, Const.PaletteColorBank));
+            DrawSwappablePalette(SNES.CpuToOffset(pointer, Const.SwapPaletteColorBank));
         }
         public unsafe void PaintVramTiles()
         {
@@ -778,7 +787,7 @@ namespace TeheManX_Editor.Forms
             for (int i = 0; i < BGPalettes[id][bgPalIdId].Slots.Count; i++)
             {
                 int colorIndex = BGPalettes[id][bgPalIdId].Slots[i].ColorIndex;
-                int colorOffset = SNES.CpuToOffset(BGPalettes[id][bgPalIdId].Slots[i].Address, Const.PaletteColorBank);
+                int colorOffset = SNES.CpuToOffset(BGPalettes[id][bgPalIdId].Slots[i].Address, Const.SwapPaletteColorBank);
 
                 for (int c = 0; c < 16; c++)
                 {
@@ -859,17 +868,18 @@ namespace TeheManX_Editor.Forms
 
                 int[] maxAmount = new int[bgStages];
                 int[] shared = new int[bgStages];
-                GetMaxPalettesFromRom(maxAmount, shared);
 
-                if (false) //no stages share data when using json
+                if (Level.Project.BGPalettes != null) //no stages share data when using json
                 {
                     for (int i = 0; i < bgStages; i++)
                         shared[i] = -1;
                 }
+                else
+                    GetMaxPalettesFromRom(maxAmount, shared);
 
                 int length = CreateBGPalettesData(BGPalettes, shared).Length;
 
-                if (length > Const.BackgroundPaletteInfoLength) //TODO: get max for each
+                if (length > Const.BackgroundPaletteInfoLength && Level.Project.BGSettings == null)
                 {
                     BGPalettes[Level.Id] = uneditedList;
                     MessageBox.Show($"The new BG Tile Info length exceeds the maximum allowed space in the ROM (0x{length:X} vs max of 0x{Const.BackgroundPaletteInfoLength:X}). Please lower some counts for this or another stage.");

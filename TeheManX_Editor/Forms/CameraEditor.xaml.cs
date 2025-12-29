@@ -14,7 +14,7 @@ namespace TeheManX_Editor.Forms
     public partial class CameraEditor : UserControl
     {
         #region Properties
-        List<NumInt> borderInts = new List<NumInt>();
+        public List<NumInt> borderInts = new List<NumInt>();
         public bool triggersEnabled;
         private bool suppressInts;
         #endregion Properties
@@ -62,19 +62,27 @@ namespace TeheManX_Editor.Forms
         #region Methods
         public void CollectData()
         {
-            CameraBorderSettings = new int[Const.MaxTotalCameraSettings];
-            Buffer.BlockCopy(SNES.rom, Const.CameraSettingsOffset, CameraBorderSettings, 0, Const.MaxTotalCameraSettings * 4);
+            if (Level.Project.CameraTriggers == null)
+            {
+                CameraBorderSettings = new int[Const.MaxTotalCameraSettings];
+                Buffer.BlockCopy(SNES.rom, Const.CameraSettingsOffset, CameraBorderSettings, 0, Const.MaxTotalCameraSettings * 4);
 
-            int cameraStages = Const.Id == Const.GameId.MegaManX3 ? 0xF : Const.PlayableLevelsCount;
-            int[] maxAmount = new int[cameraStages];
-            int[] shared = new int[cameraStages];
-            GetMaxCameraTriggersFromRom(maxAmount, shared);
-            CameraTriggers = CollectCameraTriggersFromRom(maxAmount, shared);
+                int cameraStages = Const.Id == Const.GameId.MegaManX3 ? 0xF : Const.PlayableLevelsCount;
+                int[] maxAmount = new int[cameraStages];
+                int[] shared = new int[cameraStages];
+                GetMaxCameraTriggersFromRom(maxAmount, shared);
+                CameraTriggers = CollectCameraTriggersFromRom(maxAmount, shared);
+            }
+            else
+            {
+                CameraBorderSettings = Level.Project.CameraBorderSettings;
+                CameraTriggers = Level.Project.CameraTriggers;
+            }
 
             suppressInts = true;
             raidoEnable = false;
 
-            int max = Const.MaxTotalCameraSettings - 1;
+            int max = Level.Project.CameraTriggers != null ? 254 : Const.MaxTotalCameraSettings - 1;
 
             MainWindow.window.camE.borderSettingInt.Maximum = max;
             MainWindow.window.camE.borderSettingInt.Value = 0;
@@ -534,17 +542,18 @@ namespace TeheManX_Editor.Forms
 
                 int[] maxAmount = new int[cameraStages];
                 int[] shared = new int[cameraStages];
-                GetMaxCameraTriggersFromRom(maxAmount, shared);
 
-                if (false) //no stages share data when using json
+                if (Level.Project.CameraTriggers != null) //no stages share data when using json
                 {
                     for (int i = 0; i < cameraStages; i++)
                         shared[i] = -1;
                 }
+                else
+                    GetMaxCameraTriggersFromRom(maxAmount, shared);
 
                 int length = CreateCameraTriggersData(CameraTriggers, shared, 0).Length;
 
-                if (length > Const.CameraTriggersLength)
+                if (length > Const.CameraTriggersLength && Level.Project.CameraTriggers == null)
                 {
                     CameraTriggers[Level.Id] = uneditedList;
                     MessageBox.Show($"The new Camera Triggers length exceeds the maximum allowed space in the ROM (0x{length:X} vs max of 0x{Const.CameraTriggersLength:X}). Please lower some counts for this or another stage.");

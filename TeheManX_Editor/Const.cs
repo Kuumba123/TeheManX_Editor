@@ -44,6 +44,8 @@ namespace TeheManX_Editor
         public static int PaletteInfoOffset;
         public static int PaletteStageBase; //Base Id for Stage Palettes
 
+        public static int SwapPaletteColorBank;
+
         public static int BackgroundPaletteOffset;
         public static int BackgroundPaletteInfoLength;
 

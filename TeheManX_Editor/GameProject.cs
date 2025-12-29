@@ -4,6 +4,9 @@ namespace TeheManX_Editor
 {
     public class GameProject
     {
+        public int PaletteInfoOffset {  get; set; }
+        public int PaletteColorBank { get; set; }
+        public List<List<BGPalette>> BGPalettes { get; set; }
         public int EnemyOffset { get; set; }
         public List<Enemy>[] Enemies {  get; set; }
         public int CheckpointOffset { get; set; }

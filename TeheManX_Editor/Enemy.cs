@@ -3,12 +3,12 @@
     public class Enemy
     {
         #region Properties
-        public short X;
-        public short Y;
-        public byte Id;
-        public byte SubId;
-        public byte Type;
-        public byte Column; //just to make exporting easier
+        public short X {  get; set; }
+        public short Y { get; set; }
+        public byte Id { get; set; }
+        public byte SubId { get; set; }
+        public byte Type { get; set; }
+        public byte Column { get; set; } //just to make exporting easier
         #endregion Properties
 
         #region Constructors

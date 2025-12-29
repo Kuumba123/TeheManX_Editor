@@ -43,7 +43,7 @@
             <RowDefinition Height="auto"/>
             <RowDefinition/>
         </Grid.RowDefinitions>
-        
+
         <StackPanel>
             <TextBlock FontSize="18" Foreground="White" FontFamily="Consolas" HorizontalAlignment="Center">Background Tile Settings</TextBlock>
             <Border BorderBrush="White" BorderThickness="2">
@@ -84,11 +84,10 @@
                     </StackPanel>
                 </StackPanel>
             </Border>
-        </StackPanel>
-
-        <StackPanel Grid.Row="1">
-            <Button Margin="10" Click="EditBGSlotCountBtn_Click">Edit BG Entry Slot Counts</Button>
-            <Button Margin="10" Click="LoadBtn_Click">Load External Assets</Button>
+            <StackPanel Grid.Row="1">
+                <Button Margin="10" Click="EditBGSlotCountBtn_Click">Edit BG Entry Slot Counts</Button>
+                <Button Margin="10" Click="LoadBtn_Click">Load External Assets</Button>
+            </StackPanel>
         </StackPanel>
 
         <!--Object Tile Display Area -->
@@ -101,7 +100,7 @@
                 </Grid.ColumnDefinitions>
                 <Button Style="{StaticResource TileButton}" x:Name="zoomInBtn" Click="zoomInBtn_Click" Width="25" Height="25" Margin="0" Padding="0" VerticalAlignment="Center" HorizontalAlignment="Left">+</Button>
                 <Button Style="{StaticResource TileButton}" x:Name="zoomOutBtn" Click="zoomOutBtn_Click" Width="25" Height="25" Margin="0" Padding="0" FontSize="15" Grid.Column="1">-</Button>
-                <TextBlock Grid.Column="2" HorizontalAlignment="Center">VRAM Tiles</TextBlock>
+                <TextBlock Grid.Column="2" FontSize="18" FontFamily="Consolas" HorizontalAlignment="Center">VRAM Tiles</TextBlock>
             </Grid>
             <Grid x:Name="objectTileGrid" HorizontalAlignment="Left" VerticalAlignment="Top">
                 <Image x:Name="objectTilesImage" Width="512" Height="512" Grid.ColumnSpan="16" Grid.RowSpan="16" MouseUp="objectTilesImage_MouseUp"></Image>
@@ -130,11 +129,11 @@
             </StackPanel>
             <StackPanel Orientation="Horizontal">
                 <TextBlock Width="160">Palette Id:</TextBlock>
-                <local:NumInt x:Name="palSetInt" Value="0" Minimum="0" Maximum="#200" ValueChanged="palSetInt_ValueChanged"></local:NumInt>
+                <local:NumInt x:Name="palSetInt" Value="0" Minimum="0" Maximum="#200" Increment="2" ValueChanged="palSetInt_ValueChanged"></local:NumInt>
             </StackPanel>
             <StackPanel Orientation="Horizontal">
                 <TextBlock Width="160">Palette Dest:</TextBlock>
-                <local:NumInt x:Name="dumpInt" Value="0" Minimum="0" Maximum="#70" ValueChanged="dumpInt_ValueChanged"></local:NumInt>
+                <local:NumInt x:Name="dumpInt" Value="0" Minimum="0" Maximum="#70" Increment="#10" ValueChanged="dumpInt_ValueChanged"></local:NumInt>
             </StackPanel>
             <Separator></Separator>
             <StackPanel Orientation="Horizontal">

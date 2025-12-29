@@ -83,17 +83,8 @@ namespace TeheManX_Editor.Forms
         #region Methods
         public void CollectData()
         {
-            int bgStages = Const.Id == Const.GameId.MegaManX3 ? 0xF : Const.PlayableLevelsCount;
-            int[] maxAmount = new int[bgStages];
-            int[] shared = new int[bgStages];
-            GetMaxBGSettingsFromRom(maxAmount, shared);
-            BGSettings = CollecBGSettingsFromRom(maxAmount, shared);
-
-            int objectStages = Const.Id == Const.GameId.MegaManX ? 0x24 : Const.Id == Const.GameId.MegaManX2 ? 0xF : 0x12;
-            maxAmount = new int[objectStages];
-            shared = new int[objectStages];
-            GetMaxObjectSettingsFromRom(maxAmount, shared);
-            ObjectSettings = CollecObjectSettingsFromRom(maxAmount, shared);
+            CollectBGData();
+            CollectOBJData();
 
             suppressInts = true;
 
@@ -107,6 +98,32 @@ namespace TeheManX_Editor.Forms
             compressTileInt.Value = 0;
 
             suppressInts = false;
+        }
+        public void CollectBGData()
+        {
+            if (Level.Project.BGSettings == null)
+            {
+                int bgStages = Const.Id == Const.GameId.MegaManX3 ? 0xF : Const.PlayableLevelsCount;
+                int[] maxAmount = new int[bgStages];
+                int[] shared = new int[bgStages];
+                GetMaxBGSettingsFromRom(maxAmount, shared);
+                BGSettings = CollecBGSettingsFromRom(maxAmount, shared);
+            }
+            else
+                BGSettings = Level.Project.BGSettings;
+        }
+        public void CollectOBJData()
+        {
+            if (Level.Project.ObjectSettings == null)
+            {
+                int objectStages = Const.Id == Const.GameId.MegaManX ? 0x24 : Const.Id == Const.GameId.MegaManX2 ? 0xF : 0x12;
+                int[] maxAmount = new int[objectStages];
+                int[] shared = new int[objectStages];
+                GetMaxObjectSettingsFromRom(maxAmount, shared);
+                ObjectSettings = CollecObjectSettingsFromRom(maxAmount, shared);
+            }
+            else
+                ObjectSettings = Level.Project.ObjectSettings;
         }
         public void AssignLimits()
         {
@@ -1122,17 +1139,18 @@ namespace TeheManX_Editor.Forms
 
                 int[] maxAmount = new int[bgStages];
                 int[] shared = new int[bgStages];
-                GetMaxBGSettingsFromRom(maxAmount, shared);
 
-                if (false) //no stages share data when using json
+                if (Level.Project.BGSettings != null) //no stages share data when using json
                 {
                     for (int i = 0; i < bgStages; i++)
                         shared[i] = -1;
                 }
+                else
+                    GetMaxBGSettingsFromRom(maxAmount, shared);
 
                 int length = CreateBGSettingsData(BGSettings, shared).Length;
 
-                if (length > Const.BackgroundTileInfoLength)
+                if (length > Const.BackgroundTileInfoLength && Level.Project.BGSettings == null)
                 {
                     BGSettings[Level.Id] = uneditedList;
                     MessageBox.Show($"The new BG Tile Info length exceeds the maximum allowed space in the ROM (0x{length:X} vs max of 0x{Const.BackgroundTileInfoLength:X}). Please lower some counts for this or another stage.");
@@ -1366,17 +1384,18 @@ namespace TeheManX_Editor.Forms
 
                 int[] maxAmount = new int[objectStages];
                 int[] shared = new int[objectStages];
-                GetMaxObjectSettingsFromRom(maxAmount, shared);
 
-                if (false) //no stages share data when using json (NOTE: X1 should probably have some extra logic because of the non playable stages)
+                if (Level.Project.ObjectSettings != null) //no stages share data when using json (NOTE: X1 should probably have some extra logic because of the non playable stages)
                 {
                     for (int i = 0; i < objectStages; i++)
                         shared[i] = -1;
                 }
+                else
+                    GetMaxObjectSettingsFromRom(maxAmount, shared);
 
                 int length = CreateObjectSettingsData(ObjectSettings, shared).Length;
 
-                if (length > Const.ObjectTileInfoLength)
+                if (length > Const.ObjectTileInfoLength && Level.Project.ObjectSettings == null)
                 {
                     ObjectSettings[Level.Id] = uneditedList;
                     MessageBox.Show($"The new Object Tile Info length exceeds the maximum allowed space in the ROM (0x{length:X} vs max of 0x{Const.ObjectTileInfoLength:X}). Please lower some counts for this or another stage.");
@@ -1425,9 +1444,7 @@ namespace TeheManX_Editor.Forms
             if (SNES.rom == null || suppressInts || !MainWindow.window.tileE.objTileSetInt.IsEnabled)
                 return;
 
-            int id;
-            if (Const.Id == Const.GameId.MegaManX3 && Level.Id > 0xE) id = (Level.Id - 0xF) + 2; //Buffalo or Beetle
-            else id = Level.Id;
+            int id = (Const.Id == Const.GameId.MegaManX3 && Level.Id > 0xE) ? (Level.Id - 0xF) + 2 : Level.Id; // Buffalo or Beetle
 
             if (ObjectSettings[id][objectTileSetId].Slots.Count != 0)
             {

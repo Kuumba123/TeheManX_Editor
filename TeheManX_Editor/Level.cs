@@ -3,6 +3,7 @@ using System.Buffers.Binary;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.Json;
 using System.Windows;
 using System.Windows.Media;
 using TeheManX_Editor.Forms;
@@ -37,10 +38,8 @@ namespace TeheManX_Editor
         }
         public static unsafe void Draw16xTile(int id, int x, int y, int stride, IntPtr dest)
         {
-            int stageId;
-            if (Const.Id == Const.GameId.MegaManX3 && Id == 0xE) stageId = 0x10; //special case for MMX3 rekt version of dophler 2
-            else if (Const.Id == Const.GameId.MegaManX3 && Id > 0xE) stageId = (Id - 0xF) + 0xE; //Buffalo or Beetle
-            else stageId = Id;
+            // MMX3 special cases
+            int stageId = (Const.Id == Const.GameId.MegaManX3 && Id == 0xE) ? 0x10 : (Const.Id == Const.GameId.MegaManX3 && Id > 0xE) ? (Id - 0xF) + 0xE : Id;
 
             int offset = SNES.CpuToOffset(BinaryPrimitives.ReadInt32LittleEndian(SNES.rom.AsSpan(Const.Tile16DataPointersOffset[BG] + stageId * 3)) + id * 8);
             byte* buffer = (byte*)dest;
@@ -93,13 +92,8 @@ namespace TeheManX_Editor
         }
         public static unsafe void Draw16xTile_Clamped(int id, int x, int y,int stride, IntPtr dest,int bmpWidth, int bmpHeight)
         {
-            int stageId;
-            if (Const.Id == Const.GameId.MegaManX3 && Id == 0xE)
-                stageId = 0x10;
-            else if (Const.Id == Const.GameId.MegaManX3 && Id > 0xE)
-                stageId = (Id - 0xF) + 0xE;
-            else
-                stageId = Id;
+            // MMX3 special cases
+            int stageId = (Const.Id == Const.GameId.MegaManX3 && Id == 0xE) ? 0x10 : (Const.Id == Const.GameId.MegaManX3 && Id > 0xE) ? (Id - 0xF) + 0xE : Id;
 
             int offset = SNES.CpuToOffset(
                 BinaryPrimitives.ReadInt32LittleEndian(
@@ -162,10 +156,8 @@ namespace TeheManX_Editor
         }
         public static unsafe void DrawScreen(int s, int stride, IntPtr ptr)
         {
-            int id;
-            if (Const.Id == Const.GameId.MegaManX3 && Id == 0xE) id = 0x10; //special case for MMX3 rekt version of dophler 2
-            else if (Const.Id == Const.GameId.MegaManX3 && Id > 0xE) id = (Id - 0xF) + 0xE; //Buffalo or Beetle
-            else id = Id;
+            // MMX3 special cases
+            int id = (Const.Id == Const.GameId.MegaManX3 && Id == 0xE) ? 0x10 : (Const.Id == Const.GameId.MegaManX3 && Id > 0xE) ? (Id - 0xF) + 0xE : Id;
 
             int offset = SNES.CpuToOffset(BinaryPrimitives.ReadInt32LittleEndian(SNES.rom.AsSpan(Const.ScreenDataPointersOffset[BG] + id * 3))) + s * 0x80;
             int tile32Offset = SNES.CpuToOffset(BinaryPrimitives.ReadInt32LittleEndian(SNES.rom.AsSpan(Const.Tile32DataPointersOffset[BG] + id * 3)));
@@ -185,10 +177,8 @@ namespace TeheManX_Editor
         }
         public static unsafe void DrawScreen(int s,int drawX,int drawY, int stride, IntPtr ptr)
         {
-            int id;
-            if (Const.Id == Const.GameId.MegaManX3 && Id == 0xE) id = 0x10; //special case for MMX3 rekt version of dophler 2
-            else if (Const.Id == Const.GameId.MegaManX3 && Id > 0xE) id = (Id - 0xF) + 0xE; //Buffalo or Beetle
-            else id = Id;
+            // MMX3 special cases
+            int id = (Const.Id == Const.GameId.MegaManX3 && Id == 0xE) ? 0x10 : (Const.Id == Const.GameId.MegaManX3 && Id > 0xE) ? (Id - 0xF) + 0xE : Id;
 
             int offset = SNES.CpuToOffset(BinaryPrimitives.ReadInt32LittleEndian(SNES.rom.AsSpan(Const.ScreenDataPointersOffset[BG] + id * 3))) + s * 0x80;
             int tile32Offset = SNES.CpuToOffset(BinaryPrimitives.ReadInt32LittleEndian(SNES.rom.AsSpan(Const.Tile32DataPointersOffset[BG] + id * 3)));
@@ -208,10 +198,8 @@ namespace TeheManX_Editor
         }
         public static unsafe void DrawScreen_Clamped(int s, int drawX, int drawY, int stride, IntPtr ptr, int bmpWidth, int bmpHeight)
         {
-            int id;
-            if (Const.Id == Const.GameId.MegaManX3 && Id == 0xE) id = 0x10; //special case for MMX3 rekt version of dophler 2
-            else if (Const.Id == Const.GameId.MegaManX3 && Id > 0xE) id = (Id - 0xF) + 0xE; //Buffalo or Beetle
-            else id = Id;
+            // MMX3 special cases
+            int id = (Const.Id == Const.GameId.MegaManX3 && Id == 0xE) ? 0x10 : (Const.Id == Const.GameId.MegaManX3 && Id > 0xE) ? (Id - 0xF) + 0xE : Id;
 
             int offset = SNES.CpuToOffset(BinaryPrimitives.ReadInt32LittleEndian(SNES.rom.AsSpan(Const.ScreenDataPointersOffset[BG] + id * 3))) + s * 0x80;
             int tile32Offset = SNES.CpuToOffset(BinaryPrimitives.ReadInt32LittleEndian(SNES.rom.AsSpan(Const.Tile32DataPointersOffset[BG] + id * 3)));
@@ -247,10 +235,8 @@ namespace TeheManX_Editor
             {
                 for (int i = 0; i < Const.LevelsCount; i++)
                 {
-                    int id;
-                    if (Const.Id == Const.GameId.MegaManX3 && i == 0xE) id = 0x10; //special case for MMX3 rekt version of dophler 2
-                    else if (Const.Id == Const.GameId.MegaManX3 && i > 0xE) id = (i - 0xF) + 0xE; //Buffalo or Beetle
-                    else id = i;
+                    // MMX3 special cases
+                    int id = (Const.Id == Const.GameId.MegaManX3 && i == 0xE) ? 0x10 : (Const.Id == Const.GameId.MegaManX3 && i > 0xE) ? (i - 0xF) + 0xE : i;
                     int infoOffset = SNES.CpuToOffset(BinaryPrimitives.ReadInt32LittleEndian(SNES.rom.AsSpan(Const.LayoutPointersOffset[l] + id * 3)));
 
                     Array.Clear(temp, 0, temp.Length);
@@ -616,6 +602,11 @@ namespace TeheManX_Editor
         }
         private static void LoadEnemyData()
         {
+            if (Project.Enemies != null)
+            {
+                Enemies = Project.Enemies;
+                return;
+            }
             for (int i = 0; i < Const.LevelsCount; i++)
             {
                 if (Enemies[i] != null)
@@ -762,28 +753,37 @@ namespace TeheManX_Editor
                 }
             }
 
-            int totalSize = 0;
-            int allowedSize = (Const.Id == Const.GameId.MegaManX) ? Const.TotalEnemyDataLength + Const.MegaManX.ExtraTotalEnemyDataLength : Const.TotalEnemyDataLength;
 
-            //Size Check in case enemy data is too long
-            for (int id = 0; id < totalStages; id++)
-                totalSize += GetEnemyDataLength(Enemies[id]);
-
-            if (totalSize > allowedSize)
+            if (Project.Enemies == null)
             {
-                MessageBox.Show($"Enemy Data is too large to be saved to the game ({totalSize:X} vs allowed size of {allowedSize:X}).", "ERROR");
-                return false;
+                int totalSize = 0;
+                int allowedSize = (Const.Id == Const.GameId.MegaManX) ? Const.TotalEnemyDataLength + Const.MegaManX.ExtraTotalEnemyDataLength : Const.TotalEnemyDataLength;
+
+                //Size Check in case enemy data is too long
+                for (int id = 0; id < totalStages; id++)
+                    totalSize += GetEnemyDataLength(Enemies[id]);
+
+                if (totalSize > allowedSize)
+                {
+                    MessageBox.Show($"Enemy Data is too large to be saved to the game ({totalSize:X} vs allowed size of {allowedSize:X}).", "ERROR");
+                    return false;
+                }
             }
 
             ushort[] pointerData = new ushort[totalStages];
 
-            int dumpOffset = Const.EnemyPointersOffset + totalStages * 2;
+            int startOffset = Project.Enemies == null ? Const.EnemyPointersOffset : Project.EnemyOffset;
+
+            int dumpOffset = startOffset + totalStages * 2;
             int dumpAmount = 0;
 
-            if (Const.Id != Const.GameId.MegaManX3)
-                dumpOffset += 6; //X1 & X2 have 3 dummy entries for some reason...
-            else
-                dumpOffset += 2; //X3 has 1 dummy entry...
+            if (Project.Enemies == null)
+            {
+                if (Const.Id != Const.GameId.MegaManX3)
+                    dumpOffset += 6; //X1 & X2 have 3 dummy entries for some reason...
+                else
+                    dumpOffset += 2; //X3 has 1 dummy entry...
+            }
 
             bool extraData = false;
 
@@ -791,7 +791,7 @@ namespace TeheManX_Editor
             {
                 byte[] data = CreateEnemyData(Enemies[id]);
 
-                if (Const.Id == Const.GameId.MegaManX && !extraData && (dumpAmount + data.Length) > Const.MegaManX.TotalEnemyDataLength)
+                if (Const.Id == Const.GameId.MegaManX && !extraData && (dumpAmount + data.Length) > Const.MegaManX.TotalEnemyDataLength && Project.Enemies == null)
                 {
                     extraData = true;
                     dumpOffset = Const.MegaManX.ExtraTotalEnemyDataOffset;
@@ -806,19 +806,41 @@ namespace TeheManX_Editor
                 dumpAmount += data.Length;
             }
             //Now Write 16-bit Pointers
-            Buffer.BlockCopy(pointerData, 0, SNES.rom, Const.EnemyPointersOffset, totalStages * 2);
+            Buffer.BlockCopy(pointerData, 0, SNES.rom, startOffset, totalStages * 2);
 
             return true;
         }
-        public static bool SaveProject()
+        public static void LoadProject(string directory)
         {
+            string jsonFileName = $"TeheManX{(int)Const.Id + 1}_{Const.Version}_Project.json";
+            string combinedPath = Path.Combine(directory, jsonFileName);
+
+            if (!File.Exists(combinedPath))
+            {
+                Project = new GameProject();
+                return;
+            }
+
+            try
+            {
+                Project = JsonSerializer.Deserialize<GameProject>(File.ReadAllText(combinedPath));
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(e.Message, "ERROR");
+                Application.Current.Shutdown();
+            }
+        }
+        public static bool SaveProject(bool writeJson = true)
+        {
+            bool saveJson = false;
             /*
              * Object Tiles Export
              */
 
             int objectStages = Const.Id == Const.GameId.MegaManX ? 0x24 : Const.Id == Const.GameId.MegaManX2 ? 0xF : 0x12;
 
-            if (true) //Using data in game
+            if (Project.ObjectSettings == null) //Using data in game
             {
                 //Get the Max Amount of Object Tile Settings
                 int[] maxAmount = new int[objectStages];
@@ -833,6 +855,12 @@ namespace TeheManX_Editor
             }
             else //Using data in json project file
             {
+                saveJson = true;
+                int[] shared = new int[objectStages];
+                for (int i = 0; i < objectStages; i++)
+                    shared[i] = -1;
+                byte[] exportData = TileEditor.CreateObjectSettingsData(TileEditor.ObjectSettings, shared);
+                Array.Copy(exportData, 0, SNES.rom, Project.ObjectTilesInfoOffset, exportData.Length);
             }
 
             /*
@@ -841,7 +869,7 @@ namespace TeheManX_Editor
 
             int bgStages = Const.Id == Const.GameId.MegaManX3 ? 0xF : Const.PlayableLevelsCount;
 
-            if (true) //Using data in game
+            if (Project.BGSettings == null) //Using data in game
             {
                 //Get the Max Amount of BG Tile Settings
                 int[] maxAmount = new int[bgStages];
@@ -856,6 +884,13 @@ namespace TeheManX_Editor
             }
             else //Using data in json project file
             {
+                saveJson = true;
+                int[] shared = new int[bgStages];
+                for (int i = 0; i < bgStages; i++)
+                    shared[i] = -1;
+                List<List<BGSetting>> sourceSettings = TileEditor.BGSettings;
+                byte[] exportData = TileEditor.CreateBGSettingsData(sourceSettings, shared);
+                Array.Copy(exportData, 0, SNES.rom, Project.BackgroundTilesInfoOffset, exportData.Length);
             }
 
             /*
@@ -863,14 +898,13 @@ namespace TeheManX_Editor
              */
 
             int cameraStages = Const.Id == Const.GameId.MegaManX3 ? 0xF : Const.PlayableLevelsCount;
-            int cameraBorderSettingsOffset;
-            int[] sourceBorderSettings = null;
+            int cameraBorderSettingsOffset = 0;
 
-            if (true) //Using data in game
+            if (Project.CameraTriggers == null) //Using data in game
             {
                 //Get the Max Amount of Camera Triggers
-                int[] maxAmount = new int[bgStages];
-                int[] shared = new int[bgStages];
+                int[] maxAmount = new int[cameraStages];
+                int[] shared = new int[cameraStages];
                 CameraEditor.GetMaxCameraTriggersFromRom(maxAmount, shared);
 
                 List<List<CameraTrigger>> sourceSettings = CameraEditor.CameraTriggers;
@@ -880,19 +914,28 @@ namespace TeheManX_Editor
                 Array.Copy(exportData, 0, SNES.rom, Const.CameraTriggersOffset, exportData.Length);
 
                 cameraBorderSettingsOffset = Const.CameraSettingsOffset;
-                sourceBorderSettings = CameraEditor.CameraBorderSettings;
             }
             else //Using data in json project file
             {
+                saveJson = true;
+                int[] shared = new int[cameraStages];
+                for (int i = 0; i < cameraStages; i++)
+                    shared[i] = -1;
 
+                List<List<CameraTrigger>> sourceSettings = CameraEditor.CameraTriggers;
+
+                byte[] exportData = CameraEditor.CreateCameraTriggersData(sourceSettings, shared, SNES.OffsetToCpu(Project.CameraTriggersOffset));
+                Array.Copy(exportData, 0, SNES.rom, Project.CameraTriggersOffset, exportData.Length);
+
+                cameraBorderSettingsOffset = Project.CameraBordersOffset;
             }
-            Buffer.BlockCopy(sourceBorderSettings, 0, SNES.rom, cameraBorderSettingsOffset, sourceBorderSettings.Length * 4);
+            Buffer.BlockCopy(CameraEditor.CameraBorderSettings, 0, SNES.rom, cameraBorderSettingsOffset, CameraEditor.CameraBorderSettings.Length * 4);
 
             /*
              * Checkpoint Export
              */
 
-            if (true) //Using data in game
+            if (Project.Checkpoints == null) //Using data in game
             {
                 List<List<Checkpoint>> sourceSettings = SpawnWindow.Checkpoints;
 
@@ -902,14 +945,19 @@ namespace TeheManX_Editor
             }
             else //Using data in json project file
             {
+                saveJson = true;
+                List<List<Checkpoint>> sourceSettings = SpawnWindow.Checkpoints;
 
+                //Export Checkpoints
+                byte[] exportData = SpawnWindow.CreateCheckpointData(sourceSettings);
+                Array.Copy(exportData, 0, SNES.rom, Project.CheckpointOffset, exportData.Length);
             }
 
             /*
              * Palette Swap Export
              */
 
-            if (true) //Using data in game
+            if (Project.BGPalettes == null) //Using data in game
             {
                 //Get the Max Amount of BG Tile Settings
                 int[] maxAmount = new int[bgStages];
@@ -922,16 +970,39 @@ namespace TeheManX_Editor
                 byte[] exportData = PaletteEditor.CreateBGPalettesData(sourceSettings, shared);
                 Array.Copy(exportData, 0, SNES.rom, Const.BackgroundPaletteOffset, exportData.Length);
             }
+            else
+            {
+                saveJson = true;
+                int[] shared = new int[bgStages];
+                for (int i = 0; i < bgStages; i++)
+                    shared[i] = -1;
+
+                List<List<BGPalette>> sourceSettings = PaletteEditor.BGPalettes;
+
+                //Export Checkpoints
+                byte[] exportData = PaletteEditor.CreateBGPalettesData(sourceSettings, shared);
+                Array.Copy(exportData, 0, SNES.rom, Project.PaletteInfoOffset, exportData.Length);
+            }
+
+            /*
+             * Enemy Export
+             */
+
+            if ((saveJson || Project.Enemies != null) && writeJson)
+            {
+                string json = JsonSerializer.Serialize(Project);
+                string jsonFileName = $"TeheManX{(int)Const.Id + 1}_{Const.Version}_Project.json";
+                string combinedPath = Path.Combine(Path.GetDirectoryName(SNES.savePath), jsonFileName);
+                File.WriteAllText(combinedPath, json);
+            }
             return true;
         }
         public static void AssignPallete()
         {
             if (Id < Const.PlayableLevelsCount)
             {
-                int id;
-                if (Const.Id == Const.GameId.MegaManX3 && Id == 0xE) id = 0xB; //special case for MMX3 rekt version of dophler 2
-                else if (Const.Id == Const.GameId.MegaManX3 && Id > 0xE) id = (Id - 0xF) + 2;
-                else id = Id;
+                // MMX3 special cases
+                int id = (Const.Id == Const.GameId.MegaManX3 && Id == 0xE) ? 0xB : (Const.Id == Const.GameId.MegaManX3 && Id > 0xE) ? (Id - 0xF) + 2 : Id;
 
                 PaletteId = id * 2 + Const.PaletteStageBase;
                 int infoOffset = SNES.CpuToOffset(BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(Const.PaletteInfoOffset + PaletteId)), Const.PaletteBank);
@@ -985,9 +1056,7 @@ namespace TeheManX_Editor
         public static void LoadDynamicBackgroundTiles()
         {
             //Load Dynamic Background Tiles
-            int id;
-            if (Const.Id == Const.GameId.MegaManX3 && Id > 0xE) id = (Id & 1) + 2; //Buffalo or Beetle
-            else id = Id;
+            int id = (Const.Id == Const.GameId.MegaManX3 && Id > 0xE) ? (Id & 1) + 2 : Id; // Buffalo or Beetle
 
             int set = TileSet;
             int slot = 0;
@@ -1051,10 +1120,8 @@ namespace TeheManX_Editor
         }
         public static void DecompressLevelTiles() //also loads dynamic background tiles and pallete data for those tiles
         {
-            int id;
-            if (Const.Id == Const.GameId.MegaManX3 && Id == 0xE) id = 0xB; //special case for MMX3 rekt version of dophler 2
-            else if (Const.Id == Const.GameId.MegaManX3 && Id > 0xE) id = (Id - 0xF) + 2; //Buffalo or Beetle
-            else id = Id;
+            // MMX3 special cases
+            int id = (Const.Id == Const.GameId.MegaManX3 && Id == 0xE) ? 0xB : (Const.Id == Const.GameId.MegaManX3 && Id > 0xE) ? (Id - 0xF) + 2 : Id;
 
             int infoOffset = SNES.CpuToOffset(BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(Const.LoadTileSetInfoOffset + id * 2 + Const.LoadTileSetStageBase)), Const.LoadTileSetBank);
 

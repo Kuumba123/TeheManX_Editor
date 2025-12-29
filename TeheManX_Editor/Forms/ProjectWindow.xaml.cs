@@ -11,6 +11,11 @@ namespace TeheManX_Editor.Forms
     /// </summary>
     public partial class ProjectWindow : Window
     {
+        #region Properties
+        bool edited;
+        bool enable;
+        #endregion Properties
+
         #region Constructors
         public ProjectWindow()
         {
@@ -18,10 +23,170 @@ namespace TeheManX_Editor.Forms
 
             if (SNES.rom.Length >= 0x400000 && Encoding.ASCII.GetString(SNES.rom, 0x3FFFF0, 6) == "POGYOU")
                 expandMB4Grid.Visibility = Visibility.Collapsed;
+
+            enable = true;
         }
         #endregion Constructors
 
         #region Events
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            if (!edited)
+                return;
+
+            if (enemyOffsetInt.Value == null)
+            {
+                MessageBox.Show("Invalid Enemy Offset", "ERROR");
+                e.Cancel = true;
+                return;
+            }
+            if (paletteOffsetInt.Value == null)
+            {
+                MessageBox.Show("Invalid Palette Swap Info Offset", "ERROR");
+                e.Cancel = true;
+                return;
+            }
+
+            if (paletteBankInt.Value == null)
+            {
+                MessageBox.Show("Invalid Palette Swap Bank", "ERROR");
+                e.Cancel = true;
+                return;
+            }
+
+            if (checkpointInt.Value == null)
+            {
+                MessageBox.Show("Invalid Checkpoint Offset", "ERROR");
+                e.Cancel = true;
+                return;
+            }
+            if (cameraTriggerInt.Value == null)
+            {
+                MessageBox.Show("Invalid Camera Trigger Offset", "ERROR");
+                e.Cancel = true;
+                return;
+            }
+            if (cameraBorderInt.Value == null)
+            {
+                MessageBox.Show("Invalid Camera Border Offset", "ERROR");
+                e.Cancel = true;
+                return;
+            }
+            if (bgTileInt.Value == null)
+            {
+                MessageBox.Show("Invalid Background Tile Setting Info Offset", "ERROR");
+                e.Cancel = true;
+                return;
+            }
+            if (objTileInt.Value == null)
+            {
+                MessageBox.Show("Invalid Object Tile Setting Info Offset", "ERROR");
+                e.Cancel = true;
+                return;
+            }
+            if (MessageBox.Show("Are sure your okay with this configuration?", "WARNING", MessageBoxButton.YesNo) != MessageBoxResult.Yes)
+            {
+                e.Cancel = true;
+                return;
+            }
+
+            //Enemy
+            if (enemyCheck.IsChecked == true)
+            {
+                Level.Project.Enemies = Level.Enemies;
+                Level.Project.EnemyOffset = (int)enemyOffsetInt.Value;
+            }
+            else
+                Level.Project.Enemies = null;
+
+            //Palette
+            if (paletteCheck.IsChecked == true)
+            {
+                Level.Project.BGPalettes = PaletteEditor.BGPalettes;
+                Level.Project.PaletteInfoOffset = (int)paletteOffsetInt.Value;
+                Level.Project.PaletteColorBank = (int)paletteBankInt.Value;
+            }
+            else
+            {
+                Level.Project.BGPalettes = null;
+                MainWindow.window.paletteE.CollectData();
+            }
+            MainWindow.window.paletteE.AssignLimits();
+
+            //Checkpoint
+            if (checkpointCheck.IsChecked == true)
+            {
+                Level.Project.Checkpoints = SpawnWindow.Checkpoints;
+                Level.Project.CheckpointOffset = (int)checkpointInt.Value;
+            }
+            else
+            {
+                Level.Project.Checkpoints = null;
+                MainWindow.window.spawnE.CollectData();
+            }
+            MainWindow.window.spawnE.SetSpawnSettings();
+
+            //Camera
+            if (cameraCheck.IsChecked == true)
+            {
+                Level.Project.CameraTriggers = CameraEditor.CameraTriggers;
+                Level.Project.CameraTriggersOffset = (int)cameraTriggerInt.Value;
+                Level.Project.CameraBordersOffset = (int)cameraBorderInt.Value;
+
+                if (CameraEditor.CameraBorderSettings.Length < 255)
+                {
+                    Array.Resize(ref CameraEditor.CameraBorderSettings, 255);
+
+                    //Fix up new Empty Entries
+                    for (int i = 0; i < CameraEditor.CameraBorderSettings.Length; i++)
+                    {
+                        if (CameraEditor.CameraBorderSettings[i] != 0) continue;
+                        CameraEditor.CameraBorderSettings[i] = Const.CameraBorderLeftWRAM;
+                    }
+                }
+                for (int i = 0; i < 4; i++)
+                    MainWindow.window.camE.borderInts[i].Maximum = 254;
+                Level.Project.CameraBorderSettings = CameraEditor.CameraBorderSettings;
+            }
+            else
+            {
+                Level.Project.CameraTriggers = null;
+                Array.Resize(ref CameraEditor.CameraBorderSettings, Const.MaxTotalCameraSettings); //need to resize in case they dont want json any more.
+                for (int i = 0; i < 4; i++)
+                    MainWindow.window.camE.borderInts[i].Maximum = Const.MaxTotalCameraSettings - 1;
+                MainWindow.window.camE.borderSettingInt.Value = 0;
+                MainWindow.window.camE.borderSettingInt.Maximum = Const.MaxTotalCameraSettings - 1;
+                MainWindow.window.camE.CollectData();
+            }
+            MainWindow.window.camE.AssignTriggerLimits();
+
+            //Background Tiles
+            if (bgTileCheck.IsChecked == true)
+            {
+                Level.Project.BGSettings = TileEditor.BGSettings;
+                Level.Project.BackgroundTilesInfoOffset = (int)bgTileInt.Value;
+            }
+            else
+            {
+                Level.Project.BGSettings = null;
+                MainWindow.window.tileE.CollectBGData();
+            }
+
+            //Object Tiles
+            if (objTileCheck.IsChecked == true)
+            {
+                Level.Project.ObjectSettings = TileEditor.ObjectSettings;
+                Level.Project.ObjectTilesInfoOffset = (int)objTileInt.Value;
+            }
+            else
+            {
+                Level.Project.ObjectSettings = null;
+                MainWindow.window.tileE.CollectOBJData();
+            }
+
+            MainWindow.window.tileE.AssignLimits();
+            SNES.edit = true;
+        }
         private void expandBtn_Click(object sender, RoutedEventArgs e)
         {
             if (MainWindow.window.screenE.mode16)
@@ -250,6 +415,30 @@ namespace TeheManX_Editor.Forms
             MessageBox.Show($"4MB expansion complete! Every bank after 0x{((dumpOffset / 0x8000) | (addrMask >> 16)):X} is availble for use!");
             MessageBox.Show("The expansion was applied for Layout , Screen , 32x32 , 16x16 tabs!");
             expandMB4Grid.Visibility = Visibility.Collapsed;
+        }
+        private void expansionHelpBtn_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+        private void projectTrackPatchBtn_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+        private void projectTrackHelpBtn_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+        private void CheckBox_Changed(object sender, RoutedEventArgs e)
+        {
+            if (!enable)
+                return;
+            edited = true;
+        }
+        private void Int_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        {
+            if (!enable)
+                return;
+            edited = true;
         }
         #endregion Events
     }

@@ -126,6 +126,7 @@ namespace TeheManX_Editor.Forms
                     //File Validated
                     SNES.date = File.GetLastWriteTime(args[1]);
                     SNES.savePath = args[1];
+                    Level.LoadProject(Path.GetDirectoryName(SNES.savePath));
                     Level.LoadLevelData();
                     //Setup Editor
                     Level.AssignPallete();
@@ -612,6 +613,7 @@ namespace TeheManX_Editor.Forms
                     //File Validated
                     SNES.date = File.GetLastWriteTime(fd.FileName);
                     SNES.savePath = fd.FileName;
+                    Level.LoadProject(Path.GetDirectoryName(SNES.savePath));
                     Level.LoadLevelData();
                     //Setup Editor
                     undos.Clear();
@@ -1486,7 +1488,7 @@ namespace TeheManX_Editor.Forms
                 MessageBox.Show("You must exit 16x16 Mode before you can save the game!");
                 return;
             }
-            if (SNES.rom == null || !Level.SaveLayouts() || !Level.SaveEnemyData() || !Level.SaveProject())
+            if (SNES.rom == null || !Level.SaveLayouts() || !Level.SaveEnemyData() || !Level.SaveProject(false))
                 return;
             using (var fd = new System.Windows.Forms.SaveFileDialog())
             {
@@ -1498,6 +1500,7 @@ namespace TeheManX_Editor.Forms
                     {
                         File.WriteAllBytes(fd.FileName, SNES.rom);
                         SNES.savePath = fd.FileName;
+                        Level.SaveProject();
                         SNES.date = File.GetLastWriteTime(fd.FileName);
                         SNES.edit = false;
                     }
