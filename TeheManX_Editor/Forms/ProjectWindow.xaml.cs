@@ -282,6 +282,7 @@ namespace TeheManX_Editor.Forms
                     int id = i;
 
                     //Dump Existing 16x16 Tile Data
+                    Array.Clear(SNES.rom, dumpOffset, Const.ExpandMaxTiles16 * 8);
                     Array.Copy(tileData16[i], 0, SNES.rom, dumpOffset, Const.Tile16Count[i, 0] * 8);
                     dumpAddr = SNES.OffsetToCpu(dumpOffset) | addrMask;
 
@@ -416,9 +417,21 @@ namespace TeheManX_Editor.Forms
             MessageBox.Show($"4MB expansion complete! Every bank after 0x{((dumpOffset / 0x8000) | (addrMask >> 16)):X} is availble for use!");
             MessageBox.Show("The expansion was applied for Layout , Screen , 32x32 , 16x16 tabs!");
 
-            /*
-             * TODO: ask if they want patch that removes checks 408000-40FFFF (also 1.1 has differnet offsets than 1.0)
-             */
+            //MegaMan X Copy Protection related code
+            if (Const.Id == Const.GameId.MegaManX && MessageBox.Show("Would apply the patch that disables the cart size checks?","", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+            {
+                int[] writeOffsets;
+
+                if (SNES.rom[0x7FDB] == 0)
+                    writeOffsets = Const.MegaManX.CartSizeCheckAsmOffset;
+                else
+                    writeOffsets = Const.MegaManX.RevACartSizeCheckAsmOffset;
+
+                foreach (var item in writeOffsets)
+                    SNES.rom[item] = 0x80;
+
+                MessageBox.Show("Cart size check patch applied!");
+            }
         }
         private void expansionHelpBtn_Click(object sender, RoutedEventArgs e)
         {

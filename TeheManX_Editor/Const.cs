@@ -198,6 +198,8 @@ namespace TeheManX_Editor
 
             public static readonly int[] HadoukenAsmOffsets = { 0x03CA8A, 0x0427AA , 0x03D0D6 }; //Hadouken Stage ID
             public static readonly int[] RevistsAsmOffset = { 0x03CA97 , 0x03CA9B }; //Revists Count
+            public static readonly int[] CartSizeCheckAsmOffset = { 0x824A, 0x21C3 }; //both JP & NA 1.0
+            public static readonly int[] RevACartSizeCheckAsmOffset = { 0x824F, 0x21FC8 };
             internal static class NA // North America Version
             {
                 public const int LoadTileSetInfoOffset = 0x3756F;
