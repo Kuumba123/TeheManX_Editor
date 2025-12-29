@@ -1611,7 +1611,8 @@ namespace TeheManX_Editor.Forms
         }
         private void helpBtn_Click(object sender, RoutedEventArgs e)
         {
-
+            HelpWindow h = new HelpWindow(0);
+            h.ShowDialog();
         }
         private void undoBtn_Click(object sender, RoutedEventArgs e)
         {

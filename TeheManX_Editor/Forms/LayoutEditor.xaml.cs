@@ -188,8 +188,8 @@ namespace TeheManX_Editor.Forms
         }
         private void Help_Click(object sender, RoutedEventArgs e)
         {
-            //HelpWindow h = new HelpWindow(1);
-            //h.ShowDialog();
+            HelpWindow h = new HelpWindow(1);
+            h.ShowDialog();
         }
         private void SnapButton_Click(object sender, RoutedEventArgs e)
         {

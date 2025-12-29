@@ -20,10 +20,6 @@ namespace TeheManX_Editor.Forms
         public ProjectWindow()
         {
             InitializeComponent();
-
-            if (SNES.rom.Length >= 0x400000 && Encoding.ASCII.GetString(SNES.rom, 0x3FFFF0, 6) == "POGYOU")
-                expandMB4Grid.Visibility = Visibility.Collapsed;
-
             enable = true;
         }
         #endregion Constructors
@@ -194,8 +190,13 @@ namespace TeheManX_Editor.Forms
                 MessageBox.Show("You must exit 16x16 mode if you want to enable the 4MB expansion!");
                 return;
             }
+            if (SNES.rom.Length >= 0x400000 && Encoding.ASCII.GetString(SNES.rom, 0x3FFFF0, 6) == "POGYOU")
+            {
+                MessageBox.Show("You already have the expansion patch.");
+                return;
+            }
 
-            SNES.rom[0x7FD7] = 0x12;
+            SNES.rom[0x7FD7] = 0xC;
             Array.Resize(ref SNES.rom, 0x400000);
             Array.Copy(Encoding.ASCII.GetBytes("POGYOU"), 0, SNES.rom, 0x3FFFF0, 6);
 
@@ -414,7 +415,10 @@ namespace TeheManX_Editor.Forms
             MainWindow.window.tile16E.AssignLimits();
             MessageBox.Show($"4MB expansion complete! Every bank after 0x{((dumpOffset / 0x8000) | (addrMask >> 16)):X} is availble for use!");
             MessageBox.Show("The expansion was applied for Layout , Screen , 32x32 , 16x16 tabs!");
-            expandMB4Grid.Visibility = Visibility.Collapsed;
+
+            /*
+             * TODO: ask if they want patch that removes checks 408000-40FFFF (also 1.1 has differnet offsets than 1.0)
+             */
         }
         private void expansionHelpBtn_Click(object sender, RoutedEventArgs e)
         {
