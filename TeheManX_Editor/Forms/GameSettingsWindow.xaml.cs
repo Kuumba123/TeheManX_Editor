@@ -72,7 +72,7 @@ namespace TeheManX_Editor.Forms
                     unkownPannel.Visibility = Visibility.Collapsed;
                     hadoukenStageLbl.Content = "Shoruken Stage";
 
-                    if (this.gameVersion == Const.GameVersion.NA)
+                    if (gameVersion == Const.GameVersion.NA)
                     {
                         CapsulePositionOffset = Const.MegaManX2.NA.CapsulePositionOffset;
                         CapsuleArmorIndexesOffset = Const.MegaManX2.NA.CapsuleArmorIndexesOffset;
@@ -90,8 +90,10 @@ namespace TeheManX_Editor.Forms
                         CapsuleTextOffset = Const.MegaManX2.JP.CapsuleTextOffset;
                         HadoukenAsmOffsets = Const.MegaManX2.JP.ShoryukenAsmOffsets;
                     }
+                    hadoukenStageInt.Value = rom[HadoukenAsmOffsets[0]];
                     break;
                 case Const.GameId.MegaManX3:
+                    hadoukenStageInt.Value = rom[Const.MegaManX3.GoldenArmorIdOffset];
                     hadoukenStageInt.Maximum = 0xA;
                     stageInt.Maximum = 0xA;
                     hadoukenVistPannel.Visibility = Visibility.Collapsed;
