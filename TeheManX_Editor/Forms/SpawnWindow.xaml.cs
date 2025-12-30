@@ -145,6 +145,11 @@ namespace TeheManX_Editor.Forms
                     scrollInt.Visibility = Visibility.Visible;
                     scrollTypeText.Visibility = Visibility.Visible;
                 }
+                else
+                {
+                    scrollInt.Visibility = Visibility.Collapsed;
+                    scrollTypeText.Visibility = Visibility.Collapsed;
+                }
             }
             else
             {
