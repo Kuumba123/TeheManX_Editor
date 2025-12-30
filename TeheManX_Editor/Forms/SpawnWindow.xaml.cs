@@ -100,7 +100,7 @@ namespace TeheManX_Editor.Forms
                             point.BorderBottom = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + 0x15));
                             point.BG2X_Base = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + 0x17));
                             point.BG2Y_Base = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + 0x19));
-                            point.MegaFlip = SNES.rom[offset + 0x1B];
+                            point.WramFlag = SNES.rom[offset + 0x1B];
                             point.CollisionTimer = SNES.rom[offset + 0x1C];
                         }
                         else
@@ -137,8 +137,8 @@ namespace TeheManX_Editor.Forms
             {
                 silkShotInt.Visibility = Visibility.Visible;
                 silkShotTxt.Visibility = Visibility.Visible;
-                wramInt.Visibility = Visibility.Visible;
-                wramTxt.Visibility = Visibility.Visible;
+                megaFlipInt.Visibility = Visibility.Visible;
+                megaFlipTxt.Visibility = Visibility.Visible;
 
                 if (Const.Id == Const.GameId.MegaManX3)
                 {
@@ -155,8 +155,8 @@ namespace TeheManX_Editor.Forms
             {
                 silkShotInt.Visibility = Visibility.Collapsed;
                 silkShotTxt.Visibility = Visibility.Collapsed;
-                wramInt.Visibility = Visibility.Collapsed;
-                wramTxt.Visibility = Visibility.Collapsed;
+                megaFlipInt.Visibility = Visibility.Collapsed;
+                megaFlipTxt.Visibility = Visibility.Collapsed;
                 scrollInt.Visibility = Visibility.Collapsed;
                 scrollTypeText.Visibility = Visibility.Collapsed;
             }
@@ -294,7 +294,7 @@ namespace TeheManX_Editor.Forms
                         BinaryPrimitives.WriteUInt16LittleEndian(pointData.AsSpan(0x17), point.BG2X_Base);
                         BinaryPrimitives.WriteUInt16LittleEndian(pointData.AsSpan(0x19), point.BG2Y_Base);
 
-                        pointData[0x1B] = point.MegaFlip;
+                        pointData[0x1B] = point.WramFlag;
                         pointData[0x1C] = point.CollisionTimer;
                     }
                     else

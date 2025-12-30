@@ -104,11 +104,11 @@
                 <local:NumInt Minimum="0" Maximum="#FFFF" x:Name="bg2IntBaseY" ValueChanged="bg2IntBaseY_ValueChanged"></local:NumInt>
             </StackPanel>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                <TextBlock x:Name="wramTxt">WRAM Flag???</TextBlock>
+                <TextBlock>WRAM Flag???</TextBlock>
                 <local:NumInt Minimum="0" Maximum="#FF" x:Name="wramInt" ValueChanged="wramIntInt_ValueChanged"></local:NumInt>
             </StackPanel>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                <TextBlock>Mega Flip</TextBlock>
+                <TextBlock x:Name="megaFlipTxt">Mega Flip</TextBlock>
                 <local:NumInt Minimum="0" Maximum="#FF" x:Name="megaFlipInt" ValueChanged="megaFlipInt_ValueChanged"></local:NumInt>
             </StackPanel>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
