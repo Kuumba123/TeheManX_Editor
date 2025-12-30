@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Forms;
 
 namespace TeheManX_Editor.Forms
@@ -351,6 +350,61 @@ namespace TeheManX_Editor.Forms
                     }
                     ExternalPaletteWindow paletteWindow = new ExternalPaletteWindow(rom, gameId, file);
                     paletteWindow.ShowDialog();
+                }
+            }
+        }
+        private void ConfigureGameSettings_Click(object sender, RoutedEventArgs e)
+        {
+            using (var fd = new OpenFileDialog())
+            {
+                fd.Filter = "SFC |*.sfc";
+                fd.Title = "Open an MegaMan X1-3 SFC File";
+
+                if (fd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                {
+                    string file = fd.FileName;
+                    byte[] rom = File.ReadAllBytes(file);
+
+                    Const.GameId gameId = Const.GameId.MegaManX;
+                    Const.GameVersion version = Const.GameVersion.NA;
+
+                    if (Encoding.ASCII.GetString(rom, 0x7FC0, 10) == "MEGAMAN X ")
+                    {
+                        gameId = Const.GameId.MegaManX;
+                        version = Const.GameVersion.NA;
+                    }
+                    else if (Encoding.ASCII.GetString(rom, 0x7FC0, 10) == "ROCKMAN X ")
+                    {
+                        gameId = Const.GameId.MegaManX;
+                        version = Const.GameVersion.JP;
+                    }
+                    else if (Encoding.ASCII.GetString(rom, 0x7FC0, 10) == "MEGAMAN X2")
+                    {
+                        gameId = Const.GameId.MegaManX2;
+                        version = Const.GameVersion.NA;
+                    }
+                    else if (Encoding.ASCII.GetString(rom, 0x7FC0, 10) == "ROCKMAN X2")
+                    {
+                        gameId = Const.GameId.MegaManX2;
+                        version = Const.GameVersion.JP;
+                    }
+                    else if (Encoding.ASCII.GetString(rom, 0x7FC0, 10) == "MEGAMAN X3")
+                    {
+                        gameId = Const.GameId.MegaManX3;
+                        version = Const.GameVersion.NA;
+                    }
+                    else if (Encoding.ASCII.GetString(rom, 0x7FC0, 10) == "ROCKMAN X3")
+                    {
+                        gameId = Const.GameId.MegaManX3;
+                        version = Const.GameVersion.JP;
+                    }
+                    else
+                    {
+                        System.Windows.MessageBox.Show("Invalid Game");
+                        return;
+                    }
+                    GameSettingsWindow gameSettings = new GameSettingsWindow(file, rom, (int)gameId, (int)version);
+                    gameSettings.ShowDialog();
                 }
             }
         }

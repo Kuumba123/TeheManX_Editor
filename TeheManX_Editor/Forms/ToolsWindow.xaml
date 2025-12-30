@@ -50,11 +50,13 @@
                             <Grid.RowDefinitions>
                                 <RowDefinition/>
                                 <RowDefinition/>
+                                <RowDefinition/>
                             </Grid.RowDefinitions>
                             <Button Click="MMX1_DecompressClick">Decompress Tiles</Button>
                             <Button Click="MMX1_CompressClick" Grid.Column="1">Compress Tiles</Button>
                             <Button Click="MMX1_ExtractCompressClick" Grid.Row="1">Extract Compressed Tiles</Button>
                             <Button Grid.Row="1" Grid.Column="1" Click="MMX1_PaletteEditorClick">Edit Palette</Button>
+                            <Button Grid.Row="2" Grid.ColumnSpan="2" Click="ConfigureGameSettings_Click">Configure Game Settings</Button>
                         </Grid>
                     </StackPanel>
                 </Expander>
@@ -71,11 +73,13 @@
                             <Grid.RowDefinitions>
                                 <RowDefinition/>
                                 <RowDefinition/>
+                                <RowDefinition/>
                             </Grid.RowDefinitions>
                             <Button Click="MMX2_DecompressClick">Decompress Tiles</Button>
                             <Button Click="MMX2_CompressClick" Grid.Column="1">Compress Tiles</Button>
                             <Button Click="MMX2_ExtractCompressClick" Grid.Row="1">Extract Compressed Tiles</Button>
                             <Button Grid.Row="1" Grid.Column="1" Click="MMX1_PaletteEditorClick">Edit Palette</Button>
+                            <Button Grid.Row="2" Grid.ColumnSpan="2" Click="ConfigureGameSettings_Click">Configure Game Settings</Button>
                         </Grid>
                     </StackPanel>
                 </Expander>
@@ -92,11 +96,13 @@
                             <Grid.RowDefinitions>
                                 <RowDefinition/>
                                 <RowDefinition/>
+                                <RowDefinition/>
                             </Grid.RowDefinitions>
                             <Button Click="MMX2_DecompressClick">Decompress Tiles</Button>
                             <Button Click="MMX2_CompressClick" Grid.Column="1">Compress Tiles</Button>
                             <Button Click="MMX2_ExtractCompressClick" Grid.Row="1">Extract Compressed Tiles</Button>
                             <Button Grid.Row="1" Grid.Column="1" Click="MMX1_PaletteEditorClick">Edit Palette</Button>
+                            <Button Grid.Row="2" Grid.ColumnSpan="2" Click="ConfigureGameSettings_Click">Configure Game Settings</Button>
                         </Grid>
                     </StackPanel>
                 </Expander>

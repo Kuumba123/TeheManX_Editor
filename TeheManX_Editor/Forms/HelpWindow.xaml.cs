@@ -39,7 +39,18 @@ namespace TeheManX_Editor.Forms
             "after the 16x16 tab. It basicly does this by keep track of the data via a json project file and then when you want to export it to the game " +
             "you tell the editor (via the settings in this project window) the ROM offset you want to dump it at. " +
             "However this feature is more for advanced users since there is no pre-included patch (atleast for now...) so far now your gonna have to write " +
-            "the code that loads this data your self."
+            "the code that loads this data your self.",
+            //5
+            "This is where you can edit the Dr.Light capsule settings (I cant believe I actually had to make this...). " +
+            "At the top you will find the stage containing the Hadouken/Shoryuken/Golden-Armor (as well as a revist count for X1). " +
+            "Below that you will find the Capsule Stage Specfic Settings. The following properties are Position X , Position Y , " +
+            "Camera X , Camera Y , Armor Index (basicly determines witch upgrade you are going to get) , Text Box Id , Upgrade Movement Index and " +
+            "some MegaMan X3 exclusive property that I do not know about. As for the armor index I also dont really have a table as to what is what but " +
+            "you can always just look at what has already been configured and see what value you need to set to for spefic upgrade. I will " +
+            "mention that you normally still need to set that property even for the Hadouken/Shoryuken/Golden-Armor Capsule. " +
+            "As for the Camera X & Camera Y these basicly tell the game where to scroll the screen to but if you set the X to 0 it won't bother scrolling at all. " +
+            "Lastly MegaMan X2 has some weird Camera spefic code for the Ostrich capsule (assuming my notes are right) you can apply that fix for it by simply clicking " +
+            "on the coresponding button."
         };
         public HelpWindow(int msgId)
         {

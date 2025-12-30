@@ -16,6 +16,7 @@ namespace TeheManX_Editor.Forms
         byte[] rom;
         Const.GameId gameId;
         Const.GameVersion gameVersion;
+        int stageId;
 
         //Offsets
         int CapsulePositionOffset;
@@ -39,9 +40,10 @@ namespace TeheManX_Editor.Forms
             switch (gameId)
             {
                 case Const.GameId.MegaManX:
+                    hadoukenStageInt.Value = rom[Const.MegaManX.HadoukenAsmOffsets[0]];
                     hadoukenStageInt.Maximum = 8;
                     stageInt.Maximum = 8;
-                    unkownInt.Visibility = Visibility.Collapsed;
+                    unkownPannel.Visibility = Visibility.Collapsed;
                     fixPannelX2.Visibility = Visibility.Collapsed;
 
                     if (this.gameVersion == Const.GameVersion.NA)
@@ -61,13 +63,13 @@ namespace TeheManX_Editor.Forms
                         CapsuleTextOffset = Const.MegaManX.JP.CapsuleTextOffset;
                     }
                     HadoukenAsmOffsets = Const.MegaManX.HadoukenAsmOffsets;
-                    revistInt.Value = SNES.rom[Const.MegaManX.RevistsAsmOffset[0]];
+                    revistInt.Value = rom[Const.MegaManX.RevistsAsmOffset[0]];
                     break;
                 case Const.GameId.MegaManX2:
                     hadoukenStageInt.Maximum = 0xB;
                     stageInt.Maximum = 0xB;
                     hadoukenVistPannel.Visibility = Visibility.Collapsed;
-                    unkownInt.Visibility = Visibility.Collapsed;
+                    unkownPannel.Visibility = Visibility.Collapsed;
                     hadoukenStageLbl.Content = "Shoruken Stage";
 
                     if (this.gameVersion == Const.GameVersion.NA)
@@ -124,23 +126,23 @@ namespace TeheManX_Editor.Forms
         private void SetCapsuleStageSettings()
         {
             enable = false;
-            int positionOffset = CapsulePositionOffset + (stageInt.Value.Value * 4);
+            int positionOffset = CapsulePositionOffset + (stageId * 4);
             positionIntX.Value = BinaryPrimitives.ReadUInt16LittleEndian(rom.AsSpan(positionOffset));
             positionIntY.Value = BinaryPrimitives.ReadUInt16LittleEndian(rom.AsSpan(positionOffset + 2));
-            int cameraOffset = CapsuleCameraPositionOffset + (stageInt.Value.Value * 4);
+            int cameraOffset = CapsuleCameraPositionOffset + (stageId * 4);
             cameraIntX.Value = BinaryPrimitives.ReadUInt16LittleEndian(rom.AsSpan(cameraOffset));
             cameraIntY.Value = BinaryPrimitives.ReadUInt16LittleEndian(rom.AsSpan(cameraOffset + 2));
 
-            armorIndexInt.Value = rom[CapsuleArmorIndexesOffset + stageInt.Value.Value];
+            armorIndexInt.Value = rom[CapsuleArmorIndexesOffset + stageId];
             if (gameId != Const.GameId.MegaManX3)
-                textBoxIdInt.Value = rom[CapsuleTextOffset + stageInt.Value.Value];
+                textBoxIdInt.Value = rom[CapsuleTextOffset + stageId];
             else
             {
-                textBoxIdInt.Value = rom[CapsuleTextOffset + stageInt.Value.Value * 2];
-                unkownInt.Value = rom[CapsuleTextOffset + stageInt.Value.Value * 2 + 1];
+                textBoxIdInt.Value = rom[CapsuleTextOffset + stageId * 2];
+                unkownInt.Value = rom[CapsuleTextOffset + stageId * 2 + 1];
             }
 
-            movementIndexInt.Value = rom[UpgradeMovementOffset + stageInt.Value.Value];
+            movementIndexInt.Value = rom[UpgradeMovementOffset + stageId];
             enable = true;
         }
         #endregion Methods
@@ -148,71 +150,73 @@ namespace TeheManX_Editor.Forms
         #region Events
         private void helpBtn_Click(object sender, RoutedEventArgs e)
         {
-
+            HelpWindow helpWindow = new HelpWindow(5);
+            helpWindow.ShowDialog();
         }
         private void applyFixBtn_Click(object sender, RoutedEventArgs e)
         {
             if (gameId != Const.GameId.MegaManX2 || !enable) return;
             int offset = gameVersion == Const.GameVersion.NA ? Const.MegaManX2.NA.OstrichIdOffset : Const.MegaManX2.JP.OstrichIdOffset;
-            SNES.rom[offset] = 0xFF;
+            rom[offset] = 0xFF;
             MessageBox.Show("Ostrich Fix Applied!");
         }
         private void hadoukenStageInt_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
             if (!enable || e.NewValue == null) return;
             foreach (int offset in HadoukenAsmOffsets)
-                rom[offset] = (byte)hadoukenStageInt.Value.Value;
+                rom[offset] = (byte)(int)hadoukenStageInt.Value.Value;
         }
         private void revistInt_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
             if (!enable || e.NewValue == null) return;
             foreach (int offset in Const.MegaManX.RevistsAsmOffset)
-                rom[offset] = (byte)revistInt.Value.Value;
+                rom[offset] = (byte)(int)revistInt.Value.Value;
         }
         private void stageInt_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
             if (!enable || e.NewValue == null) return;
+            stageId = (int)e.NewValue;
             SetCapsuleStageSettings();
         }
         private void positionIntX_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
             if (!enable || e.NewValue == null) return;
-            BinaryPrimitives.WriteUInt16LittleEndian(rom.AsSpan(CapsulePositionOffset + stageInt.Value.Value * 4), (ushort)e.NewValue);
+            BinaryPrimitives.WriteUInt16LittleEndian(rom.AsSpan(CapsulePositionOffset + stageId * 4), (ushort)(int)e.NewValue);
         }
         private void positionIntY_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
             if (!enable || e.NewValue == null) return;
-            BinaryPrimitives.WriteUInt16LittleEndian(rom.AsSpan(CapsulePositionOffset + stageInt.Value.Value * 4 + 2), (ushort)e.NewValue);
+            BinaryPrimitives.WriteUInt16LittleEndian(rom.AsSpan(CapsulePositionOffset + stageId * 4 + 2), (ushort)(int)e.NewValue);
         }
         private void cameraIntX_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
             if (!enable || e.NewValue == null) return;
-            BinaryPrimitives.WriteUInt16LittleEndian(rom.AsSpan(CapsuleCameraPositionOffset + stageInt.Value.Value * 4), (ushort)e.NewValue);
+            BinaryPrimitives.WriteUInt16LittleEndian(rom.AsSpan(CapsuleCameraPositionOffset + stageId * 4), (ushort)(int)e.NewValue);
         }
         private void cameraIntY_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
             if (!enable || e.NewValue == null) return;
-            BinaryPrimitives.WriteUInt16LittleEndian(rom.AsSpan(CapsuleCameraPositionOffset + stageInt.Value.Value * 4 + 2), (ushort)e.NewValue);
+            BinaryPrimitives.WriteUInt16LittleEndian(rom.AsSpan(CapsuleCameraPositionOffset + stageId * 4 + 2), (ushort)(int)e.NewValue);
         }
         private void armorIndexInt_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
             if (!enable || e.NewValue == null) return;
-            rom[CapsuleArmorIndexesOffset + stageInt.Value.Value] = (byte)e.NewValue;
+            rom[CapsuleArmorIndexesOffset + stageId] = (byte)(int)e.NewValue;
         }
         private void textBoxIdInt_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
             if (!enable || e.NewValue == null) return;
-            rom[CapsuleTextOffset + stageInt.Value.Value * (gameId == Const.GameId.MegaManX3 ? 2 : 1)] = (byte)e.NewValue;
+            rom[CapsuleTextOffset + stageId * (gameId == Const.GameId.MegaManX3 ? 2 : 1)] = (byte)(int)e.NewValue;
         }
         private void movementIndexInt_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
             if (!enable || e.NewValue == null) return;
-            rom[UpgradeMovementOffset + stageInt.Value.Value] = (byte)e.NewValue;
+            rom[UpgradeMovementOffset + stageId] = (byte)(int)e.NewValue;
         }
         private void unkownInt_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
             if (!enable || e.NewValue == null) return;
-            unkownInt.Value = rom[CapsuleTextOffset + stageInt.Value.Value * 2 + 1];
+            rom[CapsuleTextOffset + stageId * 2 + 1] = (byte)(int)e.NewValue;
         }
         private void SaveBtn_Click(object sender, RoutedEventArgs e)
         {
