@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Buffers.Binary;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
@@ -82,7 +81,7 @@ namespace TeheManX_Editor.Forms
                 enemyLabels[i].Visibility = Visibility.Visible;
             }
 
-            while (triggerRects.Count < (MainWindow.window.camE.triggerInt.Maximum + 1)) //Add to Canvas
+            while (triggerRects.Count < CameraEditor.CameraTriggers[Level.Id].Count) //Add to Canvas
             {
                 Rectangle r = new Rectangle()
                 {
@@ -218,6 +217,19 @@ namespace TeheManX_Editor.Forms
                 return;
 
             int id = Level.Id;
+
+            while (triggerRects.Count < CameraEditor.CameraTriggers[id].Count) //Add to Canvas
+            {
+                Rectangle r = new Rectangle()
+                {
+                    IsHitTestVisible = false,
+                    StrokeThickness = 1,
+                    Stroke = Brushes.Green,
+                    Fill = new SolidColorBrush(Color.FromArgb(96, 0xAD, 0xD8, 0xE6))
+                };
+                triggerRects.Add(r);
+                MainWindow.window.enemyE.canvas.Children.Add(r);
+            }
 
             for (int i = 0; i < CameraEditor.CameraTriggers[id].Count; i++)
             {
