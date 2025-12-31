@@ -254,40 +254,43 @@ namespace TeheManX_Editor.Forms
 
                     Level.DecompressTiles2(compressedTileId, Bank7F, 0);
 
-                    while (true)
+                    if (relativeVramAddr != 0x8000 || Const.Id == Const.GameId.MegaManX)
                     {
-                        int length = SNES.rom[specOffset];
-                        if (length == 0)
-                            break;
-                        if (length == 0xFF)
+                        while (true)
                         {
-                            specOffset++;
-                            continue;
+                            int length = SNES.rom[specOffset];
+                            if (length == 0)
+                                break;
+                            if (length == 0xFF)
+                            {
+                                specOffset++;
+                                continue;
+                            }
+                            length *= 16;
+
+                            byte vramBaseHigh = SNES.rom[specOffset + 1];
+                            int destOffset = (relativeVramAddr + (((vramBaseHigh & 0x7F) - 0x60) << 8)) * 2;
+
+                            int srcAvailable = Bank7F.Length - srcOffset;
+                            int dstAvailable = ObjectTiles.Length - destOffset;
+
+                            // Nothing to copy
+                            if (srcAvailable <= 0 || dstAvailable <= 0 || length <= 0)
+                                ;
+                            else
+                            {
+                                // Clamp length to what is actually available
+                                int safeLength = Math.Min(length, Math.Min(srcAvailable, dstAvailable));
+
+                                Array.Copy(Bank7F, srcOffset, ObjectTiles, destOffset, safeLength);
+                            }
+
+
+                            if ((vramBaseHigh & 0x80) != 0)
+                                break;
+                            srcOffset += length;
+                            specOffset += 2;
                         }
-                        length *= 16;
-
-                        byte vramBaseHigh = SNES.rom[specOffset + 1];
-                        int destOffset = (relativeVramAddr + (((vramBaseHigh & 0x7F) - 0x60) << 8)) * 2;
-
-                        int srcAvailable = Bank7F.Length - srcOffset;
-                        int dstAvailable = ObjectTiles.Length - destOffset;
-
-                        // Nothing to copy
-                        if (srcAvailable <= 0 || dstAvailable <= 0 || length <= 0)
-                            ;
-                        else
-                        {
-                            // Clamp length to what is actually available
-                            int safeLength = Math.Min(length, Math.Min(srcAvailable, dstAvailable));
-
-                            Array.Copy(Bank7F, srcOffset, ObjectTiles, destOffset, safeLength);
-                        }
-
-
-                        if ((vramBaseHigh & 0x80) != 0)
-                            break;
-                        srcOffset += length;
-                        specOffset += 2;
                     }
 
                     //Load Object Palette
@@ -1449,32 +1452,35 @@ namespace TeheManX_Editor.Forms
             if (ObjectSettings[id][objectTileSetId].Slots.Count != 0)
             {
                 int i = objectTileSlotId;
-
+                ushort relativeVramAddr = ObjectSettings[id][objectTileSetId].Slots[i].VramAddress;
                 byte compressedTileId = ObjectSettings[id][objectTileSetId].Slots[i].TileId;
 
                 int specOffset = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(Const.CompressedTilesSwapInfoOffset + compressedTileId * 2)) + Const.CompressedTilesSwapInfoOffset;
 
                 int totalLength = 0;
 
-                while (true)
+                if (relativeVramAddr != 0x8000 || Const.Id == Const.GameId.MegaManX)
                 {
-                    int length = SNES.rom[specOffset];
-                    if (length == 0)
-                        break;
-                    if (length == 0xFF)
+                    while (true)
                     {
-                        specOffset++;
-                        continue;
+                        int length = SNES.rom[specOffset];
+                        if (length == 0)
+                            break;
+                        if (length == 0xFF)
+                        {
+                            specOffset++;
+                            continue;
+                        }
+                        totalLength += length * 16;
+
+
+                        byte vramBaseHigh = SNES.rom[specOffset + 1];
+
+
+                        if ((vramBaseHigh & 0x80) != 0)
+                            break;
+                        specOffset += 2;
                     }
-                    totalLength += length * 16;
-
-
-                    byte vramBaseHigh = SNES.rom[specOffset + 1];
-
-
-                    if ((vramBaseHigh & 0x80) != 0)
-                        break;
-                    specOffset += 2;
                 }
                 MessageBox.Show($"The total amount of bytes this object slot transfers to VRAM is 0x{totalLength:X} bytes.");
             }
