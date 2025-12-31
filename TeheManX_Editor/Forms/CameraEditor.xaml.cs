@@ -444,6 +444,7 @@ namespace TeheManX_Editor.Forms
                 CameraTriggers[id][cameraTriggerId].TopSide = valueNew;
             }
             SNES.edit = true;
+            MainWindow.window.enemyE.UpdateEnemyLabelPositions();
         }
         private void borderSettingInt_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {

@@ -98,16 +98,14 @@ namespace TeheManX_Editor.Forms
             if (!MainWindow.window.camE.triggersEnabled)
                 return;
 
-            int listOffset = BitConverter.ToUInt16(SNES.rom, Const.CameraTriggersOffset + Level.Id * 2);
+            int id = Level.Id;
 
-            for (int i = 0; i < (MainWindow.window.camE.triggerInt.Maximum + 1); i++)
+            for (int i = 0; i < CameraEditor.CameraTriggers[id].Count; i++)
             {
-                int offset = SNES.CpuToOffset(BitConverter.ToUInt16(SNES.rom, SNES.CpuToOffset(listOffset + i * 2, Const.CameraSettingsBank)), Const.CameraSettingsBank);
-
-                int rightSide = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset));
-                int leftSide = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + 2));
-                int bottomSide = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + 4));
-                int topSide = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + 6));
+                int rightSide = CameraEditor.CameraTriggers[id][i].RightSide;
+                int leftSide = CameraEditor.CameraTriggers[id][i].LeftSide;
+                int bottomSide = CameraEditor.CameraTriggers[id][i].BottomSide;
+                int topSide = CameraEditor.CameraTriggers[id][i].TopSide;
 
                 int width = rightSide - leftSide;
                 int height = bottomSide - topSide;
@@ -219,16 +217,14 @@ namespace TeheManX_Editor.Forms
             if (!MainWindow.window.camE.triggersEnabled)
                 return;
 
-            int listOffset = BitConverter.ToUInt16(SNES.rom, Const.CameraTriggersOffset + Level.Id * 2);
+            int id = Level.Id;
 
-            for (int i = 0; i < (MainWindow.window.camE.triggerInt.Maximum + 1); i++)
+            for (int i = 0; i < CameraEditor.CameraTriggers[id].Count; i++)
             {
-                int offset = SNES.CpuToOffset(BitConverter.ToUInt16(SNES.rom, SNES.CpuToOffset(listOffset + i * 2, Const.CameraSettingsBank)), Const.CameraSettingsBank);
-
-                int rightSide = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset));
-                int leftSide = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + 2));
-                int bottomSide = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + 4));
-                int topSide = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + 6));
+                int rightSide = CameraEditor.CameraTriggers[id][i].RightSide;
+                int leftSide = CameraEditor.CameraTriggers[id][i].LeftSide;
+                int bottomSide = CameraEditor.CameraTriggers[id][i].BottomSide;
+                int topSide = CameraEditor.CameraTriggers[id][i].TopSide;
 
                 int width = rightSide - leftSide;
                 int height = bottomSide - topSide;
@@ -241,6 +237,8 @@ namespace TeheManX_Editor.Forms
 
                 Canvas.SetLeft(triggerRects[i], leftSide - viewerX);
                 Canvas.SetTop(triggerRects[i], topSide - viewerY);
+
+                triggerRects[i].Visibility = Visibility.Visible;
             }
         }
         private void DisableSelect() //Disable editing Enemy Properties
@@ -430,20 +428,10 @@ namespace TeheManX_Editor.Forms
                 if (bottomSide > 0xFFFF)
                     bottomSide = 0xFFFF;
 
-                int listOffset = BitConverter.ToUInt16(SNES.rom, Const.CameraTriggersOffset + Level.Id * 2);
-                int offset = SNES.CpuToOffset(BitConverter.ToUInt16(SNES.rom, SNES.CpuToOffset(listOffset + (int)MainWindow.window.camE.triggerInt.Value * 2, Const.CameraSettingsBank)), Const.CameraSettingsBank);
-
-                BinaryPrimitives.WriteUInt16LittleEndian(SNES.rom.AsSpan(offset), (ushort)rightSide);
-                MainWindow.window.camE.rightInt.Value = rightSide;
-
-                BinaryPrimitives.WriteUInt16LittleEndian(SNES.rom.AsSpan(offset + 2), (ushort)leftSide);
-                MainWindow.window.camE.leftInt.Value = leftSide;
-
-                BinaryPrimitives.WriteUInt16LittleEndian(SNES.rom.AsSpan(offset + 4), (ushort)bottomSide);
-                MainWindow.window.camE.bottomInt.Value = bottomSide;
-
-                BinaryPrimitives.WriteUInt16LittleEndian(SNES.rom.AsSpan(offset + 6), (ushort)topSide);
-                MainWindow.window.camE.topInt.Value = topSide;
+                CameraEditor.CameraTriggers[index][(int)MainWindow.window.camE.triggerInt.Value].RightSide = (ushort)rightSide;
+                CameraEditor.CameraTriggers[index][(int)MainWindow.window.camE.triggerInt.Value].LeftSide = (ushort)leftSide;
+                CameraEditor.CameraTriggers[index][(int)MainWindow.window.camE.triggerInt.Value].BottomSide = (ushort)bottomSide;
+                CameraEditor.CameraTriggers[index][(int)MainWindow.window.camE.triggerInt.Value].TopSide = (ushort)topSide;
 
                 SNES.edit = true;
                 MainWindow.window.enemyE.UpdateEnemyLabelPositions();
