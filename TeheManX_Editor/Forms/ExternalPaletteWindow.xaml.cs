@@ -403,7 +403,7 @@ namespace TeheManX_Editor.Forms
             if (colorDialog.confirm)
             {
                 ushort newC = (ushort)(colorDialog.canvas.SelectedColor.Value.B / 8 * 1024 + colorDialog.canvas.SelectedColor.Value.G / 8 * 32 + colorDialog.canvas.SelectedColor.Value.R / 8);
-                BinaryPrimitives.WriteUInt16LittleEndian(SNES.rom.AsSpan(offset), newC);
+                BinaryPrimitives.WriteUInt16LittleEndian(rom.AsSpan(offset), newC);
 
                 //Convert & Change Clut in GUI
                 byte R = (byte)(newC % 32 * 8);
