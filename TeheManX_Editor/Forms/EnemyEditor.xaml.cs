@@ -414,6 +414,9 @@ namespace TeheManX_Editor.Forms
                 selectRect.Visibility = Visibility.Collapsed;
                 int index = Level.Id;
 
+                if (CameraEditor.CameraTriggers[index].Count == 0)
+                    return;
+
                 int leftSide = ((int)(Canvas.GetLeft(selectRect) + viewerX));
                 int rightSide = ((int)(Canvas.GetLeft(selectRect) + selectRect.Width + viewerX));
                 int topSide = (int)(Canvas.GetTop(selectRect) + viewerY);
@@ -428,10 +431,10 @@ namespace TeheManX_Editor.Forms
                 if (bottomSide > 0xFFFF)
                     bottomSide = 0xFFFF;
 
-                CameraEditor.CameraTriggers[index][(int)MainWindow.window.camE.triggerInt.Value].RightSide = (ushort)rightSide;
-                CameraEditor.CameraTriggers[index][(int)MainWindow.window.camE.triggerInt.Value].LeftSide = (ushort)leftSide;
-                CameraEditor.CameraTriggers[index][(int)MainWindow.window.camE.triggerInt.Value].BottomSide = (ushort)bottomSide;
-                CameraEditor.CameraTriggers[index][(int)MainWindow.window.camE.triggerInt.Value].TopSide = (ushort)topSide;
+                CameraEditor.CameraTriggers[index][CameraEditor.cameraTriggerId].RightSide = (ushort)rightSide;
+                CameraEditor.CameraTriggers[index][CameraEditor.cameraTriggerId].LeftSide = (ushort)leftSide;
+                CameraEditor.CameraTriggers[index][CameraEditor.cameraTriggerId].BottomSide = (ushort)bottomSide;
+                CameraEditor.CameraTriggers[index][CameraEditor.cameraTriggerId].TopSide = (ushort)topSide;
 
                 SNES.edit = true;
                 MainWindow.window.enemyE.UpdateEnemyLabelPositions();

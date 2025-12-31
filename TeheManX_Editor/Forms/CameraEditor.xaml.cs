@@ -25,7 +25,7 @@ namespace TeheManX_Editor.Forms
         public static List<List<CameraTrigger>> CameraTriggers = new List<List<CameraTrigger>>();
         public static int[] CameraBorderSettings;
 
-        private static int cameraTriggerId;
+        public static int cameraTriggerId;
         private static int cameraBorderSettingId;
         #endregion Fields
 
