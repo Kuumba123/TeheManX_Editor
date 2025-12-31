@@ -1225,6 +1225,7 @@ namespace TeheManX_Editor.Forms
                 return;
             suppressInts = true;
             objectTileSetId = (int)e.NewValue;
+            objectTileSlotId = 0;
             objectSlotInt.Value = 0;
 
             if (MainWindow.window.tileE.objectFreshCheck.IsChecked == true)
