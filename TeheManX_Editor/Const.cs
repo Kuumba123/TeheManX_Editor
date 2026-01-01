@@ -4,10 +4,10 @@ namespace TeheManX_Editor
     static class Const
     {
         public static readonly string ReproURL = "https://api.github.com/repos/Kuumba123/TeheManX_Editor/releases/latest";
-        public const string EditorVersion = "1.1";
+        public const string EditorVersion = "1.0.1";
         public static readonly string[] PastVersions =
         {
-            "1.1",
+            "1.0.1",
             "1.0"
         };
         public const int MaxUndo = 512;
