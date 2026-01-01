@@ -4,9 +4,10 @@ namespace TeheManX_Editor
     static class Const
     {
         public static readonly string ReproURL = "https://api.github.com/repos/Kuumba123/TeheManX_Editor/releases/latest";
-        public const string EditorVersion = "1.0";
+        public const string EditorVersion = "1.1";
         public static readonly string[] PastVersions =
         {
+            "1.1",
             "1.0"
         };
         public const int MaxUndo = 512;
@@ -198,8 +199,8 @@ namespace TeheManX_Editor
 
             public static readonly int[] HadoukenAsmOffsets = { 0x03CA8A, 0x0427AA , 0x03D0D6 }; //Hadouken Stage ID
             public static readonly int[] RevistsAsmOffset = { 0x03CA97 , 0x03CA9B }; //Revists Count
-            public static readonly int[] CartSizeCheckAsmOffset = { 0x824A, 0x21C3 }; //both JP & NA 1.0
-            public static readonly int[] RevACartSizeCheckAsmOffset = { 0x824F, 0x21FC8 };
+            public static readonly int[] CartSizeCheckAsmOffset = { 0x824A, 0x21FC3 , 0x2241B}; //both JP & NA 1.0
+            public static readonly int[] RevACartSizeCheckAsmOffset = { 0x824F, 0x21FC8 , 0x22420 };
             internal static class NA // North America Version
             {
                 public const int LoadTileSetInfoOffset = 0x3756F;

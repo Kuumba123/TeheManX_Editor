@@ -192,8 +192,8 @@ namespace TeheManX_Editor.Forms
             }
             if (SNES.rom.Length >= 0x400000 && Encoding.ASCII.GetString(SNES.rom, 0x3FFFF0, 6) == "POGYOU")
             {
-                MessageBox.Show("You already have the expansion patch.");
-                return;
+                if (MessageBox.Show("You already have the expansion patch. Are you sure you want to apply it again?", "", MessageBoxButton.YesNo) != MessageBoxResult.Yes)
+                    return;
             }
 
             SNES.rom[0x7FD7] = 0xC;
