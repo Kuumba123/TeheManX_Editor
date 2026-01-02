@@ -747,9 +747,10 @@ namespace TeheManX_Editor
             {
                 if (Enemies[id].Count == 0)
                 {
-                    MessageBox.Show(
-                        $"Enemy Data for Stage {id:X2} needs atleast 1 enemy because of a bug in the game's enemy dumping code.", "ERROR");
-                    return false;
+                    if (MessageBox.Show($"Enemy Data for Stage {id:X2} needs atleast 1 enemy because of a bug in the game's enemy dumping code and will crash the game if go into that stage. Are you sure you want to export?", "ERROR", MessageBoxButton.YesNo) != MessageBoxResult.Yes)
+                        return false;
+                    else
+                        break;
                 }
             }
 
