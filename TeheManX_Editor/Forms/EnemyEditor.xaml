@@ -54,22 +54,22 @@
                     <StackPanel Orientation="Horizontal">
                         <!--ID-->
                         <TextBlock Width="70" FontSize="18" Foreground="White" FontFamily="Consolas">ID:</TextBlock>
-                        <local:NumInt x:Name="idInt" Width="60" ButtonSpinnerWidth="20" FontSize="20" Value="0" Maximum="#FF" Minimum="0" MaxLength="3" ValueChanged="idInt_ValueChanged" IsUndoEnabled="False" IsEnabled="False"/>
+                        <local:NumInt x:Name="idInt" Width="60" ButtonSpinnerWidth="20" FontSize="20" Value="0" Maximum="#FF" Minimum="0" ValueChanged="idInt_ValueChanged" IsEnabled="False"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
                         <!--Var-->
                         <TextBlock Width="70" FontSize="18" Foreground="White" FontFamily="Consolas">Var:</TextBlock>
-                        <local:NumInt x:Name="varInt" Width="60" ButtonSpinnerWidth="20" FontSize="22" Value="0" Maximum="#FF" Minimum="0" MaxLength="3" IsEnabled="False" ValueChanged="varInt_ValueChanged"/>
+                        <local:NumInt x:Name="varInt" Width="60" ButtonSpinnerWidth="20" FontSize="22" Value="0" Maximum="#FF" Minimum="0" IsEnabled="False" ValueChanged="varInt_ValueChanged"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
                         <!--Type-->
                         <TextBlock Width="70" FontSize="18" Foreground="White" FontFamily="Consolas">Type:</TextBlock>
-                        <local:NumInt x:Name="typeInt" Width="60" ButtonSpinnerWidth="20" FontSize="22" Value="0" Maximum="#5" Minimum="0" MaxLength="3" IsEnabled="False" ValueChanged="typeInt_ValueChanged"/>
+                        <local:NumInt x:Name="typeInt" Width="60" ButtonSpinnerWidth="20" FontSize="22" Value="0" Maximum="#5" Minimum="0" IsEnabled="False" ValueChanged="typeInt_ValueChanged"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
                         <!--Column-->
                         <TextBlock Width="70" FontSize="18" Foreground="White" FontFamily="Consolas">Column:</TextBlock>
-                        <local:NumInt x:Name="columnInt" Width="60" ButtonSpinnerWidth="20" FontSize="22" Value="0" Maximum="#100" Minimum="0" MaxLength="3" IsEnabled="False" ValueChanged="colInt_ValueChanged"/>
+                        <local:NumInt x:Name="columnInt" Width="60" ButtonSpinnerWidth="20" FontSize="22" Value="0" Maximum="#100" Minimum="0" IsEnabled="False" ValueChanged="colInt_ValueChanged"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
                     </StackPanel>
@@ -82,13 +82,13 @@
                     <!--X-->
                     <StackPanel Orientation="Horizontal">
                         <TextBlock FontSize="33" Foreground="White" FontFamily="Consolas" Padding="3,3,0,3">X:</TextBlock>
-                        <local:NumInt x:Name="xInt" ButtonSpinnerWidth="20" Width="100" Height="40" FontSize="33" Value="0" Maximum="#1FFF" Minimum="0" MaxLength="3" IsEnabled="False" ValueChanged="xInt_ValueChanged"/>
+                        <local:NumInt x:Name="xInt" ButtonSpinnerWidth="20" Width="100" Height="40" FontSize="33" Value="0" Maximum="#1FFF" Minimum="0" IsEnabled="False" ValueChanged="xInt_ValueChanged"/>
                         <Button Style="{StaticResource TileButton}" x:Name="zoomInBtn" Click="zoomInBtn_Click" Margin="15,0,0,0" Padding="0" Width="25" Height="25">+</Button>
                     </StackPanel>
                     <!--Y-->
                     <StackPanel Orientation="Horizontal">
                         <TextBlock FontSize="33" Foreground="White" FontFamily="Consolas" Padding="3,3,0,3">Y:</TextBlock>
-                        <local:NumInt x:Name="yInt" ButtonSpinnerWidth="20" Width="100" Height="40" FontSize="33" Value="0" Maximum="#1FFF" Minimum="0" MaxLength="3" IsEnabled="False" ValueChanged="yInt_ValueChanged"/>
+                        <local:NumInt x:Name="yInt" ButtonSpinnerWidth="20" Width="100" Height="40" FontSize="33" Value="0" Maximum="#1FFF" Minimum="0" IsEnabled="False" ValueChanged="yInt_ValueChanged"/>
                         <Button Style="{StaticResource TileButton}" x:Name="zoomOutBtn" Click="zoomOutBtn_Click" Margin="15,0,0,0" Padding="0" Width="25" Height="25">-</Button>
                     </StackPanel>
                 </StackPanel>
