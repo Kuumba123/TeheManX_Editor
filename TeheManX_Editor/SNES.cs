@@ -20,26 +20,38 @@ namespace TeheManX_Editor
 
             if (Encoding.ASCII.GetString(rom, 0x7FC0, 10) == "MEGAMAN X ")
             {
+                if (rom.Length < 0x180000)
+                    return false;
                 Const.AssignProperties(Const.GameId.MegaManX, Const.GameVersion.NA, tempExpand);
             }
             else if (Encoding.ASCII.GetString(rom, 0x7FC0, 10) == "ROCKMAN X ")
             {
+                if (rom.Length < 0x180000)
+                    return false;
                 Const.AssignProperties(Const.GameId.MegaManX, Const.GameVersion.JP, tempExpand);
             }
             else if (Encoding.ASCII.GetString(rom, 0x7FC0, 10) == "MEGAMAN X2")
             {
+                if (rom.Length < 0x180000)
+                    return false;
                 Const.AssignProperties(Const.GameId.MegaManX2, Const.GameVersion.NA, tempExpand);
             }
             else if (Encoding.ASCII.GetString(rom, 0x7FC0, 10) == "ROCKMAN X2")
             {
+                if (rom.Length < 0x180000)
+                    return false;
                 Const.AssignProperties(Const.GameId.MegaManX2, Const.GameVersion.JP, tempExpand);
             }
             else if (Encoding.ASCII.GetString(rom, 0x7FC0, 10) == "MEGAMAN X3")
             {
+                if (rom.Length < 0x200000)
+                    return false;
                 Const.AssignProperties(Const.GameId.MegaManX3, Const.GameVersion.NA, tempExpand);
             }
             else if (Encoding.ASCII.GetString(rom, 0x7FC0, 10) == "ROCKMAN X3")
             {
+                if (rom.Length < 0x200000)
+                    return false;
                 Const.AssignProperties(Const.GameId.MegaManX3, Const.GameVersion.JP, tempExpand);
             }
             else

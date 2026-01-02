@@ -600,11 +600,29 @@ namespace TeheManX_Editor.Forms
                 if (fd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                 {
                     //Validate SFC File
-                    byte[] rom = File.ReadAllBytes(fd.FileName);
+                    byte[] rom = null;
+
+                    try
+                    {
+                        FileInfo fileInfo = new FileInfo(fd.FileName);
+
+                        if (fileInfo.Length > 0x800000)
+                        {
+                            MessageBox.Show("Invalid Rom Size", "ERROR");
+                            return;
+                        }
+
+                        rom = File.ReadAllBytes(fd.FileName);
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show(ex.Message, "ERROR");
+                        return;
+                    }
 
                     if (!SNES.IsValidRom(rom))
                     {
-                        MessageBox.Show("Your ROM File is corrupted or you didn't  select the correct version of the game.", "ERROR");
+                        MessageBox.Show("Your ROM File is corrupted or you didn't  select the correct game.", "ERROR");
                         return;
                     }
 
