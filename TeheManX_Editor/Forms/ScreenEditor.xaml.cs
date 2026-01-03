@@ -240,10 +240,7 @@ namespace TeheManX_Editor.Forms
                     Array.Clear(screenData16, 0, screenData16.Length);
                 else
                 {
-                    // MMX3 special cases
-                    int Id = (Const.Id == Const.GameId.MegaManX3 && Level.Id == 0xE) ? 0x10 : (Const.Id == Const.GameId.MegaManX3 && Level.Id > 0xE) ? (Level.Id - 0xF) + 0xE : Level.Id;
-
-                    int offset = SNES.CpuToOffset(BinaryPrimitives.ReadInt32LittleEndian(SNES.rom.AsSpan(Const.ScreenDataPointersOffset[Level.BG] + Id * 3)));
+                    int offset = Level.ScreenDataOffset;
                     Array.Clear(SNES.rom, offset, 0x80 * Const.ScreenCount[Level.Id, Level.BG]);
                 }
                 //Clear Screen Undos of 32x32
@@ -272,14 +269,11 @@ namespace TeheManX_Editor.Forms
             }
             else
             {
-                // MMX3 special cases
-                int Id = (Const.Id == Const.GameId.MegaManX3 && Level.Id == 0xE) ? 0x10 : (Const.Id == Const.GameId.MegaManX3 && Level.Id > 0xE) ? (Level.Id - 0xF) + 0xE : Level.Id;
-
                 if (MainWindow.undos.Count == Const.MaxUndo)
                     MainWindow.undos.RemoveAt(0);
                 MainWindow.undos.Add(Undo.CreateGroupScreenUndo((byte)screenId, 0, 0, 8, 8));;
 
-                int offset = SNES.CpuToOffset(BinaryPrimitives.ReadInt32LittleEndian(SNES.rom.AsSpan(Const.ScreenDataPointersOffset[Level.BG] + Id * 3))) + screenId * 0x80;
+                int offset = Level.ScreenDataOffset + screenId * 0x80;
                 Array.Clear(SNES.rom, offset, 0x80);
                 DrawScreen();
 
@@ -405,12 +399,9 @@ namespace TeheManX_Editor.Forms
             int cX = SNES.GetSelectedTile(x, MainWindow.window.screenE.screenImage.ActualWidth, 8);
             int cY = SNES.GetSelectedTile(y, MainWindow.window.screenE.screenImage.ActualHeight, 8);
 
-            // MMX3 special cases
-            int Id = (Const.Id == Const.GameId.MegaManX3 && Level.Id == 0xE) ? 0x10 : (Const.Id == Const.GameId.MegaManX3 && Level.Id > 0xE) ? (Level.Id - 0xF) + 0xE : Level.Id;
-
             if (e.ChangedButton == MouseButton.Right)
             {
-                int offset = SNES.CpuToOffset(BinaryPrimitives.ReadInt32LittleEndian(SNES.rom.AsSpan(Const.ScreenDataPointersOffset[Level.BG] + Id * 3)));
+                int offset = Level.ScreenDataOffset;
                 selectedTile = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + (screenId * 0x80) + (cX * 2) + (cY * 16)));
                 tile32Int.Value = selectedTile;
                 DrawTile();
@@ -418,7 +409,7 @@ namespace TeheManX_Editor.Forms
             }
             else
             {
-                int offset = SNES.CpuToOffset(BinaryPrimitives.ReadInt32LittleEndian(SNES.rom.AsSpan(Const.ScreenDataPointersOffset[Level.BG] + Id * 3)));
+                int offset = Level.ScreenDataOffset;
                 screenDown = true;
                 ushort tileId = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + screenId * 0x80 + cX * 2 + cY * 16));
                 if (tileId == selectedTile)
@@ -456,10 +447,7 @@ namespace TeheManX_Editor.Forms
                     int cY = SNES.GetSelectedTile(y, screenImage.ActualHeight, 8);
                     int cord = (cX * 2) + (cY * 16);
 
-                    // MMX3 special cases
-                    int Id = (Const.Id == Const.GameId.MegaManX3 && Level.Id == 0xE) ? 0x10 : (Const.Id == Const.GameId.MegaManX3 && Level.Id > 0xE) ? (Level.Id - 0xF) + 0xE : Level.Id;
-
-                    int offset = SNES.CpuToOffset(BinaryPrimitives.ReadInt32LittleEndian(SNES.rom.AsSpan(Const.ScreenDataPointersOffset[Level.BG] + Id * 3))) + screenId * 0x80;
+                    int offset = Level.ScreenDataOffset + screenId * 0x80;
 
                     ushort tileId = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + cord));
                     if (tileId == selectedTile)
@@ -541,11 +529,8 @@ namespace TeheManX_Editor.Forms
             if (screenData16 == null || screenData16.Length != newSize)
                 screenData16 = GC.AllocateUninitializedArray<byte>(newSize, pinned: false);
 
-            // MMX3 special cases
-            int Id = (Const.Id == Const.GameId.MegaManX3 && Level.Id == 0xE) ? 0x10 : (Const.Id == Const.GameId.MegaManX3 && Level.Id > 0xE) ? (Level.Id - 0xF) + 0xE : Level.Id;
-
-            int screenDataBaseOffset = SNES.CpuToOffset(BinaryPrimitives.ReadInt32LittleEndian(SNES.rom.AsSpan(Const.ScreenDataPointersOffset[Level.BG] + Id * 3)));
-            int tile32BaseOffset = SNES.CpuToOffset(BinaryPrimitives.ReadInt32LittleEndian(SNES.rom.AsSpan(Const.Tile32DataPointersOffset[Level.BG] + Id * 3)));
+            int screenDataBaseOffset = Level.ScreenDataOffset;
+            int tile32BaseOffset = Level.Tile32DataOffset;
 
             for (int screen = 0; screen < Const.ScreenCount[Level.Id, Level.BG]; screen++)
             {
@@ -915,10 +900,7 @@ namespace TeheManX_Editor.Forms
                 return;
             }
 
-            // MMX3 special cases
-            int Id = (Const.Id == Const.GameId.MegaManX3 && Level.Id == 0xE) ? 0x10 : (Const.Id == Const.GameId.MegaManX3 && Level.Id > 0xE) ? (Level.Id - 0xF) + 0xE : Level.Id;
-
-            int tile32DestBase = SNES.CpuToOffset(BinaryPrimitives.ReadInt32LittleEndian(SNES.rom.AsSpan(Const.Tile32DataPointersOffset[Level.BG] + Id * 3)));
+            int tile32DestBase = Level.Tile32DataOffset;
 
             if (tiles32.Count < Const.Tile32Count[Level.Id, Level.BG]) //Clearing Un-Needed 32x32 Tiles
             {
@@ -940,7 +922,7 @@ namespace TeheManX_Editor.Forms
 
             byte[] data = screenData16;
 
-            int screenDestBase = SNES.CpuToOffset(BinaryPrimitives.ReadInt32LittleEndian(SNES.rom.AsSpan(Const.ScreenDataPointersOffset[Level.BG] + Id * 3)));
+            int screenDestBase = Level.ScreenDataOffset;
 
             //Create the Screen Data
             for (int screen = 0; screen < Const.ScreenCount[Level.Id, Level.BG]; screen++)
