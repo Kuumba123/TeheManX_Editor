@@ -42,27 +42,22 @@ namespace TeheManX_Editor.Forms
         #region Methods
         public void AssignLimits()
         {
-            int Id;
-            if (Const.Id == Const.GameId.MegaManX3 && Level.Id == 0xE) Id = 0x10; //special case for MMX3 rekt version of dophler 2
-            else if (Const.Id == Const.GameId.MegaManX3 && Level.Id > 0xE) Id = (Level.Id - 0xF) + 0xE; //Buffalo or Beetle
-            else Id = Level.Id;
-
             int tile32Amount = Const.Tile32Count[Level.Id, Level.BG] - 1;
             MainWindow.window.tile32E.tileInt.Maximum = tile32Amount;
             if (selectedTile > tile32Amount)
                 MainWindow.window.tile32E.tileInt.Value = tile32Amount;
 
-            int offset = SNES.CpuToOffset(BitConverter.ToInt32(SNES.rom, Const.Tile32DataPointersOffset[Level.BG] + Id * 3));
+            int offset = Level.Tile32DataOffset;
 
-            int max16 = Const.Tile16Count[Id, Level.BG] - 1;
+            int max16 = Const.Tile16Count[Level.Id, Level.BG] - 1;
 
-            MainWindow.window.tile32E.topLeftInt.Value = BitConverter.ToUInt16(SNES.rom, offset + selectedTile * 8 + 0);
+            MainWindow.window.tile32E.topLeftInt.Value = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + selectedTile * 8 + 0));
             MainWindow.window.tile32E.topLeftInt.Maximum = max16;
-            MainWindow.window.tile32E.topRightInt.Value = BitConverter.ToUInt16(SNES.rom, offset + selectedTile * 8 + 2);
+            MainWindow.window.tile32E.topRightInt.Value = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + selectedTile * 8 + 2));
             MainWindow.window.tile32E.topRightInt.Maximum = max16;
-            MainWindow.window.tile32E.bottomLeftInt.Value = BitConverter.ToUInt16(SNES.rom, offset + selectedTile * 8 + 4);
+            MainWindow.window.tile32E.bottomLeftInt.Value = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + selectedTile * 8 + 4));
             MainWindow.window.tile32E.bottomLeftInt.Maximum = max16;
-            MainWindow.window.tile32E.bottomRightInt.Value = BitConverter.ToUInt16(SNES.rom, offset + selectedTile * 8 + 6);
+            MainWindow.window.tile32E.bottomRightInt.Value = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + selectedTile * 8 + 6));
             MainWindow.window.tile32E.bottomRightInt.Maximum = max16;
 
             UpdateTile16SelectionUI();
@@ -73,12 +68,8 @@ namespace TeheManX_Editor.Forms
         public void PaintTiles32()
         {
             updateTiles32 = false;
-            int Id;
-            if (Const.Id == Const.GameId.MegaManX3 && Level.Id == 0xE) Id = 0x10; //special case for MMX3 rekt version of dophler 2
-            else if (Const.Id == Const.GameId.MegaManX3 && Level.Id > 0xE) Id = (Level.Id - 0xF) + 0xE; //Buffalo or Beetle
-            else Id = Level.Id;
 
-            int tile32Offset = SNES.CpuToOffset(BitConverter.ToInt32(SNES.rom, Const.Tile32DataPointersOffset[Level.BG] + Id * 3));
+            int tile32Offset = Level.Tile32DataOffset;
             tileBMP.Lock();
 
             for (int y = 0; y < 32; y++)
@@ -104,10 +95,10 @@ namespace TeheManX_Editor.Forms
                         }
                         continue;
                     }
-                    Level.Draw16xTile(BitConverter.ToUInt16(SNES.rom, tile32Offset + (tileId32 * 8)), x * 32, y * 32, tileBMP.BackBufferStride, tileBMP.BackBuffer);
-                    Level.Draw16xTile(BitConverter.ToUInt16(SNES.rom, tile32Offset + (tileId32 * 8) + 2), x * 32 + 16, y * 32, tileBMP.BackBufferStride, tileBMP.BackBuffer);
-                    Level.Draw16xTile(BitConverter.ToUInt16(SNES.rom, tile32Offset + (tileId32 * 8) + 4), x * 32, y * 32 + 16, tileBMP.BackBufferStride, tileBMP.BackBuffer);
-                    Level.Draw16xTile(BitConverter.ToUInt16(SNES.rom, tile32Offset + (tileId32 * 8) + 6), x * 32 + 16, y * 32 + 16, tileBMP.BackBufferStride, tileBMP.BackBuffer);
+                    Level.Draw16xTile(BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(tile32Offset + (tileId32 * 8))), x * 32, y * 32, tileBMP.BackBufferStride, tileBMP.BackBuffer);
+                    Level.Draw16xTile(BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(tile32Offset + (tileId32 * 8) + 2)), x * 32 + 16, y * 32, tileBMP.BackBufferStride, tileBMP.BackBuffer);
+                    Level.Draw16xTile(BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(tile32Offset + (tileId32 * 8) + 4)), x * 32, y * 32 + 16, tileBMP.BackBufferStride, tileBMP.BackBuffer);
+                    Level.Draw16xTile(BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(tile32Offset + (tileId32 * 8) + 6)), x * 32 + 16, y * 32 + 16, tileBMP.BackBufferStride, tileBMP.BackBuffer);
                 }
             }
             tileBMP.AddDirtyRect(new Int32Rect(0, 0, 256, 1024));
@@ -117,10 +108,6 @@ namespace TeheManX_Editor.Forms
         {
             updateTiles16 = false;
             x16BMP.Lock();
-            int Id;
-            if (Const.Id == Const.GameId.MegaManX3 && Level.Id == 0xE) Id = 0x10; //special case for MMX3 rekt version of dophler 2
-            else if (Const.Id == Const.GameId.MegaManX3 && Level.Id > 0xE) Id = (Level.Id - 0xF) + 0xE; //Buffalo or Beetle
-            else Id = Level.Id;
 
             for (int y = 0; y < 16; y++)
             {
@@ -156,16 +143,11 @@ namespace TeheManX_Editor.Forms
             updateTile = false;
             tileBMP_S.Lock();
 
-            int Id;
-            if (Const.Id == Const.GameId.MegaManX3 && Level.Id == 0xE) Id = 0x10; //special case for MMX3 rekt version of dophler 2
-            else if (Const.Id == Const.GameId.MegaManX3 && Level.Id > 0xE) Id = (Level.Id - 0xF) + 0xE; //Buffalo or Beetle
-            else Id = Level.Id;
-
-            int tile32Offset = SNES.CpuToOffset(BitConverter.ToInt32(SNES.rom, Const.Tile32DataPointersOffset[Level.BG] + Id * 3));
-            Level.Draw16xTile(BitConverter.ToUInt16(SNES.rom, tile32Offset + (selectedTile * 8)), 0, 0, tileBMP_S.BackBufferStride, tileBMP_S.BackBuffer);
-            Level.Draw16xTile(BitConverter.ToUInt16(SNES.rom, tile32Offset + (selectedTile * 8) + 2), 16, 0, tileBMP_S.BackBufferStride, tileBMP_S.BackBuffer);
-            Level.Draw16xTile(BitConverter.ToUInt16(SNES.rom, tile32Offset + (selectedTile * 8) + 4), 0, 16, tileBMP_S.BackBufferStride, tileBMP_S.BackBuffer);
-            Level.Draw16xTile(BitConverter.ToUInt16(SNES.rom, tile32Offset + (selectedTile * 8) + 6), 16, 16, tileBMP_S.BackBufferStride, tileBMP_S.BackBuffer);
+            int tile32Offset = Level.Tile32DataOffset;
+            Level.Draw16xTile(BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(tile32Offset + (selectedTile * 8))), 0, 0, tileBMP_S.BackBufferStride, tileBMP_S.BackBuffer);
+            Level.Draw16xTile(BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(tile32Offset + (selectedTile * 8) + 2)), 16, 0, tileBMP_S.BackBufferStride, tileBMP_S.BackBuffer);
+            Level.Draw16xTile(BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(tile32Offset + (selectedTile * 8) + 4)), 0, 16, tileBMP_S.BackBufferStride, tileBMP_S.BackBuffer);
+            Level.Draw16xTile(BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(tile32Offset + (selectedTile * 8) + 6)), 16, 16, tileBMP_S.BackBufferStride, tileBMP_S.BackBuffer);
             tileBMP_S.AddDirtyRect(new Int32Rect(0, 0, 32, 32));
             tileBMP_S.Unlock();
         }
@@ -198,14 +180,9 @@ namespace TeheManX_Editor.Forms
         }
         public void UpdateTile16SelectionUI() //update the cursor in the 16x16 tile selection area
         {
-            int Id;
-            if (Const.Id == Const.GameId.MegaManX3 && Level.Id == 0xE) Id = 0x10; //special case for MMX3 rekt version of dophler 2
-            else if (Const.Id == Const.GameId.MegaManX3 && Level.Id > 0xE) Id = (Level.Id - 0xF) + 0xE; //Buffalo or Beetle
-            else Id = Level.Id;
+            int offset = Level.Tile32DataOffset;
 
-            int offset = SNES.CpuToOffset(BinaryPrimitives.ReadInt32LittleEndian(SNES.rom.AsSpan(Const.Tile32DataPointersOffset[Level.BG] + Id * 3)));
-
-            ushort tile16 = BitConverter.ToUInt16(SNES.rom, offset + selectedTile * 8 + (selectedInnerTile * 2));
+            ushort tile16 = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + selectedTile * 8 + (selectedInnerTile * 2)));
 
             if (page2 != ((tile16 >> 8) & 0xFF))
                 tile16Cursor.Visibility = Visibility.Hidden;
@@ -281,17 +258,12 @@ namespace TeheManX_Editor.Forms
                 id = 0xFF;
             id += page * 0x100;
 
-            int Id;
-            if (Const.Id == Const.GameId.MegaManX3 && Level.Id == 0xE) Id = 0x10; //special case for MMX3 rekt version of dophler 2
-            else if (Const.Id == Const.GameId.MegaManX3 && Level.Id > 0xE) Id = (Level.Id - 0xF) + 0xE; //Buffalo or Beetle
-            else Id = Level.Id;
-
             if (id > (Const.Tile32Count[Level.Id,Level.BG]) - 1)
                 return;
             //New Valid Tile
             selectedTile = id;
 
-            int offset = SNES.CpuToOffset(BitConverter.ToInt32(SNES.rom, Const.Tile32DataPointersOffset[Level.BG] + Id * 3));
+            int offset = Level.Tile32DataOffset;
             UpdateTile32Ints(offset);
             DrawTile();
             tileInt.Value = selectedTile;
@@ -311,11 +283,6 @@ namespace TeheManX_Editor.Forms
                 id = 0xFF;
             id += page2 * 0x100;
 
-            int Id;
-            if (Const.Id == Const.GameId.MegaManX3 && Level.Id == 0xE) Id = 0x10; //special case for MMX3 rekt version of dophler 2
-            else if (Const.Id == Const.GameId.MegaManX3 && Level.Id > 0xE) Id = (Level.Id - 0xF) + 0xE; //Buffalo or Beetle
-            else Id = Level.Id;
-
             if (id > (Const.Tile16Count[Level.Id, Level.BG]) - 1)
                 return;
             //New Valid Inner Tile
@@ -324,7 +291,7 @@ namespace TeheManX_Editor.Forms
                 MainWindow.window.tile16E.tileInt.Value = id; //select Tile in 16x16 Tile Editor
                 return;
             }
-            int offset = SNES.CpuToOffset(BitConverter.ToInt32(SNES.rom, Const.Tile32DataPointersOffset[Level.BG] + Id * 3));
+            int offset = Level.Tile32DataOffset;
             if (MainWindow.undos.Count == Const.MaxUndo)
                 MainWindow.undos.RemoveAt(0);
             MainWindow.undos.Add(Undo.CreateTile32Undo((ushort)selectedTile, BinaryPrimitives.ReadUInt64LittleEndian(SNES.rom.AsSpan(offset + selectedTile * 8))));
@@ -374,12 +341,7 @@ namespace TeheManX_Editor.Forms
 
             selectedTile = (int)e.NewValue;
 
-            int Id;
-            if (Const.Id == Const.GameId.MegaManX3 && Level.Id == 0xE) Id = 0x10; //special case for MMX3 rekt version of dophler 2
-            else if (Const.Id == Const.GameId.MegaManX3 && Level.Id > 0xE) Id = (Level.Id - 0xF) + 0xE; //Buffalo or Beetle
-            else Id = Level.Id;
-
-            int offset = SNES.CpuToOffset(BitConverter.ToInt32(SNES.rom, Const.Tile32DataPointersOffset[Level.BG] + Id * 3));
+            int offset = Level.Tile32DataOffset;
 
             MainWindow.window.tile32E.topLeftInt.Value = BitConverter.ToUInt16(SNES.rom, offset + selectedTile * 8 + 0);
             MainWindow.window.tile32E.topRightInt.Value = BitConverter.ToUInt16(SNES.rom, offset + selectedTile * 8 + 2);
@@ -396,13 +358,8 @@ namespace TeheManX_Editor.Forms
             if (e.NewValue == null || SNES.rom == null)
                 return;
 
-            int Id;
-            if (Const.Id == Const.GameId.MegaManX3 && Level.Id == 0xE) Id = 0x10; //special case for MMX3 rekt version of dophler 2
-            else if (Const.Id == Const.GameId.MegaManX3 && Level.Id > 0xE) Id = (Level.Id - 0xF) + 0xE; //Buffalo or Beetle
-            else Id = Level.Id;
-
-            int offset = SNES.CpuToOffset(BitConverter.ToInt32(SNES.rom, Const.Tile32DataPointersOffset[Level.BG] + Id * 3));
-            if ((ushort)(int)e.NewValue == BitConverter.ToUInt16(SNES.rom, offset + selectedTile * 8 + 0))
+            int offset = Level.Tile32DataOffset;
+            if ((ushort)(int)e.NewValue == BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + selectedTile * 8 + 0)))
                 return;
 
             BinaryPrimitives.WriteUInt16LittleEndian(SNES.rom.AsSpan(offset + selectedTile * 8 + 0), (ushort)(int)e.NewValue);
@@ -423,13 +380,8 @@ namespace TeheManX_Editor.Forms
             if (e.NewValue == null || SNES.rom == null)
                 return;
 
-            int Id;
-            if (Const.Id == Const.GameId.MegaManX3 && Level.Id == 0xE) Id = 0x10; //special case for MMX3 rekt version of dophler 2
-            else if (Const.Id == Const.GameId.MegaManX3 && Level.Id > 0xE) Id = (Level.Id - 0xF) + 0xE; //Buffalo or Beetle
-            else Id = Level.Id;
-
-            int offset = SNES.CpuToOffset(BitConverter.ToInt32(SNES.rom, Const.Tile32DataPointersOffset[Level.BG] + Id * 3));
-            if ((ushort)(int)e.NewValue == BitConverter.ToUInt16(SNES.rom, offset + selectedTile * 8 + 2))
+            int offset = Level.Tile32DataOffset;
+            if ((ushort)(int)e.NewValue == BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + selectedTile * 8 + 2)))
                 return;
 
             if (MainWindow.undos.Count == Const.MaxUndo)
@@ -454,13 +406,8 @@ namespace TeheManX_Editor.Forms
             if (e.NewValue == null || SNES.rom == null)
                 return;
 
-            int Id;
-            if (Const.Id == Const.GameId.MegaManX3 && Level.Id == 0xE) Id = 0x10; //special case for MMX3 rekt version of dophler 2
-            else if (Const.Id == Const.GameId.MegaManX3 && Level.Id > 0xE) Id = (Level.Id - 0xF) + 0xE; //Buffalo or Beetle
-            else Id = Level.Id;
-
-            int offset = SNES.CpuToOffset(BitConverter.ToInt32(SNES.rom, Const.Tile32DataPointersOffset[Level.BG] + Id * 3));
-            if ((ushort)(int)e.NewValue == BitConverter.ToUInt16(SNES.rom, offset + selectedTile * 8 + 4))
+            int offset = Level.Tile32DataOffset;
+            if ((ushort)(int)e.NewValue == BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + selectedTile * 8 + 4)))
                 return;
 
             if (MainWindow.undos.Count == Const.MaxUndo)
@@ -485,13 +432,8 @@ namespace TeheManX_Editor.Forms
             if (e.NewValue == null || SNES.rom == null)
                 return;
 
-            int Id;
-            if (Const.Id == Const.GameId.MegaManX3 && Level.Id == 0xE) Id = 0x10; //special case for MMX3 rekt version of dophler 2
-            else if (Const.Id == Const.GameId.MegaManX3 && Level.Id > 0xE) Id = (Level.Id - 0xF) + 0xE; //Buffalo or Beetle
-            else Id = Level.Id;
-
-            int offset = SNES.CpuToOffset(BitConverter.ToInt32(SNES.rom, Const.Tile32DataPointersOffset[Level.BG] + Id * 3));
-            if ((ushort)(int)e.NewValue == BitConverter.ToUInt16(SNES.rom, offset + selectedTile * 8 + 6))
+            int offset = Level.Tile32DataOffset;
+            if ((ushort)(int)e.NewValue == BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + selectedTile * 8 + 6)))
                 return;
 
             if (MainWindow.undos.Count == Const.MaxUndo)
