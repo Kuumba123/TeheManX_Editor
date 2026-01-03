@@ -5,7 +5,6 @@ using System.IO;
 using System.Linq;
 using System.Text.Json;
 using System.Windows;
-using System.Windows.Media;
 using TeheManX_Editor.Forms;
 
 namespace TeheManX_Editor
