@@ -24,6 +24,11 @@ namespace TeheManX_Editor
         public static int PaletteColorAddress;
         public static List<Enemy>[] Enemies = new List<Enemy>[Const.MaxLevels];
         public static GameProject Project;
+        //Offsets for the current Level
+        public static int ScreenDataOffset;
+        public static int Tile32DataOffset;
+        public static int Tile16DataOffset;
+        public static int TileCollisionDataOffset;
         #endregion Fields
 
         #region Methods
@@ -38,12 +43,10 @@ namespace TeheManX_Editor
         }
         public static unsafe void Draw16xTile(int id, int x, int y, int stride, IntPtr dest)
         {
-            // MMX3 special cases
-            int stageId = (Const.Id == Const.GameId.MegaManX3 && Id == 0xE) ? 0x10 : (Const.Id == Const.GameId.MegaManX3 && Id > 0xE) ? (Id - 0xF) + 0xE : Id;
+            int offset = Tile16DataOffset + id * 8;
 
-            int offset = SNES.CpuToOffset(BinaryPrimitives.ReadInt32LittleEndian(SNES.rom.AsSpan(Const.Tile16DataPointersOffset[BG] + stageId * 3)) + id * 8);
             byte* buffer = (byte*)dest;
-
+            byte[] tiles = Tiles;
             Color backColor = Palette[0, 0];
 
             for (int i = 0; i < 4; i++)
@@ -69,10 +72,10 @@ namespace TeheManX_Editor
                     for (int col = 0; col < 8; col++)
                     {
                         int bit = 7 - col; // leftmost pixel = bit7
-                        int p0 = (Tiles[base1] >> bit) & 1;
-                        int p1 = (Tiles[base1 + 1] >> bit) & 1;
-                        int p2 = (Tiles[base2] >> bit) & 1;
-                        int p3 = (Tiles[base2 + 1] >> bit) & 1;
+                        int p0 = (tiles[base1] >> bit) & 1;
+                        int p1 = (tiles[base1 + 1] >> bit) & 1;
+                        int p2 = (tiles[base2] >> bit) & 1;
+                        int p3 = (tiles[base2 + 1] >> bit) & 1;
 
                         byte index = (byte)(p0 | (p1 << 1) | (p2 << 2) | (p3 << 3));
 
@@ -92,15 +95,10 @@ namespace TeheManX_Editor
         }
         public static unsafe void Draw16xTile_Clamped(int id, int x, int y,int stride, IntPtr dest,int bmpWidth, int bmpHeight)
         {
-            // MMX3 special cases
-            int stageId = (Const.Id == Const.GameId.MegaManX3 && Id == 0xE) ? 0x10 : (Const.Id == Const.GameId.MegaManX3 && Id > 0xE) ? (Id - 0xF) + 0xE : Id;
-
-            int offset = SNES.CpuToOffset(
-                BinaryPrimitives.ReadInt32LittleEndian(
-                    SNES.rom.AsSpan(Const.Tile16DataPointersOffset[BG] + stageId * 3))
-                + id * 8);
+            int offset = Tile16DataOffset + id * 8;
 
             byte* buffer = (byte*)dest;
+            byte[] tiles = Tiles;
             Color backColor = Palette[0, 0];
 
             // precalc bounds
@@ -135,10 +133,10 @@ namespace TeheManX_Editor
                         if (px < 0 || px > maxX) continue;
 
                         int bit = 7 - col;
-                        int p0 = (Tiles[base1] >> bit) & 1;
-                        int p1 = (Tiles[base1 + 1] >> bit) & 1;
-                        int p2 = (Tiles[base2] >> bit) & 1;
-                        int p3 = (Tiles[base2 + 1] >> bit) & 1;
+                        int p0 = (tiles[base1] >> bit) & 1;
+                        int p1 = (tiles[base1 + 1] >> bit) & 1;
+                        int p2 = (tiles[base2] >> bit) & 1;
+                        int p3 = (tiles[base2 + 1] >> bit) & 1;
 
                         byte index = (byte)(p0 | (p1 << 1) | (p2 << 2) | (p3 << 3));
                         Color color = index == 0 ? backColor : Palette[set, index];
@@ -156,11 +154,8 @@ namespace TeheManX_Editor
         }
         public static unsafe void DrawScreen(int s, int stride, IntPtr ptr)
         {
-            // MMX3 special cases
-            int id = (Const.Id == Const.GameId.MegaManX3 && Id == 0xE) ? 0x10 : (Const.Id == Const.GameId.MegaManX3 && Id > 0xE) ? (Id - 0xF) + 0xE : Id;
-
-            int offset = SNES.CpuToOffset(BinaryPrimitives.ReadInt32LittleEndian(SNES.rom.AsSpan(Const.ScreenDataPointersOffset[BG] + id * 3))) + s * 0x80;
-            int tile32Offset = SNES.CpuToOffset(BinaryPrimitives.ReadInt32LittleEndian(SNES.rom.AsSpan(Const.Tile32DataPointersOffset[BG] + id * 3)));
+            int offset = ScreenDataOffset + s * 0x80;
+            int tile32Offset = Tile32DataOffset;
 
             for (int y = 0; y < 8; y++)
             {
@@ -177,11 +172,8 @@ namespace TeheManX_Editor
         }
         public static unsafe void DrawScreen(int s,int drawX,int drawY, int stride, IntPtr ptr)
         {
-            // MMX3 special cases
-            int id = (Const.Id == Const.GameId.MegaManX3 && Id == 0xE) ? 0x10 : (Const.Id == Const.GameId.MegaManX3 && Id > 0xE) ? (Id - 0xF) + 0xE : Id;
-
-            int offset = SNES.CpuToOffset(BinaryPrimitives.ReadInt32LittleEndian(SNES.rom.AsSpan(Const.ScreenDataPointersOffset[BG] + id * 3))) + s * 0x80;
-            int tile32Offset = SNES.CpuToOffset(BinaryPrimitives.ReadInt32LittleEndian(SNES.rom.AsSpan(Const.Tile32DataPointersOffset[BG] + id * 3)));
+            int offset = ScreenDataOffset + s * 0x80;
+            int tile32Offset = Tile32DataOffset;
 
             for (int y = 0; y < 8; y++)
             {
@@ -198,11 +190,8 @@ namespace TeheManX_Editor
         }
         public static unsafe void DrawScreen_Clamped(int s, int drawX, int drawY, int stride, IntPtr ptr, int bmpWidth, int bmpHeight)
         {
-            // MMX3 special cases
-            int id = (Const.Id == Const.GameId.MegaManX3 && Id == 0xE) ? 0x10 : (Const.Id == Const.GameId.MegaManX3 && Id > 0xE) ? (Id - 0xF) + 0xE : Id;
-
-            int offset = SNES.CpuToOffset(BinaryPrimitives.ReadInt32LittleEndian(SNES.rom.AsSpan(Const.ScreenDataPointersOffset[BG] + id * 3))) + s * 0x80;
-            int tile32Offset = SNES.CpuToOffset(BinaryPrimitives.ReadInt32LittleEndian(SNES.rom.AsSpan(Const.Tile32DataPointersOffset[BG] + id * 3)));
+            int offset = ScreenDataOffset + s * 0x80;
+            int tile32Offset = Tile32DataOffset;
 
             for (int y = 0; y < 8; y++)
             {
@@ -997,6 +986,16 @@ namespace TeheManX_Editor
                 File.WriteAllText(combinedPath, json);
             }
             return true;
+        }
+        public static void AssignOffsets() //To Reduce duplicated code
+        {
+            // MMX3 special cases
+            int id = (Const.Id == Const.GameId.MegaManX3 && Id == 0xE) ? 0x10 : (Const.Id == Const.GameId.MegaManX3 && Id > 0xE) ? (Id - 0xF) + 0xE : Id;
+
+            ScreenDataOffset = SNES.CpuToOffset(BinaryPrimitives.ReadInt32LittleEndian(SNES.rom.AsSpan(Const.ScreenDataPointersOffset[BG] + id * 3)));
+            Tile32DataOffset = SNES.CpuToOffset(BinaryPrimitives.ReadInt32LittleEndian(SNES.rom.AsSpan(Const.Tile32DataPointersOffset[BG] + id * 3)));
+            Tile16DataOffset = SNES.CpuToOffset(BinaryPrimitives.ReadInt32LittleEndian(SNES.rom.AsSpan(Const.Tile16DataPointersOffset[BG] + id * 3)));
+            TileCollisionDataOffset = SNES.CpuToOffset(BinaryPrimitives.ReadInt32LittleEndian(SNES.rom.AsSpan(Const.TileCollisionDataPointersOffset + id * 3)));
         }
         public static void AssignPallete()
         {

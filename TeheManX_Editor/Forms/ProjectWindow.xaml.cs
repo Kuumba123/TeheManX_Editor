@@ -410,6 +410,7 @@ namespace TeheManX_Editor.Forms
             SNES.edit = true;
             SNES.expanded = true;
             Const.AssignExpand();
+            Level.AssignOffsets();
             MainWindow.window.layoutE.AssignLimits();
             MainWindow.window.screenE.AssignLimits();
             MainWindow.window.tile32E.AssignLimits();

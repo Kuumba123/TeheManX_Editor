@@ -128,6 +128,7 @@ namespace TeheManX_Editor.Forms
                     SNES.savePath = args[1];
                     Level.LoadProject(Path.GetDirectoryName(SNES.savePath));
                     Level.LoadLevelData();
+                    Level.AssignOffsets();
                     //Setup Editor
                     Level.AssignPallete();
                     window.tileE.CollectData();
@@ -201,6 +202,7 @@ namespace TeheManX_Editor.Forms
                 Level.TileSet = 0;
                 Level.AssignPallete();
                 Level.LoadLevelTiles();
+                Level.AssignOffsets();
                 Update();
             }
             else if (key == "F2")
@@ -219,6 +221,7 @@ namespace TeheManX_Editor.Forms
                 Level.TileSet = 0;
                 Level.AssignPallete();
                 Level.LoadLevelTiles();
+                Level.AssignOffsets();
                 Update();
             }
         }
@@ -298,6 +301,7 @@ namespace TeheManX_Editor.Forms
                 if (Level.BG != 0)
                 {
                     Level.BG = 0;
+                    Level.AssignOffsets();
                     window.layoutE.UpdateBtn();
                     window.layoutE.AssignLimits();
                     window.screenE.AssignLimits();
@@ -318,6 +322,7 @@ namespace TeheManX_Editor.Forms
                 if (Level.BG != 1)
                 {
                     Level.BG = 1;
+                    Level.AssignOffsets();
                     window.layoutE.UpdateBtn();
                     window.layoutE.AssignLimits();
                     window.screenE.AssignLimits();
@@ -633,6 +638,7 @@ namespace TeheManX_Editor.Forms
                     SNES.savePath = fd.FileName;
                     Level.LoadProject(Path.GetDirectoryName(SNES.savePath));
                     Level.LoadLevelData();
+                    Level.AssignOffsets();
                     //Setup Editor
                     undos.Clear();
                     Level.Id = 0;
@@ -1605,6 +1611,7 @@ namespace TeheManX_Editor.Forms
                     Level.TileSet = 0;
                     Level.AssignPallete();
                     Level.LoadLevelTiles();
+                    Level.AssignOffsets();
                     Update();
 
                     if (LayoutWindow.isOpen)

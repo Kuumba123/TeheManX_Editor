@@ -171,6 +171,7 @@ namespace TeheManX_Editor.Forms
             b.Background = Brushes.LightBlue;
             b.Foreground = Brushes.Black;
             pastLayer = b;
+            Level.AssignOffsets();
             MainWindow.window.layoutE.AssignLimits();
             MainWindow.window.screenE.AssignLimits();
             MainWindow.window.tile32E.AssignLimits();
