@@ -1615,6 +1615,7 @@ namespace TeheManX_Editor.Forms
                     Level.TileSet = 0;
                     Level.AssignPallete();
                     Level.LoadLevelTiles();
+                    Level.DecodeAllTiles();
                     Level.AssignOffsets();
                     Update();
 
