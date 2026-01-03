@@ -92,7 +92,7 @@ namespace TeheManX_Editor.Forms
                 for (int x = 0; x < 16; x++)
                 {
                     int id = x + (y * 16);
-                    int tileOffset = (id) * 0x20; // 64 bytes per tile (decoded)
+                    int tileOffset = (id) * 0x40; // 64 bytes per tile (decoded)
 
                     for (int row = 0; row < 8; row++)
                     {
