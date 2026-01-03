@@ -104,10 +104,8 @@ namespace TeheManX_Editor.Forms
         {
             updateTiles = false;
 
-            // MMX3 special cases
-            int Id = (Const.Id == Const.GameId.MegaManX3 && Level.Id == 0xE) ? 0x10 : (Const.Id == Const.GameId.MegaManX3 && Level.Id > 0xE) ? (Level.Id - 0xF) + 0xE : Level.Id;
-
-            int tile32Offset = SNES.CpuToOffset(BinaryPrimitives.ReadInt32LittleEndian(SNES.rom.AsSpan(Const.Tile32DataPointersOffset[Level.BG] + Id * 3)));
+            int tile32Offset = Level.Tile32DataOffset;
+            int tile32MaxId = Const.Tile32Count[Level.Id, Level.BG] - 1;
             tileBMP.Lock();
 
             for (int y = 0; y < 32; y++)
@@ -115,7 +113,7 @@ namespace TeheManX_Editor.Forms
                 for (int x = 0; x < 8; x++)
                 {
                     int tileId32 = x + (y * 8) + (page * 0x100);
-                    if (tileId32 > (Const.Tile32Count[Level.Id, Level.BG] - 1))
+                    if (tileId32 > tile32MaxId)
                     {
                         unsafe
                         {
@@ -146,12 +144,15 @@ namespace TeheManX_Editor.Forms
         {
             updateTiles = false;
             tileBMP16.Lock();
+            
+            int tile16MaxId = Const.Tile16Count[Level.Id, Level.BG] - 1;
+
             for (int y = 0; y < 16; y++)
             {
                 for (int x = 0; x < 16; x++)
                 {
                     int id = x + (y * 16) + (page16 * 0x100);
-                    if (id > (Const.Tile16Count[Level.Id, Level.BG] - 1))
+                    if (id > tile16MaxId)
                     {
                         unsafe
                         {
@@ -180,14 +181,15 @@ namespace TeheManX_Editor.Forms
             updateTile = false;
             tileBMP_S.Lock();
 
-            // MMX3 special cases
-            int Id = (Const.Id == Const.GameId.MegaManX3 && Level.Id == 0xE) ? 0x10 : (Const.Id == Const.GameId.MegaManX3 && Level.Id > 0xE) ? (Level.Id - 0xF) + 0xE : Level.Id;
+            int tile32Offset = Level.Tile32DataOffset + selectedTile * 8;
 
-            int tile32Offset = SNES.CpuToOffset(BinaryPrimitives.ReadInt32LittleEndian(SNES.rom.AsSpan(Const.Tile32DataPointersOffset[Level.BG] + Id * 3)));
-            Level.Draw16xTile(BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(tile32Offset + (selectedTile * 8))), 0, 0, tileBMP_S.BackBufferStride, tileBMP_S.BackBuffer);
-            Level.Draw16xTile(BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(tile32Offset + (selectedTile * 8) + 2)), 16, 0, tileBMP_S.BackBufferStride, tileBMP_S.BackBuffer);
-            Level.Draw16xTile(BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(tile32Offset + (selectedTile * 8) + 4)), 0, 16, tileBMP_S.BackBufferStride, tileBMP_S.BackBuffer);
-            Level.Draw16xTile(BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(tile32Offset + (selectedTile * 8) + 6)), 16, 16, tileBMP_S.BackBufferStride, tileBMP_S.BackBuffer);
+            nint backBuffer = tileBMP_S.BackBuffer;
+            int stride = tileBMP_S.BackBufferStride;
+
+            Level.Draw16xTile(BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(tile32Offset)), 0, 0, stride, backBuffer);
+            Level.Draw16xTile(BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(tile32Offset + 2)), 16, 0, stride, backBuffer);
+            Level.Draw16xTile(BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(tile32Offset + 4)), 0, 16, stride, backBuffer);
+            Level.Draw16xTile(BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(tile32Offset + 6)), 16, 16, stride, backBuffer);
             tileBMP_S.AddDirtyRect(new Int32Rect(0, 0, 32, 32));
             tileBMP_S.Unlock();
         }

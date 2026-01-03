@@ -55,7 +55,8 @@ namespace TeheManX_Editor.Forms
                     rect.Focusable = false;
                     rect.Width = 16;
                     rect.Height = 16;
-                    rect.Fill = new SolidColorBrush(Level.Palette[y, x]);
+                    uint RGBA = Level.Palette[y * 16 + x];
+                    rect.Fill = new SolidColorBrush(Color.FromRgb((byte)(RGBA >> 16), (byte)(RGBA >> 8), (byte)RGBA));
                     rect.MouseDown += Color_Down;
                     rect.HorizontalAlignment = HorizontalAlignment.Stretch;
                     rect.VerticalAlignment = VerticalAlignment.Stretch;
@@ -202,7 +203,7 @@ namespace TeheManX_Editor.Forms
                 for (int x = 0; x < 16; x++)
                 {
                     int id = x + (y * 16);
-                    int tileOffset = (id & 0x3FF) * 0x20; // 32 bytes per tile
+                    int tileOffset = (id) * 0x40; // 64 bytes per tile (decoded)
 
                     for (int row = 0; row < 8; row++)
                     {
@@ -211,17 +212,9 @@ namespace TeheManX_Editor.Forms
 
                         for (int col = 0; col < 8; col++)
                         {
-                            int bit = 7 - col; // leftmost pixel = bit7
-                            int p0 = (Level.Tiles[base1] >> bit) & 1;
-                            int p1 = (Level.Tiles[base1 + 1] >> bit) & 1;
-                            int p2 = (Level.Tiles[base2] >> bit) & 1;
-                            int p3 = (Level.Tiles[base2 + 1] >> bit) & 1;
+                            byte index = Level.DecodedTiles[tileOffset + col + row * 8];
 
-                            byte index = (byte)(p0 | (p1 << 1) | (p2 << 2) | (p3 << 3));
-
-                            Color color = Level.Palette[set, index];
-
-                            uint pixel = color.B | ((uint)color.G << 8) | ((uint)color.R << 16) | 0xFF000000;
+                            uint pixel = Level.Palette[set * 16 + index];
 
                             *(uint*)(buffer + (x * 8 + col) * 4 + (y * 8 + row) * vramTiles.BackBufferStride) = pixel;
                         }
@@ -243,7 +236,8 @@ namespace TeheManX_Editor.Forms
                 var row = Grid.GetRow(p as UIElement);
 
                 Rectangle rect = p as Rectangle;
-                rect.Fill = new SolidColorBrush(Level.Palette[row, col]);
+                uint RGBA = Level.Palette[row * 16 + col];
+                rect.Fill = new SolidColorBrush(Color.FromRgb((byte)(RGBA >> 16), (byte)(RGBA >> 8), (byte)RGBA));
             }
             selectSetRect.Fill = Brushes.Transparent;
         }
@@ -544,7 +538,7 @@ namespace TeheManX_Editor.Forms
                         byte B = (byte)(newC / 1024 % 32 * 8);
                         Color color = Color.FromRgb(R, G, B);
                         ((Rectangle)sender).Fill = new SolidColorBrush(color);
-                        Level.Palette[r, c] = color;
+                        Level.Palette[r * 16 + c] = 0xFF000000 | (uint)((color.R << 16) | (color.G << 8) | color.B);
                         selectSetRect.Fill = Brushes.Transparent;
 
                         //Update VRAM Tiles
@@ -796,7 +790,7 @@ namespace TeheManX_Editor.Forms
                     byte G = (byte)(color / 32 % 32 * 8);
                     byte B = (byte)(color / 1024 % 32 * 8);
 
-                    Level.Palette[((colorIndex + c) >> 4) & 0xF, (colorIndex + c) & 0xF] = Color.FromRgb(R, G, B);
+                    Level.Palette[colorIndex + c] = (uint)(0xFF000000 | (R << 16) | (G << 8) | B);
                 }
             }
 

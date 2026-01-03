@@ -133,6 +133,7 @@ namespace TeheManX_Editor.Forms
                     Level.AssignPallete();
                     window.tileE.CollectData();
                     Level.LoadLevelTiles();
+                    Level.DecodeAllTiles();
                     window.paletteE.CollectData();
                     window.spawnE.CollectData();
                     window.camE.CollectData();
@@ -202,6 +203,7 @@ namespace TeheManX_Editor.Forms
                 Level.TileSet = 0;
                 Level.AssignPallete();
                 Level.LoadLevelTiles();
+                Level.DecodeAllTiles();
                 Level.AssignOffsets();
                 Update();
             }
@@ -221,6 +223,7 @@ namespace TeheManX_Editor.Forms
                 Level.TileSet = 0;
                 Level.AssignPallete();
                 Level.LoadLevelTiles();
+                Level.DecodeAllTiles();
                 Level.AssignOffsets();
                 Update();
             }
@@ -645,6 +648,7 @@ namespace TeheManX_Editor.Forms
                     Level.AssignPallete();
                     window.tileE.CollectData();
                     Level.LoadLevelTiles();
+                    Level.DecodeAllTiles();
                     window.paletteE.CollectData();
                     window.spawnE.CollectData();
                     window.camE.CollectData();

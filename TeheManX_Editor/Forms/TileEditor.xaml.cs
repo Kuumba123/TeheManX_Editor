@@ -953,6 +953,7 @@ namespace TeheManX_Editor.Forms
             }
             else
                 Level.LoadLevelTiles();
+            Level.DecodeAllTiles();
 
             MainWindow.window.layoutE.DrawLayout();
             MainWindow.window.layoutE.DrawScreen();

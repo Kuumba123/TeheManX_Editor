@@ -17,9 +17,10 @@ namespace TeheManX_Editor
         public static int BG = 0;
         public static int TileSet = 0; //For backgrounds that use multiple TileSets
         public static byte[] Tiles = new byte[0x8000]; //Includes Filler Tiles
+        public static byte[] DecodedTiles = new byte[0x8000 * 2];
         public static byte[] DefaultObjectTiles; //Object Tiles for HP/Weapon/Tanks etc
         public static byte[,,] Layout = new byte[Const.MaxLevels, 2, 0x400];
-        public static Color[,] Palette = new Color[8, 16]; //Converted to 24-bit Color
+        public static uint[] Palette = new uint[8 * 16]; //Converted to 24-bit Color
         public static int PaletteId;
         public static int PaletteColorAddress;
         public static List<Enemy>[] Enemies = new List<Enemy>[Const.MaxLevels];
@@ -47,12 +48,12 @@ namespace TeheManX_Editor
 
             byte* buffer = (byte*)dest;
             byte[] tiles = Tiles;
-            Color backColor = Palette[0, 0];
+            uint backColor = Palette[0];
 
             for (int i = 0; i < 4; i++)
             {
                 ushort val = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + i * 2));
-                int tileOffset = (val & 0x3FF) * 0x20; // 32 bytes per tile
+                int tileOffset = (val & 0x3FF) * 0x40; // 64 bytes per tile (decoded)
                 int set = (val >> 10) & 7;             // Palette index
 
                 bool flipH = (val & 0x4000) != 0;
@@ -63,30 +64,19 @@ namespace TeheManX_Editor
 
                 for (int row = 0; row < 8; row++)
                 {
-                    int base1 = tileOffset + (row * 2);
-                    int base2 = tileOffset + 0x10 + (row * 2);
-
                     // Apply vertical flipping when calculating destination Y
                     int destY = flipV ? (7 ^ row) : row;
 
                     for (int col = 0; col < 8; col++)
                     {
-                        int bit = 7 - col; // leftmost pixel = bit7
-                        int p0 = (tiles[base1] >> bit) & 1;
-                        int p1 = (tiles[base1 + 1] >> bit) & 1;
-                        int p2 = (tiles[base2] >> bit) & 1;
-                        int p3 = (tiles[base2 + 1] >> bit) & 1;
-
-                        byte index = (byte)(p0 | (p1 << 1) | (p2 << 2) | (p3 << 3));
+                        byte index = DecodedTiles[tileOffset + col + row * 8];
 
                         // Apply horizontal flipping when calculating destination X
                         int destX = flipH ? (7 ^ col) : col;
 
                         int destIndex = destBase + (destY * stride) + (destX * 4);
 
-                        Color color = index == 0 ? backColor : Palette[set, index];
-
-                        uint pixel = color.B | ((uint)color.G << 8) | ((uint)color.R << 16) | 0xFF000000;
+                        uint pixel = index == 0 ? backColor : Palette[set * 16 + index];
 
                         *(uint*)(buffer + destIndex) = pixel;
                     }
@@ -99,7 +89,7 @@ namespace TeheManX_Editor
 
             byte* buffer = (byte*)dest;
             byte[] tiles = Tiles;
-            Color backColor = Palette[0, 0];
+            uint backColor = Palette[0];
 
             // precalc bounds
             int maxX = bmpWidth - 1;
@@ -108,7 +98,7 @@ namespace TeheManX_Editor
             for (int i = 0; i < 4; i++)
             {
                 ushort val = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + i * 2));
-                int tileOffset = (val & 0x3FF) * 0x20;
+                int tileOffset = (val & 0x3FF) * 0x40;
                 int set = (val >> 10) & 7;
 
                 bool flipH = (val & 0x4000) != 0;
@@ -132,19 +122,9 @@ namespace TeheManX_Editor
                         int px = tileX + srcCol;
                         if (px < 0 || px > maxX) continue;
 
-                        int bit = 7 - col;
-                        int p0 = (tiles[base1] >> bit) & 1;
-                        int p1 = (tiles[base1 + 1] >> bit) & 1;
-                        int p2 = (tiles[base2] >> bit) & 1;
-                        int p3 = (tiles[base2 + 1] >> bit) & 1;
+                        byte index = DecodedTiles[tileOffset + col + row * 8];
 
-                        byte index = (byte)(p0 | (p1 << 1) | (p2 << 2) | (p3 << 3));
-                        Color color = index == 0 ? backColor : Palette[set, index];
-
-                        uint pixel = color.B
-                                    | ((uint)color.G << 8)
-                                    | ((uint)color.R << 16)
-                                    | 0xFF000000;
+                        uint pixel = index == 0 ? backColor : Palette[set * 16 + index];
 
                         int destIndex = (py * stride) + (px * 4);
                         *(uint*)(buffer + destIndex) = pixel;
@@ -1024,7 +1004,7 @@ namespace TeheManX_Editor
                         byte G = (byte)(color / 32 % 32 * 8);
                         byte B = (byte)(color / 1024 % 32 * 8);
 
-                        Palette[((colorIndex + c) >> 4) & 0xF, (colorIndex + c) & 0xF] = Color.FromRgb(R, G, B);
+                        Palette[colorIndex + c] = (uint)(0xFF000000 | (R << 16) | (G << 8) | B);
                     }
                     infoOffset += 4;
                 }
@@ -1039,7 +1019,7 @@ namespace TeheManX_Editor
                     {
                         byte shade = (byte)(((uint)(i * 0x10) >> 3) << 3);
 
-                        Palette[s, i] = Color.FromRgb(shade, shade, shade);
+                        Palette[s * 16 + i] = (uint)(0xFF000000 | (shade << 16) | (shade << 8) | shade);
                     }
                 }
             }
@@ -1103,7 +1083,7 @@ namespace TeheManX_Editor
                             byte G = (byte)(color / 32 % 32 * 8);
                             byte B = (byte)(color / 1024 % 32 * 8);
 
-                            Palette[((colorIndex + c) >> 4) & 0xF, (colorIndex + c) & 0xF] = Color.FromRgb(R, G, B);
+                            Palette[colorIndex + c] = (uint)(0xFF000000 | (R << 16) | (G << 8) | B);
                         }
                         palInfoOffset += 4;
                     }
@@ -1341,6 +1321,38 @@ namespace TeheManX_Editor
 
             return decompressed;
         }
+        public static void DecodeAllTiles()
+        {
+            int tileCount = Tiles.Length / 0x20;
+
+            byte[] decoded = DecodedTiles;
+
+            for (int tileId = 0; tileId < tileCount; tileId++)
+            {
+                int baseOffset = tileId * 0x20;
+                int baseDest = tileId * 0x40;
+
+                for (int row = 0; row < 8; row++)
+                {
+                    int base1 = baseOffset + (row * 2);
+                    int base2 = baseOffset + 0x10 + (row * 2);
+
+                    for (int col = 0; col < 8; col++)
+                    {
+                        int bit = 7 - col;
+
+                        int p0 = (Tiles[base1] >> bit) & 1;
+                        int p1 = (Tiles[base1 + 1] >> bit) & 1;
+                        int p2 = (Tiles[base2] >> bit) & 1;
+                        int p3 = (Tiles[base2 + 1] >> bit) & 1;
+
+                        decoded[row * 8 + col + baseDest] = (byte)(p0 | (p1 << 1) | (p2 << 2) | (p3 << 3));
+                    }
+                }
+            }
+        }
+
+
         #endregion Methods
     }
 }

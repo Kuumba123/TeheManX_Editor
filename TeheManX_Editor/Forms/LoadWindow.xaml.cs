@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Buffers.Binary;
 using System.Windows;
-using System.Windows.Media;
 
 namespace TeheManX_Editor.Forms
 {
@@ -67,7 +66,7 @@ namespace TeheManX_Editor.Forms
                     byte G = (byte)(color / 32 % 32 * 8);
                     byte B = (byte)(color / 1024 % 32 * 8);
 
-                    Level.Palette[((colorIndex + c) >> 4) & 0xF, (colorIndex + c) & 0xF] = Color.FromRgb(R, G, B);
+                    Level.Palette[colorIndex + c] = (uint)(0xFF000000 | (R << 16) | (G << 8) | B);
                 }
                 infoOffset += 4;
             }
@@ -178,6 +177,7 @@ namespace TeheManX_Editor.Forms
                 }
             }
             shouldUpdate = true;
+            Level.DecodeAllTiles();
             MessageBox.Show("Tiles loaded!");
         }
         private void Window_Closed(object sender, EventArgs e)

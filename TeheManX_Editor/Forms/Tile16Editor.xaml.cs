@@ -92,29 +92,18 @@ namespace TeheManX_Editor.Forms
                 for (int x = 0; x < 16; x++)
                 {
                     int id = x + (y * 16);
-                    int tileOffset = (id & 0x3FF) * 0x20; // 32 bytes per tile
+                    int tileOffset = (id) * 0x20; // 64 bytes per tile (decoded)
 
                     for (int row = 0; row < 8; row++)
                     {
-                        int base1 = tileOffset + (row * 2);
-                        int base2 = tileOffset + 0x10 + (row * 2);
-
                         for (int col = 0; col < 8; col++)
                         {
-                            int bit = 7 - col; // leftmost pixel = bit7
-                            int p0 = (Level.Tiles[base1] >> bit) & 1;
-                            int p1 = (Level.Tiles[base1 + 1] >> bit) & 1;
-                            int p2 = (Level.Tiles[base2] >> bit) & 1;
-                            int p3 = (Level.Tiles[base2 + 1] >> bit) & 1;
+                            byte index = Level.DecodedTiles[tileOffset + col + row * 8];
 
-                            byte index = (byte)(p0 | (p1 << 1) | (p2 << 2) | (p3 << 3));
-
-                            // compute pixel position once and write 32-bit BGRA in a single store
                             int px = x * 8 + col;
                             int py = y * 8 + row;
                             int baseIdx = px * 4 + py * vramTiles.BackBufferStride;
-                            Color colStruct = Level.Palette[set, index];
-                            uint bgra = (0xFFu << 24) | ((uint)colStruct.R << 16) | ((uint)colStruct.G << 8) | (uint)colStruct.B;
+                            uint bgra = Level.Palette[set * 16 + index];
                             *(uint*)(buffer + baseIdx) = bgra;
                         }
                     }
