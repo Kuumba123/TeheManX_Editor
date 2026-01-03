@@ -1350,8 +1350,6 @@ namespace TeheManX_Editor
                 }
             }
         }
-
-
         #endregion Methods
     }
 }
