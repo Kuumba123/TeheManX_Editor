@@ -98,7 +98,7 @@ namespace TeheManX_Editor
             {
                 ushort val = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + i * 2));
                 int tileOffset = (val & 0x3FF) * 0x40;
-                int set = (val >> 10) & 7;
+                int setBase = ((val >> 10) & 7) * 16;
 
                 bool flipH = (val & 0x4000) != 0;
                 bool flipV = (val & 0x8000) != 0;
@@ -123,7 +123,7 @@ namespace TeheManX_Editor
 
                         byte index = DecodedTiles[tileOffset + col + row * 8];
 
-                        uint pixel = index == 0 ? backColor : Palette[set * 16 + index];
+                        uint pixel = index == 0 ? backColor : Palette[setBase + index];
 
                         int destIndex = (py * stride) + (px * 4);
                         *(uint*)(buffer + destIndex) = pixel;
