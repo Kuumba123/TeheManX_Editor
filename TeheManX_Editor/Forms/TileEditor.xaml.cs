@@ -153,48 +153,76 @@ namespace TeheManX_Editor.Forms
              *  Background Tile Settings
              */
 
-            //Get Max Amount of BG Tile Settings
-            bgTileSetInt.Maximum = BGSettings[Level.Id].Count - 1;
-            bgTileSetInt.Value = 0;
-            bgEntrySlotInt.Maximum = BGSettings[Level.Id][0].Slots.Count - 1;
-            bgEntrySlotInt.Value = 0;
-            bgTileSetId = 0;
-            bgEntrySlotId = 0;
-
-
-            // Set Background Tile Values
-            SetBackgroundEntryValues();
-            // Enable Background Tile UI
-            MainWindow.window.tileE.bgTileSetInt.IsEnabled = true;
-
+            if (BGSettings[Level.Id].Count == 0)
+            {
+                //...
+                MainWindow.window.tileE.bgTileSetInt.IsEnabled = false;
+                MainWindow.window.tileE.bgEntrySlotInt.IsEnabled = false;
+                MainWindow.window.tileE.bgLengthInt.IsEnabled = false;
+                MainWindow.window.tileE.bgAddressInt.IsEnabled = false;
+                MainWindow.window.tileE.bgSrcBox.IsEnabled = false;
+                MainWindow.window.tileE.bgPalInt.IsEnabled = false;
+            }
+            else
+            {
+                //Get Max Amount of BG Tile Settings
+                int max = BGSettings[Level.Id].Count - 1;
+                bgTileSetInt.Maximum = max;
+                if (bgTileSetInt.Value != null)
+                {
+                    if ((int)bgTileSetInt.Value > max)
+                        bgTileSetInt.Value = max;
+                }
+                else
+                    bgTileSetInt.Value = 0;
+                bgTileSetId = (int)bgTileSetInt.Value;
+                bgEntrySlotId = 0;
+                bgEntrySlotInt.Value = 0;
+                bgTileSetInt.IsEnabled = true;
+                SetBackgroundEntryValues();
+            }
 
             /*
              *  Object Tile Settings
              */
 
-            //Get Max Amount of Object Tile Settings
-            objTileSetInt.Maximum = ObjectSettings[Level.Id].Count - 1;
-            objTileSetInt.Value = 0;
-            objectSlotInt.Maximum = ObjectSettings[Level.Id][0].Slots.Count - 1;
-            objectSlotInt.Value = 0;
-            objectTileSetId = 0;
-            objectTileSlotId = 0;
-
-            LoadDefaultObjectTiles();
-
-            DrawObjectTiles();
-            DrawPalette();
-            UpdateCursor();
-            SetObjectSlotValues();
-
-            //Re Enable Object Tile UI
-            MainWindow.window.tileE.objTileSetInt.IsEnabled = true;
-            MainWindow.window.tileE.compressTileInt.IsEnabled = true;
-            MainWindow.window.tileE.vramLocationInt.IsEnabled = true;
-            MainWindow.window.tileE.palSetInt.IsEnabled = true;
-            MainWindow.window.tileE.dumpInt.IsEnabled = true;
-            MainWindow.window.tileE.oam1Btn.IsEnabled = true;
-            MainWindow.window.tileE.oam2Btn.IsEnabled = true;
+            if (ObjectSettings[Level.Id].Count == 0)
+            {
+                //...
+                MainWindow.window.tileE.objTileSetInt.IsEnabled = false;
+                MainWindow.window.tileE.objectSlotInt.IsEnabled = false;
+                MainWindow.window.tileE.compressTileInt.IsEnabled = false;
+                MainWindow.window.tileE.vramLocationInt.IsEnabled = false;
+                MainWindow.window.tileE.palSetInt.IsEnabled = false;
+                MainWindow.window.tileE.dumpInt.IsEnabled = false;
+                MainWindow.window.tileE.oam1Btn.IsEnabled = false;
+                MainWindow.window.tileE.oam2Btn.IsEnabled = false;
+            }
+            else
+            {
+                //Get Max Amount of Object Tile Settings
+                int max = ObjectSettings[Level.Id].Count - 1;
+                objTileSetInt.Maximum = max;
+                if (objTileSetInt.Value != null)
+                {
+                    if ((int)objTileSetInt.Value > max)
+                        objTileSetInt.Value = max;
+                }
+                else
+                    objTileSetInt.Value = 0;
+                objectTileSetId = (int)objTileSetInt.Value;
+                objectTileSlotId = 0;
+                objectSlotInt.Value = 0;
+                objectSlotInt.Maximum = ObjectSettings[Level.Id][objectTileSetId].Slots.Count - 1;
+                objTileSetInt.IsEnabled = true;
+                MainWindow.window.tileE.oam1Btn.IsEnabled = true;
+                MainWindow.window.tileE.oam2Btn.IsEnabled = true;
+                SetObjectSlotValues();
+                LoadDefaultObjectTiles();
+                DrawObjectTiles();
+                DrawPalette();
+                UpdateCursor();
+            }
 
             suppressInts = false;
         }
@@ -232,6 +260,7 @@ namespace TeheManX_Editor.Forms
             MainWindow.window.tileE.bgAddressInt.IsEnabled = true;
             MainWindow.window.tileE.bgSrcBox.IsEnabled = true;
             MainWindow.window.tileE.bgPalInt.IsEnabled = true;
+            bgEntrySlotInt.Maximum = BGSettings[id][bgTileSetId].Slots.Count - 1;
         }
         public unsafe void DrawObjectTiles()
         {
