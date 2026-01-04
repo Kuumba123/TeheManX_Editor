@@ -24,6 +24,7 @@ namespace TeheManX_Editor.Forms
         public static int paletteSetId;
         public static int bgPalIdId;
         public static int colorIndexId;
+        private static bool supressInts;
         #endregion Fields
 
         #region Properties
@@ -31,7 +32,6 @@ namespace TeheManX_Editor.Forms
         WriteableBitmap vramTiles = new WriteableBitmap(128, 512, 96, 96, PixelFormats.Bgra32, null);
         Rectangle selectSetRect = new Rectangle() { IsHitTestVisible = false, StrokeThickness = 2.5, StrokeDashArray = new DoubleCollection() { 2.2 }, CacheMode = null, Stroke = Brushes.PapayaWhip };
         public int selectedSet = 0;
-        bool supressInts;
         #endregion Properties
 
         #region Constructors
@@ -127,10 +127,10 @@ namespace TeheManX_Editor.Forms
              * Now to take care of the Swapable BG Palette
              */
 
-            if (Level.Id >= Const.PlayableLevelsCount || (Const.Id == Const.GameId.MegaManX3 && Level.Id > 0xE))
+            if (Level.Id >= Const.PlayableLevelsCount || (Const.Id == Const.GameId.MegaManX3 && Level.Id > 0xE) || BGPalettes[Level.Id].Count == 0)
             {
                 MainWindow.window.paletteE.bgPalIdInt.IsEnabled = false;
-                MainWindow.window.paletteE.paletteSetInt.IsEnabled = false;
+                MainWindow.window.paletteE.paletteSlotInt.IsEnabled = false;
                 MainWindow.window.paletteE.colorIndexInt.IsEnabled = false;
                 MainWindow.window.paletteE.dumpPalBtn.IsEnabled = false;
                 return;
@@ -138,11 +138,18 @@ namespace TeheManX_Editor.Forms
 
 
             supressInts = true;
-            bgPalIdId = 0;
-            bgPalIdInt.Value = 0;
-            bgPalIdInt.Maximum = BGPalettes[Level.Id].Count - 1;
+            int max = BGPalettes[Level.Id].Count - 1;
+            bgPalIdInt.Maximum = max;
+            if (bgPalIdInt.Value != null)
+            {
+                if ((int)bgPalIdInt.Value > max)
+                    bgPalIdInt.Value = max;
+            }
+            else
+                bgPalIdInt.Value = 0;
+            bgPalIdId = (int)bgPalIdInt.Value;
             paletteSetId = 0;
-            paletteSetInt.Value = 0;
+            paletteSlotInt.Value = 0;
             SetupSwappablePaletteUI();
             supressInts = false;
 
@@ -168,13 +175,13 @@ namespace TeheManX_Editor.Forms
 
             if (BGPalettes[id][bgPalIdId].Slots.Count == 0)
             {
-                MainWindow.window.paletteE.paletteSetInt.IsEnabled = false;
+                MainWindow.window.paletteE.paletteSlotInt.IsEnabled = false;
                 MainWindow.window.paletteE.colorIndexInt.IsEnabled = false;
                 MainWindow.window.paletteE.colorAddressInt.IsEnabled = false;
                 MainWindow.window.paletteE.dumpPalBtn.IsEnabled = false;
                 return;
             }
-            MainWindow.window.paletteE.paletteSetInt.IsEnabled = true;
+            MainWindow.window.paletteE.paletteSlotInt.IsEnabled = true;
             MainWindow.window.paletteE.colorIndexInt.IsEnabled = true;
             MainWindow.window.paletteE.colorAddressInt.IsEnabled = true;
             MainWindow.window.paletteE.dumpPalBtn.IsEnabled = true;
@@ -184,7 +191,7 @@ namespace TeheManX_Editor.Forms
 
             colorIndexInt.Value = colorIndex;
             colorAddressInt.Value = pointer;
-            paletteSetInt.Maximum = BGPalettes[id][bgPalIdId].Slots.Count - 1;
+            paletteSlotInt.Maximum = BGPalettes[id][bgPalIdId].Slots.Count - 1;
             DrawSwappablePalette(SNES.CpuToOffset(pointer, Const.SwapPaletteColorBank));
         }
         public unsafe void PaintVramTiles()
@@ -731,20 +738,22 @@ namespace TeheManX_Editor.Forms
         }
         private void bgPalIdInt_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            if (e.NewValue == null || SNES.rom == null) return;
+            if (e.NewValue == null || SNES.rom == null || supressInts) return;
 
             supressInts = true;
             bgPalIdId = (int)e.NewValue;
-            paletteSetInt.Value = 0;
+            paletteSlotInt.Value = 0;
             paletteSetId = 0;
             SetupSwappablePaletteUI();
             supressInts = false;
         }
-        private void paletteSetInt_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        private void paletteSlotInt_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
             if (e.NewValue == null || SNES.rom == null || supressInts) return;
             paletteSetId = (int)e.NewValue;
+            supressInts = true;
             SetupSwappablePaletteUI();
+            supressInts = false;
         }
         private void colorIndexInt_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
@@ -774,7 +783,7 @@ namespace TeheManX_Editor.Forms
         }
         private void DumpPaletteBtn_Click(object sender, RoutedEventArgs e)
         {
-            if (!paletteSetInt.IsEnabled) return;
+            if (!paletteSlotInt.IsEnabled) return;
 
             int id = Level.Id;
 

@@ -45,8 +45,8 @@
 
                     </Grid>
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Width="201" FontSize="18" Foreground="White" FontFamily="Consolas">Palette Set:</TextBlock>
-                        <local:NumInt Width="50" FontSize="20" x:Name="paletteSetInt" Minimum="0" ValueChanged="paletteSetInt_ValueChanged"></local:NumInt>
+                        <TextBlock Width="201" FontSize="18" Foreground="White" FontFamily="Consolas">Palette Slot:</TextBlock>
+                        <local:NumInt Width="50" FontSize="20" x:Name="paletteSlotInt" Minimum="0" ValueChanged="paletteSlotInt_ValueChanged"></local:NumInt>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Width="201" FontSize="18" Foreground="White" FontFamily="Consolas">Color Index:</TextBlock>
