@@ -11,7 +11,7 @@
     <Window.Resources>
         <system:String x:Key="Partition">QuickStart</system:String>
     </Window.Resources>
-    <Grid Name="grid" Background="Black" Focusable="True">
+    <Grid Name="grid" Background="Black" Focusable="True" KeyboardNavigation.DirectionalNavigation="None" FocusVisualStyle="{x:Null}">
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>
             <RowDefinition/>

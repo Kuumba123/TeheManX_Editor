@@ -411,12 +411,12 @@ namespace TeheManX_Editor.Forms
                 return;
 
             bool update = false;
-            if (key == "W")
+            if (key == "W" || key == "Up")
             {
                 window.paletteE.selectedSet--;
                 update = true;
             }
-            else if (key == "S")
+            else if (key == "S" || key == "Down")
             {
                 window.paletteE.selectedSet++;
                 update = true;
@@ -529,12 +529,12 @@ namespace TeheManX_Editor.Forms
                 return;
 
             bool update = false;
-            if (key == "W")
+            if (key == "W" || key == "Up")
             {
                 TileEditor.palId--;
                 update = true;
             }
-            else if (key == "S")
+            else if (key == "S" || key == "Down")
             {
                 TileEditor.palId++;
                 update = true;
