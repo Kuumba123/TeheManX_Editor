@@ -17,12 +17,12 @@ namespace TeheManX_Editor.Forms
         #region Fields
         static List<Rectangle> triggerRects = new List<Rectangle>();
         static List<EnemyLabel> enemyLabels = new List<EnemyLabel>();
+        internal static WriteableBitmap layoutBMP = new WriteableBitmap(768, 768, 96, 96, PixelFormats.Bgra32, null);
         public static double scale = 2;
         #endregion Fields
 
         #region Properties
         public bool update;
-        internal WriteableBitmap layoutBMP = new WriteableBitmap(768, 768, 96, 96, PixelFormats.Bgra32, null);
         public int viewerX = 0x400;
         public int viewerY = 0;
         UIElement obj;

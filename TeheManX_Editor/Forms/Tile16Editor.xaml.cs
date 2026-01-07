@@ -76,66 +76,106 @@ namespace TeheManX_Editor.Forms
         public unsafe void PaintVramTiles()
         {
             updateVramTiles = false;
+
             vramTiles.Lock();
+
+            // Destination framebuffer (32-bit BGRA)
             byte* buffer = (byte*)vramTiles.BackBuffer;
+            int stride = vramTiles.BackBufferStride;
+
+            // Active palette set (16 colors per set)
             int set = palId;
 
-            /*
-             *  Draw 0x200 tiles from VRAM
-             */
-
-            for (int y = 0; y < 64; y++)
+            // Pin source data to avoid bounds checks
+            fixed (byte* tilesPtr = Level.DecodedTiles)
+            fixed (uint* palettePtr = Level.Palette)
             {
-                for (int x = 0; x < 16; x++)
+                // Base pointer for the active palette (set * 16 colors)
+                uint* palBase = palettePtr + (set << 4);
+
+                /*
+                 * Draw 0x200 (512) tiles from VRAM
+                 * Layout: 16 tiles per row × 64 rows
+                 * Each tile is 8×8 pixels
+                 */
+                for (int ty = 0; ty < 64; ty++)
                 {
-                    int id = x + (y * 16);
-                    int tileOffset = (id) * 0x40; // 64 bytes per tile (decoded)
+                    // Precompute Y position for this tile row
+                    int tileY = ty << 3; // ty * 8
 
-                    for (int row = 0; row < 8; row++)
+                    for (int tx = 0; tx < 16; tx++)
                     {
-                        for (int col = 0; col < 8; col++)
-                        {
-                            byte index = Level.DecodedTiles[tileOffset + col + row * 8];
+                        int id = tx + (ty << 4); // ty * 16
+                        int tileOffset = id << 6; // id * 64 bytes per decoded tile
 
-                            int px = x * 8 + col;
-                            int py = y * 8 + row;
-                            int baseIdx = px * 4 + py * vramTiles.BackBufferStride;
-                            uint bgra = Level.Palette[set * 16 + index];
-                            *(uint*)(buffer + baseIdx) = bgra;
+                        // Precompute X position for this tile
+                        int tileX = tx << 3; // tx * 8
+
+                        // Pointer to the top-left pixel of this tile in the destination
+                        byte* dstTileBase = buffer + (tileY * stride) + (tileX << 2);
+
+                        // Pointer to the source tile data
+                        byte* srcTile = tilesPtr + tileOffset;
+
+                        // Draw 8 rows
+                        for (int row = 0; row < 8; row++)
+                        {
+                            // Destination row pointer
+                            byte* dst = dstTileBase + row * stride;
+
+                            // Source row pointer (8 bytes per row)
+                            byte* src = srcTile + (row << 3);
+
+                            // Draw 8 pixels
+                            for (int col = 0; col < 8; col++)
+                            {
+                                byte index = src[col];
+
+                                *(uint*)dst = palBase[index];
+                                dst += 4; // advance one pixel (32-bit)
+                            }
                         }
                     }
                 }
             }
+
+            // Mark entire VRAM tile view as dirty
             vramTiles.AddDirtyRect(new Int32Rect(0, 0, 128, 512));
             vramTiles.Unlock();
         }
+
         public unsafe void PaintTiles()
         {
             updateTiles = false;
             x16BMP.Lock();
 
+            int pageBase = (page * 0x100);
+            int max16 = (Const.Tile16Count[Level.Id, Level.BG]) - 1;
+            int stride = x16BMP.BackBufferStride;
+            nint backBuffer = x16BMP.BackBuffer;
+
             for (int y = 0; y < 16; y++)
             {
                 for (int x = 0; x < 16; x++)
                 {
-                    int id = x + (y * 16) + (page * 0x100);
-                    if (id > (Const.Tile16Count[Level.Id, Level.BG]) - 1)
+                    int id = x + (y * 16) + pageBase;
+                    if (id > max16)
                     {
                         unsafe
                         {
-                            byte* buffer = (byte*)x16BMP.BackBuffer;
+                            byte* buffer = (byte*)backBuffer;
                             uint val = 0xFF000000;
                             for (int r = 0; r < 16; r++)
                             {
                                 for (int c = 0; c < 16; c++)
                                 {
-                                    *(uint*)(buffer + (x * 16 + c) * 4 + (y * 16 + r) * x16BMP.BackBufferStride) = val;
+                                    *(uint*)(buffer + (x * 16 + c) * 4 + (y * 16 + r) * stride) = val;
                                 }
                             }
                         }
                         continue;
                     }
-                    Level.Draw16xTile(id, x * 16, y * 16, x16BMP.BackBufferStride, x16BMP.BackBuffer);
+                    Level.Draw16xTile(id, x * 16, y * 16, stride, backBuffer);
                 }
             }
             x16BMP.AddDirtyRect(new Int32Rect(0, 0, 256, 256));

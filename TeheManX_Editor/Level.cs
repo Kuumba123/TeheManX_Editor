@@ -44,89 +44,124 @@ namespace TeheManX_Editor
         public static unsafe void Draw16xTile(int id, int x, int y, int stride, IntPtr dest)
         {
             int offset = Tile16DataOffset + id * 8;
-
             byte* buffer = (byte*)dest;
-            byte[] tiles = Tiles;
-            uint backColor = Palette[0];
 
-            for (int i = 0; i < 4; i++)
+            // Pin arrays once to avoid bounds checks in hot loops
+            fixed (uint* palettePtr = Palette)
+            fixed (byte* tilesPtr = DecodedTiles)
+            fixed (byte* romPtr = SNES.rom)
             {
-                ushort val = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + i * 2));
-                int tileOffset = (val & 0x3FF) * 0x40; // 64 bytes per tile (decoded)
-                int set = (val >> 10) & 7;             // Palette index
+                uint backColor = palettePtr[0];
 
-                bool flipH = (val & 0x4000) != 0;
-                bool flipV = (val & 0x8000) != 0;
-
-                // Top-left of this 8x8 subtile in destination
-                int destBase = (x + ((i & 1) * 8)) * 4 + (y + ((i >> 1) * 8)) * stride;
-
-                for (int row = 0; row < 8; row++)
+                for (int i = 0; i < 4; i++)
                 {
-                    // Apply vertical flipping when calculating destination Y
-                    int destY = flipV ? (7 ^ row) : row;
+                    ushort val = *(ushort*)(romPtr + offset + (i << 1));
 
-                    for (int col = 0; col < 8; col++)
+                    int tileOffset = (val & 0x03FF) << 6;
+
+                    // Bits 10–12: palette index
+                    // Shifted and masked so result is already *16
+                    uint* palBase = palettePtr + ((val >> 6) & 0x70);
+
+                    bool flipH = (val & 0x4000) != 0;
+                    bool flipV = (val & 0x8000) != 0;
+
+                    // Top-left pixel of this 8x8 subtile in destination
+                    int destBase = ((x + ((i & 1) << 3)) << 2) + (y + ((i >> 1) << 3)) * stride;
+
+                    for (int row = 0; row < 8; row++)
                     {
-                        byte index = DecodedTiles[tileOffset + col + row * 8];
+                        // Apply vertical flipping by reversing row index
+                        int rowIndex = flipV ? (7 - row) : row;
 
-                        // Apply horizontal flipping when calculating destination X
-                        int destX = flipH ? (7 ^ col) : col;
+                        byte* dstRow = buffer + destBase + rowIndex * stride;
 
-                        int destIndex = destBase + (destY * stride) + (destX * 4);
+                        // Set starting X position and step direction
+                        // Horizontal flipping is handled by walking backwards
+                        byte* dst = flipH ? dstRow + 7 * 4 : dstRow;
+                        int step = flipH ? -4 : 4;
 
-                        uint pixel = index == 0 ? backColor : Palette[set * 16 + index];
+                        // Pointer to the source tile row (decoded, 1 byte per pixel)
+                        byte* src = tilesPtr + tileOffset + (row << 3);
 
-                        *(uint*)(buffer + destIndex) = pixel;
+                        for (int col = 0; col < 8; col++)
+                        {
+                            byte index = *src++;
+
+                            *(uint*)dst = index == 0 ? backColor : palBase[index];
+
+                            dst += step;
+                        }
                     }
                 }
             }
         }
-        public static unsafe void Draw16xTile_Clamped(int id, int x, int y,int stride, IntPtr dest,int bmpWidth, int bmpHeight)
+        public static unsafe void Draw16xTile_Clamped(int id,int x,int y,int stride,IntPtr dest,int bmpWidth,int bmpHeight)
         {
             int offset = Tile16DataOffset + id * 8;
-
             byte* buffer = (byte*)dest;
-            byte[] tiles = Tiles;
-            uint backColor = Palette[0];
 
-            // precalc bounds
             int maxX = bmpWidth - 1;
             int maxY = bmpHeight - 1;
 
-            for (int i = 0; i < 4; i++)
+            fixed (uint* palettePtr = Palette)
+            fixed (byte* tilesPtr = DecodedTiles)
+            fixed (byte* romPtr = SNES.rom)
             {
-                ushort val = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + i * 2));
-                int tileOffset = (val & 0x3FF) * 0x40;
-                int setBase = ((val >> 10) & 7) * 16;
+                uint backColor = palettePtr[0];
 
-                bool flipH = (val & 0x4000) != 0;
-                bool flipV = (val & 0x8000) != 0;
-
-                int tileX = x + ((i & 1) * 8);
-                int tileY = y + ((i >> 1) * 8);
-
-                for (int row = 0; row < 8; row++)
+                for (int i = 0; i < 4; i++)
                 {
-                    int srcRow = flipV ? (7 - row) : row;
-                    int py = tileY + srcRow;
-                    if (py < 0 || py > maxY) continue;
+                    ushort val = *(ushort*)(romPtr + offset + (i << 1));
 
-                    int base1 = tileOffset + (row * 2);
-                    int base2 = tileOffset + 0x10 + (row * 2);
+                    int tileOffset = (val & 0x03FF) << 6;
+                    uint* palBase = palettePtr + ((val >> 6) & 0x70);
 
-                    for (int col = 0; col < 8; col++)
+                    bool flipH = (val & 0x4000) != 0;
+                    bool flipV = (val & 0x8000) != 0;
+
+                    int tileX = x + ((i & 1) << 3);
+                    int tileY = y + ((i >> 1) << 3);
+
+                    // ---- Clip Y ----
+                    int y0 = tileY;
+                    int y1 = tileY + 7;
+
+                    int drawY0 = Math.Max(y0, 0);
+                    int drawY1 = Math.Min(y1, maxY);
+
+                    if (drawY0 > drawY1)
+                        continue;
+
+                    for (int py = drawY0; py <= drawY1; py++)
                     {
-                        int srcCol = flipH ? (7 - col) : col;
-                        int px = tileX + srcCol;
-                        if (px < 0 || px > maxX) continue;
+                        // Map destination Y back to tile row
+                        int row = flipV ? (7 - (py - tileY)) : (py - tileY);
 
-                        byte index = DecodedTiles[tileOffset + col + row * 8];
+                        byte* dstRow = buffer + py * stride;
+                        byte* src = tilesPtr + tileOffset + (row << 3);
 
-                        uint pixel = index == 0 ? backColor : Palette[setBase + index];
+                        // ---- Clip X ----
+                        int x0 = tileX;
+                        int x1 = tileX + 7;
 
-                        int destIndex = (py * stride) + (px * 4);
-                        *(uint*)(buffer + destIndex) = pixel;
+                        int drawX0 = Math.Max(x0, 0);
+                        int drawX1 = Math.Min(x1, maxX);
+
+                        if (drawX0 > drawX1)
+                            continue;
+
+                        for (int px = drawX0; px <= drawX1; px++)
+                        {
+                            // Map destination X back to tile column
+                            int col = flipH ? (7 - (px - tileX)) : (px - tileX);
+
+                            byte index = src[col];
+
+                            uint pixel = index == 0 ? backColor : palBase[index];
+
+                            *(uint*)(dstRow + (px << 2)) = pixel;
+                        }
                     }
                 }
             }
@@ -199,78 +234,92 @@ namespace TeheManX_Editor
                 }
             }
             byte[] temp = new byte[0x800];
-            for (int l = 0; l < 2; l++)
+            int stage = 0;
+            int layer = 0;
+            ReadOnlySpan<byte> rom = SNES.rom;
+
+            try
             {
-                for (int i = 0; i < Const.LevelsCount; i++)
+                for (int l = 0; l < 2; l++)
                 {
-                    // MMX3 special cases
-                    int id = (Const.Id == Const.GameId.MegaManX3 && i == 0xE) ? 0x10 : (Const.Id == Const.GameId.MegaManX3 && i > 0xE) ? (i - 0xF) + 0xE : i;
-                    int infoOffset = SNES.CpuToOffset(BinaryPrimitives.ReadInt32LittleEndian(SNES.rom.AsSpan(Const.LayoutPointersOffset[l] + id * 3)));
-
-                    Array.Clear(temp, 0, temp.Length);
-                    int destIndex = 0;
-                    byte controlB;
-                    int count;
-                    int flags;
-
-                    //Copy 3 byte header
-                    temp[0] = SNES.rom[infoOffset];     //width
-                    temp[1] = SNES.rom[infoOffset + 1]; //height
-                    temp[2] = SNES.rom[infoOffset + 2]; //screen count (not needed for layout but is nice to know)
-                    Const.ScreenCount[i, l] = temp[2];
-                    infoOffset += 3;
-
-                    while (true)
+                    layer = l;
+                    for (int i = 0; i < Const.LevelsCount; i++)
                     {
-                        controlB = SNES.rom[infoOffset];
-                        infoOffset++;
+                        stage = i;
+                        // MMX3 special cases
+                        int id = (Const.Id == Const.GameId.MegaManX3 && i == 0xE) ? 0x10 : (Const.Id == Const.GameId.MegaManX3 && i > 0xE) ? (i - 0xF) + 0xE : i;
 
-                        if (controlB == 0xFF)
-                            break;
+                        int infoOffset = SNES.CpuToOffset(BinaryPrimitives.ReadInt32LittleEndian(rom.Slice(Const.LayoutPointersOffset[l] + id * 3)));
 
-                        flags = controlB;
-                        count = controlB & 0x7F;
+                        int destIndex = 0;
+                        byte controlB;
+                        int count;
+                        int flags;
 
-                        controlB = SNES.rom[infoOffset];
-                        infoOffset++;
+                        //Copy 3 byte header
+                        temp[0] = rom[infoOffset];     //width
+                        temp[1] = rom[infoOffset + 1]; //height
+                        temp[2] = rom[infoOffset + 2]; //screen count (not needed for layout but is nice to know)
+                        Const.ScreenCount[i, l] = temp[2];
+                        infoOffset += 3;
 
-                        //Write Loop
-                        while (count != 0)
+                        while (true)
                         {
-                            count--;
-
-                            temp[destIndex + 3] = controlB;
-                            destIndex++;
-
-                            if ((flags & 0x80) == 0)
-                                controlB++;
-                        }
-                    }
-
-                    infoOffset = 0;
-                    destIndex = 0;
-                    byte width = temp[0];
-                    byte height = temp[1];
-                    infoOffset += 3;
-
-                    while (height != 0)
-                    {
-                        height--;
-                        count = width;
-
-                        int destTemp = destIndex;
-
-                        while (count != 0)
-                        {
-                            count--;
-                            Layout[i, l, destTemp] = temp[infoOffset];
-                            destTemp++;
+                            controlB = rom[infoOffset];
                             infoOffset++;
-                        }
-                        destIndex += 0x20;
-                    }
 
+                            if (controlB == 0xFF)
+                                break;
+
+                            flags = controlB;
+                            count = controlB & 0x7F;
+
+                            controlB = rom[infoOffset];
+                            infoOffset++;
+
+                            //Write Loop
+                            while (count != 0)
+                            {
+                                count--;
+
+                                temp[destIndex + 3] = controlB;
+                                destIndex++;
+
+                                if ((flags & 0x80) == 0)
+                                    controlB++;
+                            }
+                        }
+
+                        infoOffset = 0;
+                        destIndex = 0;
+                        byte width = temp[0];
+                        byte height = temp[1];
+                        infoOffset += 3;
+
+                        while (height != 0)
+                        {
+                            height--;
+                            count = width;
+
+                            int destTemp = destIndex;
+
+                            while (count != 0)
+                            {
+                                count--;
+                                Layout[i, l, destTemp] = temp[infoOffset];
+                                destTemp++;
+                                infoOffset++;
+                            }
+                            destIndex += 0x20;
+                        }
+
+                    }
                 }
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show($"Stage {stage:X} Layer {layer + 1} Layout Data Corrupted?\n" + e.Message, "ERROR");
+                Application.Current.Shutdown();
             }
         }
         static void GetLayoutDimensions(byte[] layout, out byte width, out byte height)
@@ -584,58 +633,60 @@ namespace TeheManX_Editor
             }
 
             int stage = 0;
+            int totalStages = (Const.Id == Const.GameId.MegaManX3) ? 0xF : Const.PlayableLevelsCount;
+            ReadOnlySpan<byte> rom = SNES.rom;
             try
             {
-                int totalStages = (Const.Id == Const.GameId.MegaManX3) ? 0xF : Const.PlayableLevelsCount;
-
                 for (int i = 0; i < totalStages; i++)
                 {
                     stage = i;
                     //Get Address of Enemy Data
-                    int addr = SNES.CpuToOffset(BinaryPrimitives.ReadInt32LittleEndian(SNES.rom.AsSpan(Const.EnemyPointersOffset + (i * 2))) , Const.EnemyDataBank);
-                    //Get Spawn Cam Byte
-                    byte column = SNES.rom[addr];
+                    int addr = SNES.CpuToOffset(BinaryPrimitives.ReadInt32LittleEndian(rom.Slice(Const.EnemyPointersOffset + (i * 2))) , Const.EnemyDataBank);
+                    //Get Column Byte
+                    byte column = rom[addr];
                     if (column == 0xFF) // No Enemies in this stage
                         continue;
                     addr++;
                     while (true)
                     {
-                        var t = Enemies[i].Count;
-                        Enemies[i].Add(new Enemy());
-
                         if (Enemies[i].Count == 0xCC /* Max Amount of Enemies*/)
                         {
-                            MessageBox.Show("Incorrect Enemy Data Format \nfor stage " + Convert.ToString(i, 16));
+                            MessageBox.Show($"Incorrect Enemy Data Format for Stage {stage:X}");
                             Application.Current.Shutdown();
                         }
 
+                        Enemy en = new Enemy();
+
+                        //Assign Column
+                        en.Column = column;
                         //Assign Type
-                        Enemies[i][t].Column = column;
-                        Enemies[i][t].Type = SNES.rom[addr];
+                        en.Type = rom[addr];
                         //Assign Y
-                        Enemies[i][t].Y = (short)(BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(addr + 1)) & 0x7FFF);
+                        en.Y = (short)(BinaryPrimitives.ReadUInt16LittleEndian(rom.Slice(addr + 1)) & 0x7FFF);
                         //Assign Id & Sub Id
-                        Enemies[i][t].Id = SNES.rom[addr + 3];
-                        Enemies[i][t].SubId = SNES.rom[addr + 4];
+                        en.Id = rom[addr + 3];
+                        en.SubId = rom[addr + 4];
                         //Assign X
-                        Enemies[i][t].X = (short)(BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(addr + 5)) & 0x7FFF);
+                        en.X = (short)(BinaryPrimitives.ReadUInt16LittleEndian(rom.Slice(addr + 5)) & 0x7FFF);
+
+                        Enemies[i].Add(en);
 
                         // Check X high byte
-                        if ((SNES.rom[addr + 6] & 0x80) == 0)
+                        if ((rom[addr + 6] & 0x80) == 0)
                             addr += 7;
                         else
                         {
                             addr += 7;
-                            if (SNES.rom[addr] == column)  // end of enemy data
+                            if (rom[addr] == column)  // end of enemy data
                                 break;
-                            column = SNES.rom[addr];
+                            column = rom[addr];
                             addr++;
                         }
                     }
                 }
             }catch(Exception e)
             {
-                MessageBox.Show($"Stage {stage:X}  Enemy Data Corrupted?\n" + e.Message, "ERROR");
+                MessageBox.Show($"Stage {stage:X} Enemy Data Corrupted?\n" + e.Message, "ERROR");
                 Application.Current.Shutdown();
             }
         }
@@ -1104,11 +1155,10 @@ namespace TeheManX_Editor
 
             int infoOffset = SNES.CpuToOffset(BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(Const.LoadTileSetInfoOffset + id * 2 + Const.LoadTileSetStageBase)), Const.LoadTileSetBank);
 
-            if (SNES.rom[infoOffset] != 0xFF)
-            {
-                int compressId = SNES.rom[infoOffset]; //which compressed tile Id to load
+            int compressId = SNES.rom[infoOffset]; //which compressed tile Id to load
+
+            if (compressId != 0xFF)
                 DecompressTiles2(compressId, Tiles, 0x200);
-            }
         }
         public static byte[] DecompressTiles(int compressedTileId)
         {
@@ -1221,10 +1271,12 @@ namespace TeheManX_Editor
             byte[] decompressed = dest;
             int addr_W = destOffset;
 
+            ReadOnlySpan<byte> rom = SNES.rom;
+
             if (Const.Id == Const.GameId.MegaManX)
             {
-                int addr_R = SNES.CpuToOffset(BinaryPrimitives.ReadInt32LittleEndian(SNES.rom.AsSpan((compressedTileId * 5) + Const.CompressedTileInfoOffset + 2)));
-                ushort size = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(compressedTileId * 5 + Const.CompressedTileInfoOffset));
+                int addr_R = SNES.CpuToOffset(BinaryPrimitives.ReadInt32LittleEndian(rom.Slice((compressedTileId * 5) + Const.CompressedTileInfoOffset + 2)));
+                ushort size = BinaryPrimitives.ReadUInt16LittleEndian(rom.Slice(compressedTileId * 5 + Const.CompressedTileInfoOffset));
                 size = (ushort)((size + 7) >> 3);
                 int controlB;
                 byte copyB;
@@ -1234,9 +1286,9 @@ namespace TeheManX_Editor
                 {
                     while (size != 0)
                     {
-                        controlB = SNES.rom[addr_R];
+                        controlB = rom[addr_R];
                         addr_R++;
-                        copyB = SNES.rom[addr_R];
+                        copyB = rom[addr_R];
                         addr_R++;
                         for (int i = 0; i < 8; i++)
                         {
@@ -1248,7 +1300,7 @@ namespace TeheManX_Editor
                             }
                             else
                             {
-                                decompressed[addr_W] = SNES.rom[addr_R];
+                                decompressed[addr_W] = rom[addr_R];
                                 addr_R++;
                                 addr_W++;
                             }
@@ -1264,12 +1316,12 @@ namespace TeheManX_Editor
             }
             else
             {
-                int addr_R = SNES.CpuToOffset(BinaryPrimitives.ReadInt32LittleEndian(SNES.rom.AsSpan(compressedTileId * 5 + Const.CompressedTileInfoOffset)));
-                int size = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(compressedTileId * 5 + Const.CompressedTileInfoOffset + 3));
+                int addr_R = SNES.CpuToOffset(BinaryPrimitives.ReadInt32LittleEndian(rom.Slice(compressedTileId * 5 + Const.CompressedTileInfoOffset)));
+                int size = BinaryPrimitives.ReadUInt16LittleEndian(rom.Slice(compressedTileId * 5 + Const.CompressedTileInfoOffset + 3));
 
                 try
                 {
-                    byte controlB = SNES.rom[addr_R];
+                    byte controlB = rom[addr_R];
                     addr_R++;
                     byte controlC = 8;
 
@@ -1277,16 +1329,16 @@ namespace TeheManX_Editor
                     {
                         if ((controlB & 0x80) == 0)
                         {
-                            dest[addr_W] = SNES.rom[addr_R];
+                            dest[addr_W] = rom[addr_R];
                             addr_R++;
                             addr_W++;
                             size--;
                         }
                         else // Copy from Window
                         {
-                            int windowPosition = (SNES.rom[addr_R] & 3) << 8;
-                            windowPosition |= SNES.rom[addr_R + 1];
-                            int length = SNES.rom[addr_R] >> 2;
+                            int windowPosition = (rom[addr_R] & 3) << 8;
+                            windowPosition |= rom[addr_R + 1];
+                            int length = rom[addr_R] >> 2;
 
                             for (int i = 0; i < length; i++)
                             {
@@ -1305,7 +1357,7 @@ namespace TeheManX_Editor
                         if (controlC == 0)
                         {
                             //Reload Control Byte
-                            controlB = SNES.rom[addr_R];
+                            controlB = rom[addr_R];
                             addr_R++;
                             controlC = 8;
                         }
@@ -1326,26 +1378,32 @@ namespace TeheManX_Editor
 
             byte[] decoded = DecodedTiles;
 
-            for (int tileId = 0; tileId < tileCount; tileId++)
+            unsafe
             {
-                int baseOffset = tileId * 0x20;
-                int baseDest = tileId * 0x40;
-
-                for (int row = 0; row < 8; row++)
+                fixed (byte* decodedPtr = DecodedTiles)
+                fixed (byte* tilesPtr = Tiles)
                 {
-                    int base1 = baseOffset + (row * 2);
-                    int base2 = baseOffset + 0x10 + (row * 2);
-
-                    for (int col = 0; col < 8; col++)
+                    for (int tileId = 0; tileId < tileCount; tileId++)
                     {
-                        int bit = 7 - col;
+                        int baseOffset = tileId * 0x20;
+                        int baseDest = tileId * 0x40;
 
-                        int p0 = (Tiles[base1] >> bit) & 1;
-                        int p1 = (Tiles[base1 + 1] >> bit) & 1;
-                        int p2 = (Tiles[base2] >> bit) & 1;
-                        int p3 = (Tiles[base2 + 1] >> bit) & 1;
+                        for (int row = 0; row < 8; row++)
+                        {
+                            int base1 = baseOffset + (row * 2);
+                            int base2 = baseOffset + 0x10 + (row * 2);
 
-                        decoded[row * 8 + col + baseDest] = (byte)(p0 | (p1 << 1) | (p2 << 2) | (p3 << 3));
+                            for (int col = 0; col < 8; col++)
+                            {
+                                int bit = 7 - col;
+
+                                int p0 = (*(tilesPtr + base1) >> bit) & 1;
+                                int p1 = (*(tilesPtr + base1 + 1) >> bit) & 1;
+                                int p2 = (*(tilesPtr + base2) >> bit) & 1;
+                                int p3 = (*(tilesPtr + base2 + 1) >> bit) & 1;
+                                *(decodedPtr + row * 8 + col + baseDest) = (byte)(p0 | (p1 << 1) | (p2 << 2) | (p3 << 3));
+                            }
+                        }
                     }
                 }
             }

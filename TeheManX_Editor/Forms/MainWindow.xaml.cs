@@ -1208,6 +1208,10 @@ namespace TeheManX_Editor.Forms
             //Enemy
             if (window.enemyE.update && window.enemyE.layoutImage.IsVisible)
                 window.enemyE.Paint();
+
+            //VRAM Tiles
+            if (window.tileE.update)
+                window.tileE.PaintObjectTiles();
         }
         private async void Window_Loaded(object sender, RoutedEventArgs e)
         {

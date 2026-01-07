@@ -198,36 +198,44 @@ namespace TeheManX_Editor.Forms
         {
             updateVramTiles = false;
             vramTiles.Lock();
+
             byte* buffer = (byte*)vramTiles.BackBuffer;
+            int stride = vramTiles.BackBufferStride;
             int set = selectedSet;
 
-            /*
-             *  Draw 0x200 tiles from VRAM
-             */
-
-            for (int y = 0; y < 64; y++)
+            fixed (byte* tilesPtr = Level.DecodedTiles)
+            fixed (uint* palettePtr = Level.Palette)
             {
-                for (int x = 0; x < 16; x++)
+                uint* palBase = palettePtr + (set << 4);
+
+                for (int ty = 0; ty < 64; ty++)
                 {
-                    int id = x + (y * 16);
-                    int tileOffset = (id) * 0x40; // 64 bytes per tile (decoded)
+                    int tileY = ty << 3;
+                    byte* dstRowBase = buffer + tileY * stride;
 
-                    for (int row = 0; row < 8; row++)
+                    for (int tx = 0; tx < 16; tx++)
                     {
-                        int base1 = tileOffset + (row * 2);
-                        int base2 = tileOffset + 0x10 + (row * 2);
+                        int id = tx + (ty << 4);
+                        int tileOffset = id << 6;
 
-                        for (int col = 0; col < 8; col++)
+                        byte* srcTile = tilesPtr + tileOffset;
+                        byte* dstTile = dstRowBase + (tx << 3 << 2);
+
+                        for (int row = 0; row < 8; row++)
                         {
-                            byte index = Level.DecodedTiles[tileOffset + col + row * 8];
+                            byte* src = srcTile + (row << 3);
+                            byte* dst = dstTile + row * stride;
 
-                            uint pixel = Level.Palette[set * 16 + index];
-
-                            *(uint*)(buffer + (x * 8 + col) * 4 + (y * 8 + row) * vramTiles.BackBufferStride) = pixel;
+                            for (int col = 0; col < 8; col++)
+                            {
+                                *(uint*)dst = palBase[src[col]];
+                                dst += 4;
+                            }
                         }
                     }
                 }
             }
+
             vramTiles.AddDirtyRect(new Int32Rect(0, 0, 128, 512));
             vramTiles.Unlock();
         }

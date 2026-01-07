@@ -36,6 +36,7 @@ namespace TeheManX_Editor.Forms
         WriteableBitmap vramTiles = new WriteableBitmap(128, 128, 96, 96, PixelFormats.Bgra32, null);
         Rectangle selectSetRect = new Rectangle() { IsHitTestVisible = false, StrokeThickness = 2.5, StrokeDashArray = new DoubleCollection() { 2.2 }, CacheMode = null, Stroke = Brushes.PapayaWhip };
         private bool suppressInts;
+        public bool update;
         #endregion Properties
 
         #region Constructor
@@ -262,11 +263,66 @@ namespace TeheManX_Editor.Forms
             MainWindow.window.tileE.bgPalInt.IsEnabled = true;
             bgEntrySlotInt.Maximum = BGSettings[id][bgTileSetId].Slots.Count - 1;
         }
+        public void PaintObjectTiles()
+        {
+            update = false;
+            unsafe
+            {
+                vramTiles.Lock();
+                byte* buffer = (byte*)vramTiles.BackBuffer;
+                int set = palId;
+
+                /*
+                 *  Draw 0x200 tiles from VRAM
+                 */
+
+                int readBase = (MainWindow.window.tileE.oam1Btn.IsChecked != false) ? 0x0000 : 0x2000;
+
+                fixed (byte* objecTilesPtr = ObjectTiles)
+                {
+                    for (int y = 0; y < 16; y++)
+                    {
+                        for (int x = 0; x < 16; x++)
+                        {
+                            int tid = x + (y * 16);
+                            int tileOffset = tid * 0x20 + readBase; // 32 bytes per tile
+
+                            for (int row = 0; row < 8; row++)
+                            {
+                                int base1 = tileOffset + (row * 2);
+                                int base2 = tileOffset + 0x10 + (row * 2);
+
+                                for (int col = 0; col < 8; col++)
+                                {
+                                    int bit = 7 - col; // leftmost pixel = bit7
+                                    int p0 = (*(objecTilesPtr + base1) >> bit) & 1;
+                                    int p1 = (*(objecTilesPtr + base1 + 1) >> bit) & 1;
+                                    int p2 = (*(objecTilesPtr + base2) >> bit) & 1;
+                                    int p3 = (*(objecTilesPtr + base2 + 1) >> bit) & 1;
+
+                                    byte index = (byte)(p0 | (p1 << 1) | (p2 << 2) | (p3 << 3));
+
+                                    // compute pixel position once and write 32-bit BGRA in a single store
+                                    int px = x * 8 + col;
+                                    int py = y * 8 + row;
+                                    int baseIdx = px * 4 + py * vramTiles.BackBufferStride;
+                                    Color colStruct = Palette[set, index];
+                                    uint bgra = (0xFFu << 24) | ((uint)colStruct.R << 16) | ((uint)colStruct.G << 8) | (uint)colStruct.B;
+                                    *(uint*)(buffer + baseIdx) = bgra;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                vramTiles.AddDirtyRect(new Int32Rect(0, 0, 128, 128));
+                vramTiles.Unlock();
+            }
+        }
         public unsafe void DrawObjectTiles()
         {
-            int id;
-            if (Const.Id == Const.GameId.MegaManX3 && Level.Id > 0xE) id = (Level.Id - 0xF) + 2; //Buffalo or Beetle
-            else id = Level.Id;
+            // MMX3 special cases
+            int id = (Const.Id == Const.GameId.MegaManX3 && Level.Id > 0xE) ? (Level.Id - 0xF) + 2 : Level.Id;
 
             if (ObjectSettings[id][objectTileSetId].Slots.Count != 0)
             {
@@ -350,53 +406,7 @@ namespace TeheManX_Editor.Forms
                     }
                 }
             }
-            /****************/
-
-            vramTiles.Lock();
-            byte* buffer = (byte*)vramTiles.BackBuffer;
-            int set = palId;
-
-            /*
-             *  Draw 0x200 tiles from VRAM
-             */
-
-            int readBase = (MainWindow.window.tileE.oam1Btn.IsChecked != false) ? 0x0000 : 0x2000;
-
-            for (int y = 0; y < 16; y++)
-            {
-                for (int x = 0; x < 16; x++)
-                {
-                    int tid = x + (y * 16);
-                    int tileOffset = tid * 0x20 + readBase; // 32 bytes per tile
-
-                    for (int row = 0; row < 8; row++)
-                    {
-                        int base1 = tileOffset + (row * 2);
-                        int base2 = tileOffset + 0x10 + (row * 2);
-
-                        for (int col = 0; col < 8; col++)
-                        {
-                            int bit = 7 - col; // leftmost pixel = bit7
-                            int p0 = (ObjectTiles[base1] >> bit) & 1;
-                            int p1 = (ObjectTiles[base1 + 1] >> bit) & 1;
-                            int p2 = (ObjectTiles[base2] >> bit) & 1;
-                            int p3 = (ObjectTiles[base2 + 1] >> bit) & 1;
-
-                            byte index = (byte)(p0 | (p1 << 1) | (p2 << 2) | (p3 << 3));
-
-                            // compute pixel position once and write 32-bit BGRA in a single store
-                            int px = x * 8 + col;
-                            int py = y * 8 + row;
-                            int baseIdx = px * 4 + py * vramTiles.BackBufferStride;
-                            Color colStruct = Palette[set, index];
-                            uint bgra = (0xFFu << 24) | ((uint)colStruct.R << 16) | ((uint)colStruct.G << 8) | (uint)colStruct.B;
-                            *(uint*)(buffer + baseIdx) = bgra;
-                        }
-                    }
-                }
-            }
-            vramTiles.AddDirtyRect(new Int32Rect(0, 0, 128, 128));
-            vramTiles.Unlock();
+            update = true;
         }
         public void DrawPalette()
         {
