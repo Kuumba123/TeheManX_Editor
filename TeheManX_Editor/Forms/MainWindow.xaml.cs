@@ -1267,39 +1267,9 @@ namespace TeheManX_Editor.Forms
                 }
             }
         }
-        private void Window_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        private void Window_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            Xceed.Wpf.Toolkit.WatermarkTextBox num = Keyboard.FocusedElement as Xceed.Wpf.Toolkit.WatermarkTextBox;
-            if (num != null)
-            {
-                TraversalRequest tRequest = new TraversalRequest(FocusNavigationDirection.Next);
-                num.MoveFocus(tRequest);
-
-                while (true)
-                {
-                    Type dataType = Keyboard.FocusedElement.GetType();
-                    if (dataType != typeof(Xceed.Wpf.Toolkit.WatermarkTextBox) && dataType != typeof(TextBox))
-                        break;
-                    ((FrameworkElement)Keyboard.FocusedElement).MoveFocus(tRequest);
-                }
-            }
-            else
-            {
-                TextBox textBox = Keyboard.FocusedElement as TextBox;
-                if (textBox != null)
-                {
-                    TraversalRequest tRequest = new TraversalRequest(FocusNavigationDirection.Next);
-                    textBox.MoveFocus(tRequest);
-
-                    while (true)
-                    {
-                        Type dataType = Keyboard.FocusedElement.GetType();
-                        if (dataType != typeof(Xceed.Wpf.Toolkit.WatermarkTextBox) && dataType != typeof(TextBox))
-                            break;
-                        ((FrameworkElement)Keyboard.FocusedElement).MoveFocus(tRequest);
-                    }
-                }
-            }
+            grid.Focus(); //This is to make text boxes and numeric up/downs lose focus
         }
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {

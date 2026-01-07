@@ -7,11 +7,11 @@
         xmlns:dockablz="clr-namespace:Dragablz.Dockablz;assembly=Dragablz"
         xmlns:forms="clr-namespace:TeheManX_Editor.Forms" xmlns:system="clr-namespace:System;assembly=mscorlib"
         mc:Ignorable="d"
-        Title="TeheMan X Editor" Width="1205" Height="930" MinHeight="600" MinWidth="465" Closing="Window_Closing" PreviewKeyDown="Window_PreviewKeyDown" PreviewMouseDown="Window_PreviewMouseDown" Loaded="Window_Loaded">
+        Title="TeheMan X Editor" Width="1205" Height="930" MinHeight="600" MinWidth="465" Closing="Window_Closing" PreviewKeyDown="Window_PreviewKeyDown" MouseDown="Window_MouseDown" Loaded="Window_Loaded">
     <Window.Resources>
         <system:String x:Key="Partition">QuickStart</system:String>
     </Window.Resources>
-    <Grid Name="grid" Background="Black">
+    <Grid Name="grid" Background="Black" Focusable="True">
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>
             <RowDefinition/>
