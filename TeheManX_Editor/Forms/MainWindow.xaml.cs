@@ -160,6 +160,7 @@ namespace TeheManX_Editor.Forms
             window.paletteE.AssignLimits();
             window.enemyE.DrawLayout();
             window.camE.AssignTriggerLimits();
+            window.enemyE.DisableSelect();
             window.enemyE.DrawEnemies();
             UpdateViewrCam();
             UpdateEnemyViewerCam();
@@ -448,9 +449,10 @@ namespace TeheManX_Editor.Forms
         }
         private void EnemyKeyCheck(string key, bool notFocus)
         {
-            if (key == "Delete" && window.enemyE.control.Tag != null)
+            if (key == "Delete" && window.enemyE.selectedEnemy != null)
             {
-                Level.Enemies[Level.Id].Remove((Enemy)((EnemyLabel)window.enemyE.control.Tag).Tag);
+                Level.Enemies[Level.Id].Remove(window.enemyE.selectedEnemy);
+                window.enemyE.DisableSelect();
                 window.enemyE.DrawEnemies();
                 SNES.edit = true;
                 return;

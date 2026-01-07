@@ -14,6 +14,16 @@ namespace TeheManX_Editor.Forms
     /// </summary>
     public partial class EnemyEditor : UserControl
     {
+        #region Constants
+        enum MouseState
+        {
+            None,
+            Pan,            //Pan Camera
+            Move,           //Enemy Move
+            TriggerSelect   //Select Camera Trigger
+        }
+        #endregion Constants
+
         #region Fields
         static List<Rectangle> triggerRects = new List<Rectangle>();
         static List<EnemyLabel> enemyLabels = new List<EnemyLabel>();
@@ -25,15 +35,12 @@ namespace TeheManX_Editor.Forms
         public bool update;
         public int viewerX = 0x400;
         public int viewerY = 0;
-        UIElement obj;
-        public FrameworkElement control = new FrameworkElement();
-        bool down = false;
-        Point point;
-        //For Moving Camera Via Mouse
-        private bool isPanning = false;
-        private Point panStartMouse;
-        private int panStartViewerX;
-        private int panStartViewerY;
+        public Enemy selectedEnemy;
+        MouseState mouseState;
+        int mouseStartX;
+        int mouseStartY;
+        int referanceStartX;
+        int referanceStartY;
         #endregion Properties
 
         #region Constructors
@@ -52,8 +59,6 @@ namespace TeheManX_Editor.Forms
         }
         public void DrawEnemies()
         {
-            DisableSelect();
-
             for (int i = 0; i < enemyLabels.Count; i++)
                 enemyLabels[i].Visibility = Visibility.Collapsed;
 
@@ -66,14 +71,12 @@ namespace TeheManX_Editor.Forms
             while (enemyLabels.Count < Level.Enemies[Level.Id].Count)
             {
                 var r = new EnemyLabel();
-                r.PreviewMouseDown += Label_PreviewMouseDown;
                 enemyLabels.Add(r);
                 MainWindow.window.enemyE.canvas.Children.Add(r);
             }
 
             for (int i = 0; i < Level.Enemies[Level.Id].Count; i++) //Update Each Enemy
             {
-                enemyLabels[i].Tag = Level.Enemies[Level.Id][i];
                 enemyLabels[i].text.Text = Level.Enemies[Level.Id][i].Id.ToString("X");
                 enemyLabels[i].AssignTypeBorder(Level.Enemies[Level.Id][i].Type);
                 Canvas.SetLeft(enemyLabels[i], Level.Enemies[Level.Id][i].X - viewerX);
@@ -197,65 +200,28 @@ namespace TeheManX_Editor.Forms
         }
         public void UpdateEnemyLabelPositions()
         {
-            for (int i = 0; i < enemyLabels.Count; i++)
-            {
-                EnemyLabel lbl = enemyLabels[i];
-
-                if (lbl.Visibility != Visibility.Visible)
-                    continue;
-
-                Enemy en = (Enemy)lbl.Tag;
-
-                double x = en.X - viewerX;
-                double y = en.Y - viewerY;
-
-                Canvas.SetLeft(lbl, x);
-                Canvas.SetTop(lbl, y);
-            }
-
-            if (!MainWindow.window.camE.triggersEnabled)
-                return;
-
-            int id = Level.Id;
-
-            while (triggerRects.Count < CameraEditor.CameraTriggers[id].Count) //Add to Canvas
-            {
-                Rectangle r = new Rectangle()
-                {
-                    IsHitTestVisible = false,
-                    StrokeThickness = 1,
-                    Stroke = Brushes.Green,
-                    Fill = new SolidColorBrush(Color.FromArgb(96, 0xAD, 0xD8, 0xE6))
-                };
-                triggerRects.Add(r);
-                MainWindow.window.enemyE.canvas.Children.Add(r);
-            }
-
-            for (int i = 0; i < CameraEditor.CameraTriggers[id].Count; i++)
-            {
-                int rightSide = CameraEditor.CameraTriggers[id][i].RightSide;
-                int leftSide = CameraEditor.CameraTriggers[id][i].LeftSide;
-                int bottomSide = CameraEditor.CameraTriggers[id][i].BottomSide;
-                int topSide = CameraEditor.CameraTriggers[id][i].TopSide;
-
-                int width = rightSide - leftSide;
-                int height = bottomSide - topSide;
-
-                if (width < 1) width = 1;
-                if (height < 1) height = 1;
-
-                triggerRects[i].Width = width;
-                triggerRects[i].Height = height;
-
-                Canvas.SetLeft(triggerRects[i], leftSide - viewerX);
-                Canvas.SetTop(triggerRects[i], topSide - viewerY);
-
-                triggerRects[i].Visibility = Visibility.Visible;
-            }
+            DrawEnemies();
         }
-        private void DisableSelect() //Disable editing Enemy Properties
+        private void SelectEnemy(Enemy en)
         {
-            MainWindow.window.enemyE.control.Tag = null;
+            selectedEnemy = en;
+            MainWindow.window.enemyE.columnInt.Value = en.Column;
+            MainWindow.window.enemyE.idInt.Value = en.Id;
+            MainWindow.window.enemyE.varInt.Value = en.SubId;
+            MainWindow.window.enemyE.typeInt.Value = en.Type;
+            MainWindow.window.enemyE.xInt.Value = en.X;
+            MainWindow.window.enemyE.yInt.Value = en.Y;
+
+            MainWindow.window.enemyE.idInt.IsEnabled = true;
+            MainWindow.window.enemyE.varInt.IsEnabled = true;
+            MainWindow.window.enemyE.typeInt.IsEnabled = true;
+            MainWindow.window.enemyE.xInt.IsEnabled = true;
+            MainWindow.window.enemyE.yInt.IsEnabled = true;
+            MainWindow.window.enemyE.columnInt.IsEnabled = true;
+        }
+        public void DisableSelect() //Disable editing Enemy Properties
+        {
+            selectedEnemy = null;
             //Disable
             MainWindow.window.enemyE.idInt.IsEnabled = false;
             MainWindow.window.enemyE.varInt.IsEnabled = false;
@@ -282,293 +248,243 @@ namespace TeheManX_Editor.Forms
         #endregion Methods
 
         #region Events
-        private void Label_PreviewMouseDown(object sender, MouseButtonEventArgs e)
-        {
-            MainWindow.window.enemyE.control.Tag = sender;
-            EnemyLabel label = sender as EnemyLabel;
-            Enemy en = (Enemy)label.Tag;
-
-            if (e.ChangedButton == MouseButton.Left)
-            {
-                // Selection logic
-                if (!down)
-                {
-                    MainWindow.window.enemyE.columnInt.Value = en.Column;
-                    MainWindow.window.enemyE.idInt.Value = en.Id;
-                    MainWindow.window.enemyE.varInt.Value = en.SubId;
-                    MainWindow.window.enemyE.typeInt.Value = en.Type;
-                    MainWindow.window.enemyE.xInt.Value = en.X;
-                    MainWindow.window.enemyE.yInt.Value = en.Y;
-
-                    MainWindow.window.enemyE.idInt.IsEnabled =
-                    MainWindow.window.enemyE.varInt.IsEnabled =
-                    MainWindow.window.enemyE.typeInt.IsEnabled =
-                    MainWindow.window.enemyE.xInt.IsEnabled =
-                    MainWindow.window.enemyE.yInt.IsEnabled =
-                    MainWindow.window.enemyE.columnInt.IsEnabled = true;
-                }
-
-                down = true;
-                obj = sender as UIElement;
-
-                Point mouseCanvas = e.GetPosition(canvas);
-                Point objCanvas = obj.TransformToAncestor(canvas).Transform(new Point(0, 0));
-
-                double left = Canvas.GetLeft(obj);
-                double top = Canvas.GetTop(obj);
-
-                point = new Point(mouseCanvas.X - objCanvas.X, mouseCanvas.Y - objCanvas.Y);
-                MainWindow.window.enemyE.canvas.CaptureMouse();
-            }
-        }
         private void canvas_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            if ((bool)MainWindow.window.camE.triggerCheck.IsChecked && MainWindow.window.camE.triggersEnabled)
+            Point pos = e.GetPosition(MainWindow.window.enemyE.canvas);
+
+            if (e.MouseDevice.MiddleButton == MouseButtonState.Pressed)
             {
-                point = e.GetPosition(MainWindow.window.enemyE.canvas);
-                down = true;
-                MainWindow.window.enemyE.canvas.CaptureMouse();
+                mouseStartX = (int)(pos.X / 1);
+                mouseStartY = (int)(pos.Y / 1);
+                referanceStartX = viewerX;
+                referanceStartY = viewerY;
+                mouseState = MouseState.Pan;
+                Mouse.OverrideCursor = Cursors.ScrollAll;
+                return;
+            }
+
+            if (Level.Id >= Const.PlayableLevelsCount || (Const.Id == Const.GameId.MegaManX3 && Level.Id > 0xE))
+                return;
+
+            if (e.MouseDevice.LeftButton == MouseButtonState.Pressed && (bool)MainWindow.window.camE.triggerCheck.IsChecked && MainWindow.window.camE.triggersEnabled)
+            {
+                mouseStartX = (int)(pos.X / 1) + viewerX;
+                mouseStartY = (int)(pos.Y / 1) + viewerY;
+                mouseState = MouseState.TriggerSelect;
+            }
+            else if (e.MouseDevice.LeftButton == MouseButtonState.Pressed || e.MouseDevice.RightButton == MouseButtonState.Pressed)
+            {
+                bool leftPressed = e.LeftButton == MouseButtonState.Pressed;
+
+                const int width = 16;
+                const int height = 16;
+                const int offsetX = 0;
+                const int offsetY = 0;
+
+                int id = Level.Id;
+
+                int clickX = (int)(pos.X / 1) + viewerX;
+                int clickY = (int)(pos.Y / 1) + viewerY;
+
+                Enemy en;
+
+                for (int i = 0; i < Level.Enemies[id].Count; i++)
+                {
+                    en = Level.Enemies[id][i];
+
+                    //Bounding Box Check
+                    if (clickX >= (en.X + offsetX) && clickX <= (en.X + width + offsetX) && clickY >= (en.Y + offsetY) && clickY <= (en.Y + height + offsetY))
+                    {
+                        if (leftPressed) // Move Enemy
+                        {
+                            mouseStartX = clickX;
+                            mouseStartY = clickY;
+                            mouseState = MouseState.Move;
+                            referanceStartX = en.X;
+                            referanceStartY = en.Y;
+                            SelectEnemy(en);
+                        }
+                        else //...
+                        {
+
+                        }
+                    }
+                }
             }
         }
-        private void canvas_PreviewMouseMove(object sender, MouseEventArgs e)
+        private void canvas_MouseMove(object sender, MouseEventArgs e)
         {
-            if (!down) return;
+            Point pos = e.GetPosition(MainWindow.window.enemyE.canvas);
+            int mouseX = (int)(Math.Round(pos.X) / 1) + viewerX;
+            int mouseY = (int)(Math.Round(pos.Y) / 1) + viewerY;
 
-            if ((bool)MainWindow.window.camE.triggerCheck.IsChecked && MainWindow.window.camE.triggersEnabled) //Select Trigger Size
+            if (mouseState == MouseState.TriggerSelect)
             {
-                Point mousePos = e.GetPosition(canvas);
-                if (point.X < mousePos.X)
-                {
-                    Canvas.SetLeft(selectRect, point.X);
-                    selectRect.Width = mousePos.X - point.X;
-                }
-                else
-                {
-                    Canvas.SetLeft(selectRect, mousePos.X);
-                    selectRect.Width = point.X - mousePos.X;
-                }
+                int leftSide = Math.Clamp(Math.Min(mouseX + -viewerX, mouseStartX + -viewerX), 0, 0x1FFF);
+                int rightSide = Math.Clamp(Math.Max(mouseX + -viewerX, mouseStartX + -viewerX), 0, 0x1FFF);
+                int topSide = Math.Clamp(Math.Min(mouseY + -viewerY, mouseStartY + -viewerY), 0, 0x1FFF);
+                int bottomSide = Math.Clamp(Math.Max(mouseY + -viewerY, mouseStartY + -viewerY), 0, 0x1FFF);
 
-                if (point.Y < mousePos.Y)
-                {
-                    Canvas.SetTop(selectRect, point.Y);
-                    selectRect.Height = mousePos.Y - point.Y;
-                }
-                else
-                {
-                    Canvas.SetTop(selectRect, mousePos.Y);
-                    selectRect.Height = point.Y - mousePos.Y;
-                }
+                Canvas.SetLeft(selectRect, leftSide);
+                selectRect.Width = rightSide - leftSide;
+
+                Canvas.SetTop(selectRect, topSide);
+                selectRect.Height = bottomSide - topSide;
                 selectRect.Visibility = Visibility.Visible;
-                return;
             }
-
-            //Move Enemy
-            if (obj == null) return;
-
-            var pos = e.GetPosition(canvas);
-
-            double x = pos.X - point.X;
-            double y = pos.Y - point.Y;
-
-            // Border checks
-            if (x < 0) x = 0;
-            if (y < 0) y = 0;
-
-            Enemy en = (Enemy)((EnemyLabel)obj).Tag;
-
-            short pastLocationX = en.X;
-            short pastLocationY = en.Y;
-
-            // Calculate world-based position
-            short locationX = (short)(viewerX + x);
-            short locationY = (short)(viewerY + y);
-
-            // Snap to 16-pixel grid when holding SHIFT
-            if (Keyboard.IsKeyDown(Key.LeftShift))
+            else if (mouseState == MouseState.Move)
             {
-                locationX = (short)(locationX & 0xFFF8); // snap X to multiple of 8
-                locationY = (short)(locationY & 0xFFF8); // snap Y to multiple of 8
+                short locationX = (short)Math.Clamp((mouseX + -mouseStartX) + referanceStartX, 0, 0x1FFF);
+                short locationY = (short)Math.Clamp((mouseY + -mouseStartY) + referanceStartY, 0, 0x1FFF);
 
-                // snap the visible label position so it moves visibly by 8px
-                x = locationX - viewerX;
-                y = locationY - viewerY;
-            }
+                // Snap to 16-pixel grid when holding SHIFT
+                if (Keyboard.IsKeyDown(Key.LeftShift))
+                {
+                    locationX = (short)(locationX & 0xFFF8); // snap X to multiple of 8
+                    locationY = (short)(locationY & 0xFFF8); // snap Y to multiple of 8
+                }
 
-            // No change no work
-            if (pastLocationX == locationX && pastLocationY == locationY)
-                return;
+                selectedEnemy.X = locationX;
+                selectedEnemy.Y = locationY;
 
-            en.Column = (byte)(locationX / 32);
+                byte column = (byte)(locationX / 32);
+                selectedEnemy.Column = column;
 
-            en.X = locationX;
-            en.Y = locationY;
-
-            MainWindow.window.enemyE.xInt.Value = locationX;
-            MainWindow.window.enemyE.yInt.Value = locationY;
-            MainWindow.window.enemyE.columnInt.Value = en.Column;
-
-            // Move the label on the canvas
-            Canvas.SetLeft(obj, x);
-            Canvas.SetTop(obj, y);
-
-            SNES.edit = true;
-        }
-        private void canvas_PreviewMouseUp(object sender, MouseButtonEventArgs e)
-        {
-            down = false;
-            if (e.ChangedButton == MouseButton.Right)
-                return;
-            if ((bool)MainWindow.window.camE.triggerCheck.IsChecked)
-            {
-                if (Level.Id >= Const.PlayableLevelsCount || (Const.Id == Const.GameId.MegaManX3 && Level.Id > 0xE))
-                    goto End;
-
-                selectRect.Visibility = Visibility.Collapsed;
-                int index = Level.Id;
-
-                if (CameraEditor.CameraTriggers[index].Count == 0)
-                    return;
-
-                int leftSide = ((int)(Canvas.GetLeft(selectRect) + viewerX));
-                int rightSide = ((int)(Canvas.GetLeft(selectRect) + selectRect.Width + viewerX));
-                int topSide = (int)(Canvas.GetTop(selectRect) + viewerY);
-                int bottomSide = (int)(Canvas.GetTop(selectRect) + selectRect.Height + viewerY);
-
-                if (leftSide < 0)
-                    leftSide = 0;
-                if (rightSide > 0xFFFF)
-                    rightSide = 0xFFFF;
-                if (topSide < 0)
-                    topSide = 0;
-                if (bottomSide > 0xFFFF)
-                    bottomSide = 0xFFFF;
-
-                CameraEditor.CameraTriggers[index][CameraEditor.cameraTriggerId].RightSide = (ushort)rightSide;
-                CameraEditor.CameraTriggers[index][CameraEditor.cameraTriggerId].LeftSide = (ushort)leftSide;
-                CameraEditor.CameraTriggers[index][CameraEditor.cameraTriggerId].BottomSide = (ushort)bottomSide;
-                CameraEditor.CameraTriggers[index][CameraEditor.cameraTriggerId].TopSide = (ushort)topSide;
+                MainWindow.window.enemyE.xInt.Value = locationX;
+                MainWindow.window.enemyE.yInt.Value = locationY;
+                MainWindow.window.enemyE.columnInt.Value = column;
 
                 SNES.edit = true;
-                MainWindow.window.enemyE.UpdateEnemyLabelPositions();
+                UpdateEnemyLabelPositions();
             }
-            else
-                obj = null;
-        End:
-            canvas.ReleaseMouseCapture();
-        }
-        private void LayoutImage_PreviewMouseDown(object sender, MouseButtonEventArgs e)
-        {
-            // Ignore if not middle mouse button
-            if (e.ChangedButton != MouseButton.Middle)
-                return;
-
-            isPanning = true;
-            panStartMouse = e.GetPosition(canvas);
-            panStartViewerX = viewerX;
-            panStartViewerY = viewerY;
-
-            Mouse.OverrideCursor = Cursors.ScrollAll;
-        }
-        private void LayoutImage_PreviewMouseMove(object sender, MouseEventArgs e)
-        {
-            // Must be actively panning AND middle button must still be pressed
-            if (!isPanning)
-                return;
-            Point pos = e.GetPosition(canvas);
-
-            double dx = pos.X - panStartMouse.X;
-            double dy = pos.Y - panStartMouse.Y;
-
-            viewerX = Math.Clamp(panStartViewerX - (int)dx, 0, 0x1FFF);
-            viewerY = Math.Clamp(panStartViewerY - (int)dy, 0, 0x1FFF);
-
-            MainWindow.window.UpdateEnemyViewerCam();
-            DrawLayout();
-            UpdateEnemyLabelPositions();
-        }
-        private void LayoutImage_PreviewMouseUp(object sender, MouseButtonEventArgs e)
-        {
-            isPanning = false;
-            Mouse.OverrideCursor = null;
-        }
-        private void LayoutImage_MouseLeave(object sender, MouseEventArgs e)
-        {
-            if (isPanning)
+            else if (mouseState == MouseState.Pan)
             {
-                isPanning = false;
-                Mouse.OverrideCursor = null;
+                int screenX = (int)Math.Round(pos.X);
+                int screenY = (int)Math.Round(pos.Y);
+
+                int worldX = screenX + viewerX;
+                int worldY = screenY + viewerY;
+
+                viewerX = (short)Math.Clamp(referanceStartX - (screenX - mouseStartX),0, 0x1FFF);
+
+                viewerY = (short)Math.Clamp(referanceStartY - (screenY - mouseStartY),0, 0x1FFF);
+
+                MainWindow.window.UpdateEnemyViewerCam();
+                DrawLayout();
+                DrawEnemies();
             }
+        }
+        private void canvas_MouseUp(object sender, MouseButtonEventArgs e)
+        {
+            if (mouseState == MouseState.TriggerSelect)
+            {
+                selectRect.Visibility = Visibility.Collapsed;
+
+                int id = Level.Id;
+
+                if (CameraEditor.CameraTriggers[id].Count == 0)
+                    return;
+
+                Point pos = e.GetPosition(MainWindow.window.enemyE.canvas);
+                int mouseX = (int)(Math.Round(pos.X) / 1) + viewerX;
+                int mouseY = (int)(Math.Round(pos.Y) / 1) + viewerY;
+
+                int leftSide = Math.Clamp(Math.Min(mouseX, mouseStartX), 0, 0x1FFF);
+                int rightSide = Math.Clamp(Math.Max(mouseX, mouseStartX), 0, 0x1FFF);
+                int topSide = Math.Clamp(Math.Min(mouseY, mouseStartY), 0, 0x1FFF);
+                int bottomSide = Math.Clamp(Math.Max(mouseY, mouseStartY), 0, 0x1FFF);
+
+                CameraEditor.CameraTriggers[id][CameraEditor.cameraTriggerId].RightSide = (ushort)rightSide;
+                CameraEditor.CameraTriggers[id][CameraEditor.cameraTriggerId].LeftSide = (ushort)leftSide;
+                CameraEditor.CameraTriggers[id][CameraEditor.cameraTriggerId].BottomSide = (ushort)bottomSide;
+                CameraEditor.CameraTriggers[id][CameraEditor.cameraTriggerId].TopSide = (ushort)topSide;
+
+                SNES.edit = true;
+                MainWindow.window.enemyE.DrawEnemies();
+            }
+            else if (mouseState == MouseState.Pan)
+                Mouse.OverrideCursor = null;
+            mouseState = MouseState.None;
+        }
+        private void canvas_MouseLeave(object sender, MouseEventArgs e)
+        {
+            if (mouseState == MouseState.TriggerSelect)
+                selectRect.Visibility = Visibility.Collapsed;
+            else if (mouseState == MouseState.Pan)
+                Mouse.OverrideCursor = null;
+            mouseState = MouseState.None;
         }
         private void idInt_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            if (control.Tag == null || e.NewValue == null || e.OldValue == null)
+            if (selectedEnemy == null || e.NewValue == null)
                 return;
             SNES.edit = true;
-            ((Enemy)((EnemyLabel)control.Tag).Tag).Id = (byte)(int)e.NewValue;
-            ((EnemyLabel)control.Tag).text.Text = ((Enemy)((EnemyLabel)control.Tag).Tag).Id.ToString("X");
-            //UpdateEnemyName(((Enemy)((EnemyLabel)control.Tag).Tag).type, ((Enemy)((EnemyLabel)control.Tag).Tag).id);
+            selectedEnemy.Id = (byte)(int)e.NewValue;
+            DrawEnemies();
         }
         private void varInt_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            if (control.Tag == null || e.NewValue == null || e.OldValue == null)
+            if (selectedEnemy == null || e.NewValue == null)
                 return;
             SNES.edit = true;
-            ((Enemy)((EnemyLabel)control.Tag).Tag).SubId = (byte)((int)e.NewValue & 0xFF);
+            selectedEnemy.SubId = (byte)((int)e.NewValue & 0xFF);
         }
         private void typeInt_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            if (control.Tag == null || e.NewValue == null || e.OldValue == null)
+            if (selectedEnemy == null || e.NewValue == null)
                 return;
             SNES.edit = true;
-            ((Enemy)((EnemyLabel)control.Tag).Tag).Type = (byte)((int)e.NewValue & 0xFF);
-            ((EnemyLabel)control.Tag).AssignTypeBorder(((Enemy)((EnemyLabel)control.Tag).Tag).Type);
-            //UpdateEnemyName(((Enemy)((EnemyLabel)control.Tag).Tag).type, ((Enemy)((EnemyLabel)control.Tag).Tag).id);
+            selectedEnemy.Type = (byte)((int)e.NewValue & 0xFF);
+            DrawEnemies();
         }
         private void colInt_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            if (control.Tag == null || e.NewValue == null || e.OldValue == null)
+            if (selectedEnemy == null || e.NewValue == null)
                 return;
             SNES.edit = true;
-            ((Enemy)((EnemyLabel)control.Tag).Tag).Column = (byte)((int)e.NewValue);
+            selectedEnemy.Column = (byte)((int)e.NewValue);
         }
         private void xInt_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            if (control.Tag == null || e.NewValue == null || e.OldValue == null)
+            if (selectedEnemy == null || e.NewValue == null)
                 return;
             SNES.edit = true;
             short posX = (short)(int)e.NewValue;
-            Enemy en = ((Enemy)((EnemyLabel)control.Tag).Tag);
+            Enemy en = selectedEnemy;
             en.X = posX;
             en.Column = (byte)((posX / 32));
-            MainWindow.window.enemyE.columnInt.Value = (int)en.Column;
-            Canvas.SetLeft((UIElement)control.Tag, ((int)e.NewValue) - viewerX);
+            UpdateEnemyLabelPositions();
         }
         private void yInt_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            if (control.Tag == null || e.NewValue == null || e.OldValue == null)
+            if (selectedEnemy == null || e.NewValue == null)
                 return;
             SNES.edit = true;
-            ((Enemy)((EnemyLabel)control.Tag).Tag).Y = (short)(int)e.NewValue;
-            Canvas.SetTop((UIElement)control.Tag, ((int)e.NewValue) - viewerY);
+            selectedEnemy.Y = (short)(int)e.NewValue;
+            UpdateEnemyLabelPositions();
         }
         private void AddEnemy_Click(object sender, RoutedEventArgs e)
         {
             if (!ValidEnemyAdd()) return;
-            var en = new Enemy();
+            Enemy en = new Enemy();
+            //TODO: should probably put in the centre witch would require taking scale into consideration
             en.X = (short)(viewerX + 0x100);
             en.Y = (short)(viewerY + 0x100);
-            en.Id = 0xF; //Default is Met
+            en.Id = 0xB; //Default is Heart Tank since it is the same Id across all games
             en.Type = 0;
+            en.Column = (byte)(en.X / 32);
             Level.Enemies[Level.Id].Add(en);
             SNES.edit = true;
+            SelectEnemy(en);
             DrawEnemies();
         }
         private void RemoveEnemy_Click(object sender, RoutedEventArgs e)
         {
-            if (control.Tag == null)
+            if (selectedEnemy == null)
                 return;
             SNES.edit = true;
-            Level.Enemies[Level.Id].Remove((Enemy)((EnemyLabel)control.Tag).Tag);
+            Level.Enemies[Level.Id].Remove(selectedEnemy);
+            DisableSelect();
             DrawEnemies();
         }
         private void ToolsBtn_Click(object sender, RoutedEventArgs e)
@@ -585,6 +501,7 @@ namespace TeheManX_Editor.Forms
                 }
                 Level.Enemies[Level.Id].Clear();
                 SNES.edit = true;
+                DisableSelect();
                 DrawEnemies();
                 MessageBox.Show("All enemies have been deleted!");
                 return;
