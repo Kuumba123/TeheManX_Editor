@@ -259,7 +259,7 @@ namespace TeheManX_Editor.Forms
             }
             if (!notFocus)  //check if NumInt is focused
                 return;
-            if (key == "W")
+            if (key == "W" || key == "Up")
             {
                 if (window.layoutE.viewerY != 0)
                 {
@@ -268,7 +268,7 @@ namespace TeheManX_Editor.Forms
                     UpdateViewrCam();
                 }
             }
-            else if (key == "S")
+            else if (key == "S" || key == "Down")
             {
                 if ((window.layoutE.viewerY >> 8) < (32 - 3))
                 {
@@ -277,7 +277,7 @@ namespace TeheManX_Editor.Forms
                     UpdateViewrCam();
                 }
             }
-            else if (key == "D")
+            else if (key == "D" || key == "Right")
             {
                 if ((window.layoutE.viewerX >> 8) < (32 - 3))
                 {
@@ -286,7 +286,7 @@ namespace TeheManX_Editor.Forms
                     UpdateViewrCam();
                 }
             }
-            else if (key == "A")
+            else if (key == "A" || key == "Left")
             {
                 if (window.layoutE.viewerX != 0)
                 {
@@ -473,16 +473,16 @@ namespace TeheManX_Editor.Forms
                     speed = 1;
             }
 
-            if (key == "W")
+            if (key == "W" || key == "Up")
             {
                 window.enemyE.viewerY -= speed;
-                if (window.enemyE.viewerY < 0) 
+                if (window.enemyE.viewerY < 0)
                     window.enemyE.viewerY = 0;
                 window.enemyE.DrawLayout();
                 window.enemyE.UpdateEnemyLabelPositions();
                 UpdateEnemyViewerCam();
             }
-            else if (key == "S")
+            else if (key == "S" || key == "Down")
             {
                 window.enemyE.viewerY += speed;
                 if (window.enemyE.viewerY > 0x1FFF)
@@ -491,7 +491,7 @@ namespace TeheManX_Editor.Forms
                 window.enemyE.UpdateEnemyLabelPositions();
                 UpdateEnemyViewerCam();
             }
-            else if (key == "D")
+            else if (key == "D" || key == "Right")
             {
                 window.enemyE.viewerX += speed;
                 if (window.enemyE.viewerX > 0x1FFF)
@@ -500,7 +500,7 @@ namespace TeheManX_Editor.Forms
                 window.enemyE.UpdateEnemyLabelPositions();
                 UpdateEnemyViewerCam();
             }
-            else if (key == "A")
+            else if (key == "A" || key == "Left")
             {
                 window.enemyE.viewerX -= speed;
                 if (window.enemyE.viewerX < 0)
