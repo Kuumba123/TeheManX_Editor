@@ -20,6 +20,26 @@ namespace TeheManX_Editor.Forms
         public ProjectWindow()
         {
             InitializeComponent();
+
+            if (Level.Project != null)
+            {
+                enemyCheck.IsChecked = Level.Project.Enemies != null;
+                paletteCheck.IsChecked = Level.Project.BGPalettes != null;
+                checkpointCheck.IsChecked = Level.Project.Checkpoints != null;
+                cameraCheck.IsChecked = Level.Project.CameraTriggers != null;
+                bgTileCheck.IsChecked = Level.Project.BGSettings != null;
+                objTileCheck.IsChecked = Level.Project.ObjectSettings != null;
+
+                enemyOffsetInt.Value = Level.Project.EnemyOffset;
+                paletteOffsetInt.Value = Level.Project.PaletteInfoOffset;
+                paletteBankInt.Value = Level.Project.PaletteColorBank;
+                checkpointInt.Value = Level.Project.CheckpointOffset;
+                cameraTriggerInt.Value = Level.Project.CameraTriggersOffset;
+                cameraBorderInt.Value = Level.Project.CameraBordersOffset;
+                bgTileInt.Value = Level.Project.BackgroundTilesInfoOffset;
+                objTileInt.Value = Level.Project.ObjectTilesInfoOffset;
+            }
+
             enable = true;
         }
         #endregion Constructors
