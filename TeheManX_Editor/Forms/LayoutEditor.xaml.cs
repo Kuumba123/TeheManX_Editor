@@ -263,7 +263,7 @@ namespace TeheManX_Editor.Forms
             {
                 MainWindow.window.layoutE.viewerX += 0x100;
                 MainWindow.window.layoutE.DrawLayout();
-                MainWindow.window.Update();
+                MainWindow.window.UpdateViewrCam();
             }
         }
         #endregion Events
