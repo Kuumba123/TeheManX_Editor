@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -452,7 +453,9 @@ namespace TeheManX_Editor.Forms
             short posX = (short)(int)e.NewValue;
             Enemy en = selectedEnemy;
             en.X = posX;
-            en.Column = (byte)((posX / 32));
+            byte column = (byte)((posX / 32));
+            en.Column = column;
+            columnInt.Value = column;
             UpdateEnemyLabelPositions();
         }
         private void yInt_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
