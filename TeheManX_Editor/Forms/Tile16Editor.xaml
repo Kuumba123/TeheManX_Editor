@@ -138,7 +138,7 @@
 
             <StackPanel Orientation="Horizontal">
                 <TextBlock FontSize="18" Foreground="White" FontFamily="Consolas" Padding="3">Vram:</TextBlock>
-                <local:NumInt x:Name="vramInt" Width="70" FontSize="18" Value="0" Minimum="0" Maximum="#1FF" ValueChanged="vramInt_ValueChanged"></local:NumInt>
+                <local:NumInt x:Name="vramInt" Width="70" FontSize="18" Value="0" Minimum="0" Maximum="#3FF" ValueChanged="vramInt_ValueChanged"></local:NumInt>
             </StackPanel>
 
             <StackPanel Orientation="Horizontal">
