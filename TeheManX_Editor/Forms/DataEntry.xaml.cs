@@ -54,7 +54,6 @@ namespace TeheManX_Editor.Forms
                 int count = stagePaletteSettings[index].Slots.Count;
                 slotCountInt.Value = count;
                 slotCount = count;
-                slotCountInt.Maximum = 4;
             }
         }
         #endregion Constructors
