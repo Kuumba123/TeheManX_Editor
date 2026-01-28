@@ -1,0 +1,39 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="310" d:DesignHeight="200"
+        x:Class="TeheManX_Editor.Forms.AboutWindow"
+        Title="TeheMan X Editor - " Height="200" Width="310" CanResize="False" WindowStartupLocation="CenterScreen">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <Image Width="56" Source="avares://TeheManX_Editor/Resources/MegaPogFrogYou 56.png" Margin="0,6"/>
+        <StackPanel Grid.Row="1" HorizontalAlignment="Center">
+            <Label Foreground="White" FontSize="13">by PogYouGuy AKA Kuumba</Label>
+        </StackPanel>
+        <StackPanel Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center">
+            <StackPanel Orientation="Horizontal">
+                <Image Width="28" Source="avares://TeheManX_Editor/Resources/Twitch Logo 28 by 33.png"></Image>
+                <TextBlock Padding="5,0,0,0" Margin="0,4,0,0" FontSize="14.7">
+                    <HyperlinkButton NavigateUri="https://www.twitch.tv/kuumba_">www.twitch.tv/kuumba_</HyperlinkButton>
+                </TextBlock>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <Image Width="28" Source="avares://TeheManX_Editor/Resources/Youtube Logo 28 by 20.png"></Image>
+                <TextBlock Padding="5,0,0,0" FontSize="14.7">
+                    <HyperlinkButton NavigateUri="https://www.youtube.com/Kuumba">www.youtube.com/Kuumba</HyperlinkButton>
+                </TextBlock>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <Image Margin="0,5,0,0" Width="28" Source="avares://TeheManX_Editor/Resources/Twitter Logo 32 by 23.png"></Image>
+                <TextBlock Padding="5,0,0,0" Margin="0,5,0,0" FontSize="14.7">
+                    <HyperlinkButton NavigateUri="https://twitter.com/ThePogChampGuy">twitter.com/ThePogChampGuy</HyperlinkButton>
+                </TextBlock>
+            </StackPanel>
+        </StackPanel>
+
+    </Grid>
+</Window>

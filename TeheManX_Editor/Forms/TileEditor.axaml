@@ -1,0 +1,125 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="1200" d:DesignHeight="650"
+             xmlns:local="clr-namespace:TeheManX_Editor.Forms"
+             x:Class="TeheManX_Editor.Forms.TileEditor">
+    <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+        <Grid>
+	    	 <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="auto"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+
+            <StackPanel>
+                <TextBlock FontSize="18"  FontFamily="Consolas" HorizontalAlignment="Center">Background Tile Settings</TextBlock>
+                <StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Width="160" FontSize="21">BG Setting:</TextBlock>
+                        <local:NumInt x:Name="bgTileSetInt" FontSize="21" Width="85" Minimum="0" Maximum="255" ValueChanged="bgTileSetInt_ValueChanged" Value="0"></local:NumInt>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Width="160" FontSize="21">Entry Slot:</TextBlock>
+                        <local:NumInt x:Name="bgEntrySlotInt" FontSize="21" Width="85" Minimum="0" Maximum="255" Value="0" ValueChanged="bgEntrySlotInt_ValueChanged"></local:NumInt>
+                    </StackPanel>
+                    <Separator></Separator>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Width="160" FontSize="21">VRAM Length:</TextBlock>
+                        <local:NumInt x:Name="bgLengthInt" FontSize="21" Width="85" Minimum="0" Maximum="65535" ValueChanged="bgLengthInt_ValueChanged" Value="0"></local:NumInt>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Width="160" FontSize="21">Vram Address:</TextBlock>
+                        <local:NumInt x:Name="bgAddressInt" FontSize="21" Width="85" Minimum="0" Maximum="65535" ValueChanged="bgAddressInt_ValueChanged" Value="0"></local:NumInt>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock x:Name="bgSrcText" FontSize="21" Width="160">CPU Address:</TextBlock>
+                        <TextBox x:Name="bgSrcBox" Padding="0" FontSize="21" Width="85" TextChanged="bgSrcBox_TextChanged">ABAAE0</TextBox>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Width="160" FontSize="21">Palette ID:</TextBlock>
+                        <local:NumInt x:Name="bgPalInt" FontSize="21" Width="85" Minimum="0" Maximum="65535" ValueChanged="bgPalInt_ValueChanged" Value="0"></local:NumInt>
+                    </StackPanel>
+                    <Separator></Separator>
+                    <CheckBox x:Name="romOffsetCheck" FontSize="18"  FontFamily="Consolas" Checked="romOffsetCheck_Changed" Unchecked="romOffsetCheck_Changed">Use Rom Offset</CheckBox>
+                    <Separator></Separator>
+                    <CheckBox x:Name="freshCheck" FontSize="18"  FontFamily="Consolas">Fresh Redraw</CheckBox>
+                    <Separator></Separator>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock FontSize="18"  FontFamily="Consolas">Redraw Level:</TextBlock>
+                        <Button Click="RedrawBtn_Click" Width="25" Height="25" Padding="0" Margin="8,1,0,0" VerticalContentAlignment="Top" VerticalAlignment="Top">🔄</Button>
+                    </StackPanel>
+                </StackPanel>
+                <StackPanel Grid.Row="1">
+                    <Button Margin="10" Click="EditBGSlotCountBtn_Click">Edit BG Entry Slot Counts</Button>
+                    <Button Margin="10" Click="LoadBtn_Click">Load External Tiles</Button>
+                </StackPanel>
+            </StackPanel>
+
+            <!--Object Tile Display Area -->
+            <StackPanel Grid.Column="1">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="auto"/>
+                        <ColumnDefinition Width="auto"/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <Button x:Name="zoomInBtn" Click="zoomInBtn_Click" Width="25" Height="25" Margin="0" Padding="0" VerticalAlignment="Center" HorizontalAlignment="Left">+</Button>
+                    <Button x:Name="zoomOutBtn" Click="zoomOutBtn_Click" Width="25" Height="25" Margin="0" Padding="0" FontSize="15" Grid.Column="1">-</Button>
+                    <TextBlock Grid.Column="2" FontSize="18" FontFamily="Consolas" HorizontalAlignment="Center">VRAM Tiles</TextBlock>
+                </Grid>
+
+                <local:SkiaControl RenderEvent="objectTilesImage_RenderEvent" x:Name="objectTilesImage" Width="512" Height="512" HorizontalAlignment="Left" VerticalAlignment="Top" PointerPressed="objectTilesImage_PointerPressed"/>
+
+            </StackPanel>
+            
+            <!--Object Tile Swapping Related Info-->
+            <StackPanel Grid.Column="2">
+                <TextBlock FontSize="18"  FontFamily="Consolas" HorizontalAlignment="Center">Object Tile Settings</TextBlock>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Width="160" FontSize="21">OBJ Setting</TextBlock>
+                    <local:NumInt x:Name="objTileSetInt" FontSize="21" Value="0" Minimum="0" Width="85" ValueChanged="objectTileSetInt_ValueChanged"></local:NumInt>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Width="160" FontSize="21">OBJ Slot</TextBlock>
+                    <local:NumInt x:Name="objectSlotInt" FontSize="21" Value="0" Minimum="0" Width="85" ValueChanged="objectSlotInt_ValueChanged"></local:NumInt>
+                </StackPanel>
+                <Separator></Separator>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Width="160" FontSize="21">Tile Id:</TextBlock>
+                    <local:NumInt x:Name="compressTileInt" FontSize="21" Value="0" Minimum="0" Width="85" ValueChanged="compressTileId_ValueChanged"></local:NumInt>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock FontSize="21" Width="160">VRAM Location:</TextBlock>
+                    <local:NumInt x:Name="vramLocationInt" FontSize="21" Value="0" Minimum="0" Maximum="65535" Width="85" ValueChanged="vramLocationInt_ValueChanged"></local:NumInt>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Width="160" FontSize="21">Palette Id:</TextBlock>
+                    <local:NumInt x:Name="palSetInt" FontSize="21" Value="0" Minimum="0" Maximum="512" Increment="2" Width="85" ValueChanged="palSetInt_ValueChanged"></local:NumInt>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Width="160" FontSize="21">Palette Dest:</TextBlock>
+                    <local:NumInt x:Name="dumpInt" FontSize="21" Value="0" Minimum="0" Maximum="112" Increment="16" Width="85" ValueChanged="dumpInt_ValueChanged"></local:NumInt>
+                </StackPanel>
+                <Separator></Separator>
+                <StackPanel Orientation="Horizontal">
+                    <RadioButton x:Name="oam1Btn" Checked="oamBtn_CheckChange" Unchecked="oamBtn_CheckChange" IsChecked="True" VerticalContentAlignment="Center"   FontSize="18">OAM1</RadioButton>
+                    <RadioButton x:Name="oam2Btn" Checked="oamBtn_CheckChange" Unchecked="oamBtn_CheckChange" VerticalContentAlignment="Center"  FontSize="18">OAM2</RadioButton>
+                    <Button Click="ReDrawVramBtn_Click" Width="25" Height="25" Padding="0" Margin="8,1,0,0" >🔄</Button>
+                    <Button Click="ObjectTileInfoBtn_Click" Width="25" Height="25" Padding="0" Margin="8,1,0,0" FontWeight="Bold">i</Button>
+                </StackPanel>
+                <CheckBox x:Name="objectFreshCheck" FontSize="18"  FontFamily="Consolas">Fresh Rdraw</CheckBox>
+                <Button Margin="10" Name="gridBtn" Click="gridBtn_Click">Enable Grid</Button>
+                <Grid x:Name="paletteGrid"  Width="256" Height="128">
+
+                </Grid>
+                <Button Margin="10" Click="EditObjectSlotCountBtn_Click">Edit Object Slot Counts</Button>
+            </StackPanel>
+        </Grid>
+    </ScrollViewer>
+</UserControl>

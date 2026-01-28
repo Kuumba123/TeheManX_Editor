@@ -1,0 +1,13 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="TeheManX_Editor.Forms.HelpWindow"
+        Title="Help" Height="300" Width="300" WindowStartupLocation="CenterScreen">
+    <Grid>
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <TextBox x:Name="box" FontSize="16" IsReadOnly="True" Foreground="White" Background="Black" TextWrapping="Wrap"></TextBox>
+        </ScrollViewer>
+    </Grid>
+</Window>

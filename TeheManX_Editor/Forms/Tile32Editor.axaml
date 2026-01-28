@@ -1,0 +1,71 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:local="clr-namespace:TeheManX_Editor.Forms"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="TeheManX_Editor.Forms.Tile32Editor">
+    <Grid UseLayoutRounding="True" x:Name="mainGrid">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <ScrollViewer Grid.RowSpan="3" VerticalAlignment="Top" HorizontalAlignment="Left" AllowAutoHide="False">
+            <!--32x32 List-->
+            <local:SkiaControl x:Name="tileImage" MeasureEvent="tileImage_MeasureEvent" RenderEvent="tileImage_RenderEvent" PointerPressed="tileImage_PointerPressed"/>
+        </ScrollViewer>
+        <StackPanel Grid.Column="1" Orientation="Horizontal">
+            <TextBlock FontSize="16" FontFamily="Consolas" Padding="3,5,1,5">x16-Tiles</TextBlock>
+            <Button Click="Tile16Button_Click" Background="Transparent">0</Button>
+            <Button Click="Tile16Button_Click" Background="Transparent">1</Button>
+            <Button Click="Tile16Button_Click" Background="Transparent">2</Button>
+            <Button Click="Tile16Button_Click" Background="Transparent">3</Button>
+            <Button Click="Tile16Button_Click" Background="Transparent">4</Button>
+            <Button Click="Tile16Button_Click" Background="Transparent">5</Button>
+        </StackPanel>
+
+        <local:SkiaControl x:Name="x16Image" MeasureEvent="x16Image_MeasureEvent" RenderEvent="x16Image_RenderEvent" MaxWidth="768" Grid.Column="1" Grid.Row="1" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="2" PointerPressed="x16Image_PointerPressed"/>
+
+        <StackPanel Grid.Column="1" Grid.Row="2">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock FontSize="18" FontFamily="Consolas" Padding="3,5,1,5">x32-Tiles</TextBlock>
+                <Button Click="Tile32Button_Click" Background="Transparent">0</Button>
+                <Button Click="Tile32Button_Click" Background="Transparent">1</Button>
+                <Button Click="Tile32Button_Click" Background="Transparent">2</Button>
+                <Button Click="Tile32Button_Click" Background="Transparent">3</Button>
+                <Button Click="Tile32Button_Click" Background="Transparent">4</Button>
+                <Button Click="Tile32Button_Click" Background="Transparent">5</Button>
+            </StackPanel>
+            <!--Tile Image for Selected 32x32 Tile & Grid Buttons-->
+            <WrapPanel Orientation="Horizontal">
+                <local:SkiaControl RenderEvent="tileImageS_RenderEvent" HorizontalAlignment="Left" Margin="3,1,1,2" Grid.ColumnSpan="2" Grid.RowSpan="2" x:Name="tileImageS" Width="64" Height="64" PointerPressed="tileImageS_PointerPressed"/>
+
+                <Button Margin="5" Width="125" Click="TileGridBtn_Click" Height="45">Show 32X Grid</Button>
+                <Button Margin="5" Width="125" Click="x16GridBtn_Click" Height="45">Show 16X Grid</Button>
+            </WrapPanel>
+
+            <!--Tile Parameters-->
+            <StackPanel Orientation="Horizontal">
+                <TextBlock FontSize="18"  FontFamily="Consolas" Padding="3">TILE:</TextBlock>
+                <local:NumInt Height="32" x:Name="tileInt" Width="70" FontSize="18" Value="0" Minimum="0" ValueChanged="tileInt_ValueChanged"></local:NumInt>
+
+                <TextBlock FontSize="18"  FontFamily="Consolas" Padding="3">TL:</TextBlock>
+                <local:NumInt Height="32" x:Name="topLeftInt" Width="70" FontSize="18" Value="0" Minimum="0" ValueChanged="topLeftInt_ValueChanged"></local:NumInt>
+
+                <TextBlock FontSize="18"  FontFamily="Consolas" Padding="3">TR:</TextBlock>
+                <local:NumInt Height="32"  x:Name="topRightInt" Width="70" FontSize="18" Value="0" Minimum="0" ValueChanged="topRightInt_ValueChanged"></local:NumInt>
+
+                <TextBlock FontSize="18"  FontFamily="Consolas" Padding="3">BL:</TextBlock>
+                <local:NumInt Height="32" x:Name="bottomLeftInt" Width="70" FontSize="18" Value="0" Minimum="0" ValueChanged="bottomLeftInt_ValueChanged"></local:NumInt>
+                
+                <TextBlock FontSize="18"  FontFamily="Consolas" Padding="3">BR:</TextBlock>
+                <local:NumInt Height="32" x:Name="bottomRightInt" Width="70" FontSize="18" Value="0" Minimum="0" ValueChanged="bottomRightInt_ValueChanged"></local:NumInt>
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</UserControl>

@@ -1,0 +1,56 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ApplicationManifest>Config/app.manifest</ApplicationManifest>
+    <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    <ApplicationIcon>Resources\Icon.ico</ApplicationIcon>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Remove="Resources\MegaPogFrogYou 56.png" />
+    <None Remove="Resources\Twitch Logo 28 by 33.png" />
+    <None Remove="Resources\Twitter Logo 32 by 23.png" />
+    <None Remove="Resources\unifont-15.0.01.ttf" />
+    <None Remove="Resources\Youtube Logo 28 by 20.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <ApplicationDefinition Include="Resources\unifont-15.0.01.ttf" />
+  </ItemGroup>
+  <ItemGroup>
+    <AvaloniaResource Include="Resources\MegaPogFrogYou 56.png" />
+    <AvaloniaResource Include="Resources\Twitch Logo 28 by 33.png" />
+    <AvaloniaResource Include="Resources\Twitter Logo 32 by 23.png" />
+    <AvaloniaResource Include="Resources\unifont-15.0.01.ttf" />
+    <AvaloniaResource Include="Resources\Youtube Logo 28 by 20.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Resources\Icon.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="11.3.9" />
+    <PackageReference Include="Avalonia.Controls.ColorPicker" Version="11.3.9" />
+    <PackageReference Include="Avalonia.Desktop" Version="11.3.9" />
+    <PackageReference Include="Avalonia.ReactiveUI" Version="11.3.8" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.9" />
+    <PackageReference Include="Avalonia.Fonts.Inter" Version="11.3.9" />
+    <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
+    <PackageReference Include="Avalonia.Diagnostics" Version="11.3.9">
+      <IncludeAssets Condition="'$(Configuration)' != 'Debug'">None</IncludeAssets>
+      <PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Dock.Avalonia" Version="11.3.8" />
+    <PackageReference Include="Dock.Avalonia.Themes.Fluent" Version="11.3.8" />
+    <PackageReference Include="Dock.Model.Avalonia" Version="11.3.8" />
+    <PackageReference Include="Dock.Serializer.Newtonsoft" Version="11.3.8" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Forms\GameSettingsWindow.axaml.cs">
+      <DependentUpon>GameSettingsWindow.axaml</DependentUpon>
+    </Compile>
+  </ItemGroup>
+</Project>

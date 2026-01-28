@@ -1,0 +1,121 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:local="clr-namespace:TeheManX_Editor.Forms"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="800"
+             x:Class="TeheManX_Editor.Forms.SpawnEditor">
+    <UserControl.Styles>
+        <Style Selector="TextBlock">
+            <Setter Property="FontFamily" Value="Consolas" />
+            <Setter Property="FontSize" Value="22" />
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="IsHitTestVisible" Value="False"/>
+        </Style>
+        <Style Selector="local|NumInt">
+            <Setter Property="FontSize" Value="24"/>
+            <Setter Property="Width" Value="100"/>
+            <Setter Property="Height" Value="35"/>
+            <Setter Property="FontFamily" Value="Consolas"/>
+        </Style>
+    </UserControl.Styles>
+    <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+
+            <!--Edit Checkpoints-->
+            <Button x:Name="gearBtn" Width="180" Height="30" Margin="5" HorizontalAlignment="Left" VerticalAlignment="Bottom" Grid.Row="1" Click="EditCheckpointBtn_Click">Edit Checkpoint Counts</Button>
+
+            <StackPanel Orientation="Horizontal" Grid.Column="1" VerticalAlignment="Top">
+                <TextBlock>Spawn</TextBlock>
+                <local:NumInt Value="0" Minimum="0" Maximum="255" x:Name="spawnInt" Width="65"  Height="33" ValueChanged="spawnInt_ValueChanged"></local:NumInt>
+            </StackPanel>
+            
+            <StackPanel HorizontalAlignment="Right" Grid.Row="1">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <TextBlock>Object Tiles Set</TextBlock>
+                    <local:NumInt Minimum="0" Maximum="255" x:Name="objectTileInt" ValueChanged="objectTileInt_ValueChanged"></local:NumInt>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <TextBlock>Background Tiles Set</TextBlock>
+                    <local:NumInt Minimum="0" Maximum="255" x:Name="backgroundTileInt" ValueChanged="backgroundTileInt_ValueChanged"></local:NumInt>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <TextBlock>Background Palette Set</TextBlock>
+                    <local:NumInt Minimum="0" Maximum="255" x:Name="backgroundPalInt" ValueChanged="backgroundPalInt_ValueChanged"></local:NumInt>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <TextBlock x:Name="silkShotTxt">Silk Shot Type</TextBlock>
+                    <local:NumInt Minimum="0" Maximum="255" x:Name="silkShotInt" ValueChanged="silkShotInt_ValueChanged"></local:NumInt>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <TextBlock>Mega-X</TextBlock>
+                    <local:NumInt Minimum="0" Maximum="65535" x:Name="megaIntX" ValueChanged="megaIntX_ValueChanged"></local:NumInt>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <TextBlock>Mega-Y</TextBlock>
+                    <local:NumInt Minimum="0" Maximum="65535" x:Name="megaIntY" ValueChanged="megaIntY_ValueChanged"></local:NumInt>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <TextBlock>Cam-X</TextBlock>
+                    <local:NumInt Minimum="0" Maximum="65535" x:Name="camIntX" ValueChanged="camIntX_ValueChanged"></local:NumInt>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <TextBlock>Cam-Y</TextBlock>
+                    <local:NumInt Minimum="0" Maximum="65535" x:Name="camIntY" ValueChanged="camIntY_ValueChanged"></local:NumInt>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <TextBlock>BG2-X</TextBlock>
+                    <local:NumInt Minimum="0" Maximum="65535" x:Name="bg2IntX" ValueChanged="bg2IntX_ValueChanged"></local:NumInt>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <TextBlock>BG2-Y</TextBlock>
+                    <local:NumInt Minimum="0" Maximum="65535" x:Name="bg2IntY" ValueChanged="bg2IntY_ValueChanged"></local:NumInt>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <TextBlock>Cam BD-L</TextBlock>
+                    <local:NumInt Minimum="0" Maximum="65535" x:Name="camBorderIntL" ValueChanged="camBorderIntL_ValueChanged"></local:NumInt>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <TextBlock>Cam BD-R</TextBlock>
+                    <local:NumInt Minimum="0" Maximum="65535" x:Name="camBorderIntR" ValueChanged="camBorderIntR_ValueChanged"></local:NumInt>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <TextBlock>Cam BD-T</TextBlock>
+                    <local:NumInt Minimum="0" Maximum="65535" x:Name="camBorderIntT" ValueChanged="camBorderIntT_ValueChanged"></local:NumInt>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <TextBlock>Cam BD-B</TextBlock>
+                    <local:NumInt Minimum="0" Maximum="65535" x:Name="camBorderIntB" ValueChanged="camBorderIntB_ValueChanged"></local:NumInt>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <TextBlock>BG2 Base X</TextBlock>
+                    <local:NumInt Minimum="0" Maximum="65535" x:Name="bg2IntBaseX" ValueChanged="bg2IntBaseX_ValueChanged"></local:NumInt>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <TextBlock>BG2 Base Y</TextBlock>
+                    <local:NumInt Minimum="0" Maximum="65535" x:Name="bg2IntBaseY" ValueChanged="bg2IntBaseY_ValueChanged"></local:NumInt>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <TextBlock>WRAM Flag???</TextBlock>
+                    <local:NumInt Minimum="0" Maximum="255" x:Name="wramInt" ValueChanged="wramIntInt_ValueChanged"></local:NumInt>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <TextBlock x:Name="megaFlipTxt">Mega Flip</TextBlock>
+                    <local:NumInt Minimum="0" Maximum="255" x:Name="megaFlipInt" ValueChanged="megaFlipInt_ValueChanged"></local:NumInt>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <TextBlock>Collision Timer</TextBlock>
+                    <local:NumInt Minimum="0" Maximum="255" x:Name="collisionInt" ValueChanged="collisionInt_ValueChanged"></local:NumInt>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <TextBlock x:Name="scrollTypeText">Scroll Type</TextBlock>
+                    <local:NumInt Minimum="0" Maximum="255" x:Name="scrollInt" ValueChanged="scrollInt_ValueChanged"></local:NumInt>
+                </StackPanel>
+            </StackPanel>
+        </Grid>
+    </ScrollViewer>
+</UserControl>

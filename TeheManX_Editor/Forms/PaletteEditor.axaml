@@ -1,0 +1,70 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:local="clr-namespace:TeheManX_Editor.Forms"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="TeheManX_Editor.Forms.PaletteEditor">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="auto"/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+
+        <!--VRAM Tiles-->
+        <ScrollViewer VerticalAlignment="Top" Grid.RowSpan="2" AllowAutoHide="False">
+            <local:SkiaControl x:Name="vramTileImage" MeasureEvent="vramTileImage_MeasureEvent" RenderEvent="vramTileImage_RenderEvent"/>
+        </ScrollViewer>
+        
+        <!--Palette-->
+        <StackPanel Grid.Column="1">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock x:Name="palTxt"  FontFamily="Consolas" FontSize="19" Margin="5,0,0,0" Width="224" VerticalAlignment="Center">Palette: 0</TextBlock>
+                <Button Click="GearBtn_Click">⚙️</Button>
+            </StackPanel>
+
+            <Grid x:Name="paletteGrid" Width="256" Height="128" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="1,0">
+
+            </Grid>
+
+            <TextBlock x:Name="colorAddressTxt"  FontFamily="Consolas" FontSize="19" Margin="5,0,0,0" Width="224" HorizontalAlignment="Left">Color Address: 0</TextBlock>
+
+
+            <StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock FontSize="24"  FontFamily="Consolas">Swap Palette Id:</TextBlock>
+                    <local:NumInt FontSize="20" Width="50" x:Name="bgPalIdInt" Minimum="0" ValueChanged="bgPalIdInt_ValueChanged"></local:NumInt>
+                </StackPanel>
+                <Grid x:Name="paletteGrid2"  Width="256" Height="16" HorizontalAlignment="Left" Margin="1,0">
+
+                </Grid>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Width="201" FontSize="18"  FontFamily="Consolas">Palette Slot:</TextBlock>
+                    <local:NumInt Width="70" FontSize="20" x:Name="paletteSlotInt" Minimum="0" ValueChanged="paletteSlotInt_ValueChanged"></local:NumInt>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Width="201" FontSize="18"  FontFamily="Consolas">Color Index:</TextBlock>
+                    <local:NumInt Width="70" FontSize="20" x:Name="colorIndexInt" Minimum="0" ValueChanged="colorIndexInt_ValueChanged"></local:NumInt>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Width="201" FontSize="17"  FontFamily="Consolas">16 bit Color Address:</TextBlock>
+                    <local:NumInt Width="70" FontSize="18"  Background="Black" x:Name="colorAddressInt" ValueChanged="colorAddressInt_ValueChanged"></local:NumInt>
+                </StackPanel>
+                <Button x:Name="dumpPalBtn" Click="DumpPaletteBtn_Click">Dump Palettes</Button>
+            </StackPanel>
+
+        </StackPanel>
+
+        <Button Margin="5" Click="EditPaletteCountBtn_Click" Width="250" Height="35" HorizontalAlignment="Left" Grid.Column="1" Grid.Row="1">Edit Palette Swap Counts</Button>
+
+        <StackPanel Orientation="Horizontal" Grid.Column="1" Grid.Row="1" HorizontalAlignment="Right" VerticalAlignment="Bottom">
+            <Button x:Name="zoomInBtn" Click="zoomInBtn_Click" Margin="5" Width="25" Height="30">+</Button>
+            <Button x:Name="zoomOutBtn" Click="zoomOutBtn_Click" Margin="5" Width="25" Height="30">-</Button>
+        </StackPanel>
+    </Grid>
+</UserControl>

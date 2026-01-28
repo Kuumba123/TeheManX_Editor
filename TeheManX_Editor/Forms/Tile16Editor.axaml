@@ -1,0 +1,99 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:forms="using:TeheManX_Editor.Forms"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:local="clr-namespace:TeheManX_Editor.Forms"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="TeheManX_Editor.Forms.Tile16Editor">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="auto"/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="7*"/>
+            <RowDefinition Height="auto"></RowDefinition>
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        
+        <!--16x16 Tiles-->
+        <local:SkiaControl x:Name="x16Image" Grid.RowSpan="3" VerticalAlignment="Top" PointerPressed="x16Image_PointerPressed" MeasureEvent="x16Image_MeasureEvent" RenderEvent="x16Image_RenderEvent"/>
+
+        <Grid Grid.Column="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+
+            <StackPanel Grid.Row="0" Orientation="Horizontal">
+                <TextBlock  FontSize="18" FontFamily="Consolas" Padding="3,5,1,5">Palette</TextBlock>
+                <Button Background="Transparent" Click="Clut_Click">0</Button>
+                <Button Background="Transparent" Click="Clut_Click">1</Button>
+                <Button Background="Transparent" Click="Clut_Click">2</Button>
+                <Button Background="Transparent" Click="Clut_Click">3</Button>
+                <Button Background="Transparent" Click="Clut_Click">4</Button>
+                <Button Background="Transparent" Click="Clut_Click">5</Button>
+                <Button Background="Transparent" Click="Clut_Click">6</Button>
+                <Button Background="Transparent" Click="Clut_Click">7</Button>
+                <Button x:Name="zoomInBtn" Click="zoomInBtn_Click" Width="25">+</Button>
+                <Button x:Name="zoomOutBtn" Click="zoomOutBtn_Click" Width="25">-</Button>
+            </StackPanel>
+
+            <!--GPU Tiles-->
+            <ScrollViewer Margin="2,0" Grid.Row="1" HorizontalAlignment="Left" VerticalAlignment="Top" AllowAutoHide="False">
+                <local:SkiaControl x:Name="vramTileImage" PointerPressed="vramTileImage_PointerPressed" MeasureEvent="vramTileImage_MeasureEvent" RenderEvent="vramTileImage_RenderEvent"/>
+            </ScrollViewer>
+        </Grid>
+        <StackPanel Grid.Column="1" Grid.Row="1">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock FontSize="18" FontFamily="Consolas" Padding="3,5,1,5">x16-Tiles</TextBlock>
+                <Button Background="Transparent" Click="Page_Click">0</Button>
+                <Button Background="Transparent" Click="Page_Click">1</Button>
+                <Button Background="Transparent" Click="Page_Click">2</Button>
+                <Button Background="Transparent" Click="Page_Click">3</Button>
+                <Button Background="Transparent" Click="Page_Click">4</Button>
+                <Button Background="Transparent" Click="Page_Click">5</Button>
+            </StackPanel>
+            
+            <!--Tile Image for Selected 16x16 Tile & Grid Buttons-->
+            <WrapPanel Orientation="Horizontal">
+                <forms:SkiaControl x:Name="tileImageS" Margin="2,0" Width="64" Height="64" PointerPressed="tileImageS_PointerPressed" MeasureEvent="tileImageS_MeasureEvent" RenderEvent="tileImageS_RenderEvent"/>
+                <Button Margin="5" Width="125" Height="45" Click="x16GridBtn_Click">Show 16X Grid</Button>
+                <Button Margin="5" Width="115" Height="45" Click="x8GridBtn_Click">Show 8X Grid</Button>
+            </WrapPanel>
+        </StackPanel>
+
+        <!--Tile Parameters-->
+        <WrapPanel Orientation="Horizontal" Grid.Column="1" Grid.Row="2">
+            <StackPanel Orientation="Horizontal" Height="32">
+                <TextBlock FontSize="18"  FontFamily="Consolas" Padding="3">TILE:</TextBlock>
+                <local:NumInt x:Name="tileInt" Width="70" FontSize="18" Value="0" Minimum="0" ValueChanged="tileInt_ValueChanged"></local:NumInt>
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal" Height="32">
+                <TextBlock FontSize="18"  FontFamily="Consolas" Padding="3">Collision:</TextBlock>
+                <local:NumInt x:Name="collisionInt" Width="45" FontSize="18" Value="0" Minimum="0" Maximum="255" ValueChanged="collisionInt_ValueChanged"></local:NumInt>
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal" Height="32">
+                <TextBlock FontSize="18"  FontFamily="Consolas" Padding="3">Vram:</TextBlock>
+                <local:NumInt x:Name="vramInt" Width="70" FontSize="18" Value="0" Minimum="0" Maximum="1023" ValueChanged="vramInt_ValueChanged"></local:NumInt>
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal" Height="32">
+                <TextBlock FontSize="18"  FontFamily="Consolas" Padding="3">Pal:</TextBlock>
+                <local:NumInt x:Name="palInt" Width="40" FontSize="18" Value="0" Minimum="0" Maximum="7" ValueChanged="palInt_ValueChanged"></local:NumInt>
+            </StackPanel>
+
+            <CheckBox x:Name="priorityCheck"  FontSize="18" FontFamily="Consolas" VerticalAlignment="Center" Margin="8,5" Checked="priorityCheck_CheckChange" Unchecked="priorityCheck_CheckChange">Priority</CheckBox>
+
+            <CheckBox x:Name="flipHCheck"  FontSize="18" FontFamily="Consolas" VerticalAlignment="Center" Margin="8,5" Checked="flipHCheck_CheckChange" Unchecked="flipHCheck_CheckChange">Flip-H</CheckBox>
+            
+            <CheckBox x:Name="flipVCheck"  FontSize="18" FontFamily="Consolas" VerticalAlignment="Center" Margin="8,5" Checked="flipVCheck_CheckChange" Unchecked="flipVCheck_CheckChange">Flip-V</CheckBox>
+        </WrapPanel>
+    </Grid>
+</UserControl>

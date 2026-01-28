@@ -1,0 +1,99 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:local="clr-namespace:TeheManX_Editor.Forms"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="TeheManX_Editor.Forms.ScreenEditor">
+    <Grid Background="{DynamicResource GridBackgroundBrush}">
+        <Grid x:Name="tile32ModeGrid">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <local:SkiaControl x:Name="screenImage" Grid.RowSpan="3" MeasureEvent="screenImage_MeasureEvent" RenderEvent="screenImage_RenderEvent"  HorizontalAlignment="Left" VerticalAlignment="Top" PointerPressed="screenImage_PointerPressed" PointerMoved="screenImage_PointerMoved" PointerReleased="screenImage_PointerReleased"/>
+
+            <StackPanel Orientation="Horizontal" Grid.Column="1" VerticalAlignment="Top">
+                <TextBlock  FontSize="18" FontFamily="Consolas" Padding="3,5,1,5">x32-Tiles</TextBlock>
+                <Button Background="Transparent" Click="Tile32PageButton_Click">0</Button>
+                <Button Background="Transparent" Click="Tile32PageButton_Click">1</Button>
+                <Button Background="Transparent" Click="Tile32PageButton_Click">2</Button>
+                <Button Background="Transparent" Click="Tile32PageButton_Click">3</Button>
+                <Button Background="Transparent" Click="Tile32PageButton_Click">4</Button>
+                <Button Background="Transparent" Click="Tile32PageButton_Click">5</Button>
+            </StackPanel>
+
+            <!--32x32 Tile List-->
+            <ScrollViewer x:Name="tileScroll" Grid.Column="1" Grid.Row="1" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="1,0" AllowAutoHide="False">
+                <local:SkiaControl x:Name="tileImage" MeasureEvent="tileImage_MeasureEvent" RenderEvent="tileImage_RenderEvent" MaxWidth="768" HorizontalAlignment="Left" VerticalAlignment="Top" PointerReleased="tileImage_PointerReleased"/>
+            </ScrollViewer>
+
+            <StackPanel Grid.Column="1" Grid.Row="2">
+                <WrapPanel Orientation="Horizontal">
+                    <local:NumInt Margin="3,0,0,0" Width="69" Height="40" Value="1" FontSize="33" Maximum="239" MinHeight="0" x:Name="screenInt" Minimum="0" ValueChanged="screenInt_ValueChanged"/>
+                    <!--Grid Buttons-->
+                    <StackPanel Orientation="Horizontal">
+                        <Button Margin="5" Padding="10" Click="ScreenGridBtn_Click">Show Screen Grid</Button>
+                        <Button Margin="5" Padding="10" Click="TileGridBtn_Click">Show Tile Grid</Button>
+                    </StackPanel>
+                </WrapPanel>
+                <!--Selected 32x32 Tile-->
+                <StackPanel Orientation="Horizontal">
+                    <local:SkiaControl x:Name="tileImageS" RenderEvent="tileImageS_RenderEvent" HorizontalAlignment="Left" Margin="3,1,1,1" Width="64" Height="64"/>
+                    <TextBlock FontSize="28"  FontFamily="Consolas" VerticalAlignment="Center">TILE:</TextBlock>
+                    <local:NumInt Margin="0" Width="85" Height="40" Value="0" FontSize="33" MinHeight="0" x:Name="tile32Int" Minimum="0" ValueChanged="tile32Int_ValueChanged"/>
+
+                    <!--Swap to 16x16 Tile Mode-->
+                    <Button Width="100" Height="40" Margin="15,0,0,0" Click="Mode16x16Button_Click">16x16 Mode</Button>
+
+                    <Button Width="30" Height="30" Padding="0" Margin="3" Click="SnapButton_Click">&#128247;</Button>
+                    <Button Width="30" Height="30" Padding="0" Margin="0" Click="Help_Click">?</Button>
+                </StackPanel>
+            </StackPanel>
+        </Grid>
+        <Grid x:Name="tile16ModeGrid" IsVisible="False">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+
+            <local:SkiaControl x:Name="screenImage16" MeasureEvent="screenImage16_MeasureEvent" RenderEvent="screenImage16_RenderEvent" HorizontalAlignment="Left" VerticalAlignment="Top" PointerPressed="screenImage16_PointerPressed" PointerMoved="screenImage16_PointerMoved" PointerReleased="screenImage16_PointerReleased"/>
+
+            <StackPanel Grid.Column="1">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock FontSize="18" FontFamily="Consolas" Padding="3,5,1,5">Tiles</TextBlock>
+                    <Button Background="Transparent" Click="Tile16PageButton_Click">0</Button>
+                    <Button Background="Transparent" Click="Tile16PageButton_Click">1</Button>
+                    <Button Background="Transparent" Click="Tile16PageButton_Click">2</Button>
+                    <Button Background="Transparent" Click="Tile16PageButton_Click">3</Button>
+                    <Button Background="Transparent" Click="Tile16PageButton_Click">4</Button>
+                    <Button Background="Transparent" Click="Tile16PageButton_Click">5</Button>
+                </StackPanel>
+
+                <local:SkiaControl MeasureEvent="tileImage16_MeasureEvent" RenderEvent="tileImage16_RenderEvent" HorizontalAlignment="Left" Margin="1,0" x:Name="tileImage16" MaxWidth="768" Grid.RowSpan="16" Grid.ColumnSpan="16" PointerPressed="tileImage16_PointerPressed" PointerReleased="tileImage16_PointerReleased" PointerMoved="tileImage16_PointerMoved" PointerExited="tileImage16_PointerExited"/>
+
+                <StackPanel Orientation="Horizontal">
+                    <local:NumInt FontFamily="Consolas" Width="69" Height="40" Value="2" FontSize="33" Maximum="239" MinHeight="0" x:Name="screenInt16" Minimum="0" ValueChanged="screenInt16_ValueChanged"/>
+                    <Button Margin="5,5,0,5" Padding="0" Width="130" Height="40" Click="ScreenGrid16Btn_Click">Show Screen Grid</Button>
+                    <Button Margin="5" Padding="0" Width="110" Height="40" Click="TileGrid16Btn_Click">Show Tile Grid</Button>
+                    <Button Margin="5" Padding="-2" Width="20" Height="20" Click="Confirm16Button_Click">✅</Button>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <!--Tile Image for Selected 16x16 Tile-->
+                    <local:SkiaControl RenderEvent="tileImageS16_RenderEvent" x:Name="tileImageS16" Width="64" Height="64" HorizontalAlignment="Left" Margin="3,1,1,1"/>
+                    <TextBlock FontSize="28"  FontFamily="Consolas" VerticalAlignment="Center" Padding="3">TILE:</TextBlock>
+                    <local:NumInt Margin="3,0,0,0" Width="85" Height="40" Value="0" FontSize="33" MinHeight="0" x:Name="tile16Int" ValueChanged="tile16Int_ValueChanged" Minimum="0"/>
+                </StackPanel>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</UserControl>

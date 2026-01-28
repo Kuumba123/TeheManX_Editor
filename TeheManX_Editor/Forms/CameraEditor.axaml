@@ -1,0 +1,90 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:local="clr-namespace:TeheManX_Editor.Forms"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="TeheManX_Editor.Forms.CameraEditor">
+    <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="auto"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+
+            <!--Trigger Settings-->
+            <StackPanel>
+                <TextBlock HorizontalAlignment="Center" FontSize="16" FontFamily="Consolas" Padding="3,5,1,5">Trigger Settings</TextBlock>
+                <Border BorderBrush="White" BorderThickness="2">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock FontSize="26" Width="160">Setting:</TextBlock>
+                            <local:NumInt x:Name="triggerInt" ValueChanged="triggerInt_ValueChanged" Minimum="0" FontSize="28" Width="102" SpinnerButtonWidth="25"></local:NumInt>
+                        </StackPanel>
+                        <Border BorderBrush="White" BorderThickness="1,1,1,1">
+                            <TextBlock HorizontalAlignment="Center" FontSize="16" FontFamily="Consolas" Padding="3,5,1,5">Border Ids</TextBlock>
+                        </Border>
+                        <Border BorderThickness="0,0,0,1" BorderBrush="White">
+                            <StackPanel x:Name="borderPannel">
+                            </StackPanel>
+                        </Border>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock FontSize="23" Width="160">Right Side:</TextBlock>
+                            <local:NumInt x:Name="rightInt" ValueChanged="SideInt_ValueChanged" Tag="0" FontSize="28" Width="102" SpinnerButtonWidth="25" Minimum="0" Maximum="65535"></local:NumInt>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock FontSize="23" Width="160">Left Side:</TextBlock>
+                            <local:NumInt x:Name="leftInt" ValueChanged="SideInt_ValueChanged" Tag="2" FontSize="28" Width="102" SpinnerButtonWidth="25" Minimum="0" Maximum="65535"></local:NumInt>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock FontSize="23" Width="160">Bottom Side:</TextBlock>
+                            <local:NumInt x:Name="bottomInt" ValueChanged="SideInt_ValueChanged" Tag="4" FontSize="28" Width="102" SpinnerButtonWidth="25" Minimum="0" Maximum="65535"></local:NumInt>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock FontSize="24" Width="160">Top Side:</TextBlock>
+                            <local:NumInt x:Name="topInt" ValueChanged="SideInt_ValueChanged" Tag="6" FontSize="28" Width="102" SpinnerButtonWidth="25" Minimum="0" Maximum="65535"></local:NumInt>
+                        </StackPanel>
+                        <Separator/>
+                        <CheckBox x:Name="triggerCheck" FontSize="18" VerticalContentAlignment="Center">Trigger Select</CheckBox>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+
+            <Button Margin="10" Height="35" Grid.Row="1" Click="EditTriggerCountBtn_Click"> Edit Camera Triggers Count</Button>
+            
+            <!--Border Settings-->
+            <StackPanel Grid.Column="1">
+                <TextBlock HorizontalAlignment="Center" FontSize="16" FontFamily="Consolas" Padding="3,5,1,5">Border Settings</TextBlock>
+                <Border BorderBrush="White" BorderThickness="2">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock FontSize="26" Width="160">Setting:</TextBlock>
+                            <local:NumInt x:Name="borderSettingInt" ValueChanged="borderSettingInt_ValueChanged" Minimum="0" Maximum="73" FontSize="28" Width="102" SpinnerButtonWidth="25"></local:NumInt>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock FontSize="26" Width="160">New Value:</TextBlock>
+                            <local:NumInt x:Name="valueInt" Minimum="0" Maximum="8191" ValueChanged="valueInt_ValueChanged" FontSize="28" Width="102" SpinnerButtonWidth="25"></local:NumInt>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+                <Border BorderBrush="White" BorderThickness="1,0,1,1">
+                    <TextBlock HorizontalAlignment="Center" FontSize="16" FontFamily="Consolas" Padding="3,5,1,5">Property</TextBlock>
+                </Border>
+
+                <Border BorderBrush="White" BorderThickness="1">
+                    <StackPanel>
+                        <RadioButton x:Name="leftBtn" FontSize="16" Tag="0" Click="RadioBtn_Click">Left Border Change</RadioButton>
+                        <RadioButton x:Name="rightBtn" FontSize="16" Tag="1" Click="RadioBtn_Click">Right Border Change</RadioButton>
+                        <RadioButton x:Name="topBtn" FontSize="16" Tag="2" Click="RadioBtn_Click">Top Border Change</RadioButton>
+                        <RadioButton x:Name="bottomBtn" FontSize="16" Tag="3" Click="RadioBtn_Click">Bottom Border Change</RadioButton>
+                    </StackPanel>
+                </Border>
+
+            </StackPanel>
+        </Grid>
+    </ScrollViewer>
+</UserControl>

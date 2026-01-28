@@ -1,0 +1,91 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:TeheManX_Editor.Forms"
+        mc:Ignorable="d"
+        x:Class="TeheManX_Editor.Forms.SettingsWindow"
+        Title="TeheMan X Editor Settings" Height="360" Width="380" CanResize="False" WindowStartupLocation="CenterScreen" Closing="Window_Closing">
+    <Window.Styles>
+        <Style Selector="CheckBox">
+			<Setter Property="FontSize" Value="17"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+        <Style Selector="Label">
+			<Setter Property="FontSize" Value="20"/>
+        </Style>
+        <Style Selector="TextBlock">
+			<Setter Property="FontSize" Value="13"/>
+        </Style>
+        <Style Selector="local|NumInt">
+			<Setter Property="Width" Value="25"/>
+        </Style>
+        <Style Selector="local|NumDouble">
+			<Setter Property="Width" Value="70"/>
+        </Style>
+    </Window.Styles>
+    <ScrollViewer AllowAutoHide="False">
+        <Grid>
+            <StackPanel>
+                <StackPanel>
+                    <Label HorizontalAlignment="Center">Testing Emulator</Label>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition Width="auto"/>
+                        </Grid.ColumnDefinitions>
+                        <Button Grid.Column="1" HorizontalAlignment="Left" Padding="4,-4,4,4" Click="emuBtn_Click">...</Button>
+                        <TextBox x:Name="emuPathBox" IsReadOnly="True"></TextBox>
+                    </Grid>
+                </StackPanel>
+                <StackPanel>
+                    <Label HorizontalAlignment="Center">Options</Label>
+                </StackPanel>
+                <CheckBox x:Name="saveOnTestCheck" Checked="saveOnTestCheck_Checked" Unchecked="saveOnTestCheck_Unchecked">Save on Test</CheckBox>
+                <CheckBox x:Name="dontUpdateCheck" Checked="dontUpdateCheck_Change" Unchecked="dontUpdateCheck_Change">Dont check for Updates</CheckBox>
+
+                <StackPanel>
+                    <Label HorizontalAlignment="Center">GUI Config</Label>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <local:NumInt FontSize="22" x:Name="displayInt" ValueChanged="displayInt_ValueChanged" IsHex="False"  Minimum="0" Maximum="9000" Height="32" Width="55"></local:NumInt>
+                    <Label>Display Referance Width</Label>
+                </StackPanel>
+                <CheckBox x:Name="fixedCheck" Checked="fixedCheck_CheckChange" Unchecked="fixedCheck_CheckChange">Fixed Scale</CheckBox>
+                <StackPanel Orientation="Horizontal">
+                    <local:NumDouble x:Name="layoutDouble" Value="2" Increment="0.25"  Minimum="1" Maximum="10" FontSize="18"  ValueChanged="layoutDouble_ValueChanged"/>
+                    <Label>Layout Scale</Label>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <local:NumDouble x:Name="layoutScreenDouble" Value="1" Increment="0.25"  Minimum="1" Maximum="10" FontSize="18"  ValueChanged="layoutScreenDouble_ValueChanged"/>
+                    <Label>Layout Screen Scale</Label>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <local:NumDouble x:Name="screenDouble" Value="2" Increment="0.25"  Minimum="1" Maximum="10" FontSize="18"  ValueChanged="screenDouble_ValueChanged"/>
+                    <Label>Screen Scale</Label>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <local:NumDouble x:Name="screenTilesDouble" Value="2" Increment="0.25"  Minimum="1" Maximum="10" FontSize="18"  ValueChanged="screenTilesDouble_ValueChanged"/>
+                    <Label>Screen Tiles Scale</Label>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <local:NumDouble x:Name="tile32Double" Value="2" Increment="0.25"  Minimum="1" Maximum="10" FontSize="18"  ValueChanged="tile32Double_ValueChanged"/>
+                    <Label>Tiles in 32x32 Tab Scale</Label>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <local:NumDouble x:Name="tile32Image16Double" Value="2" Increment="0.25"  Minimum="1" Maximum="10" FontSize="18"  ValueChanged="tile32Image16Double_ValueChanged"/>
+                    <Label>16x16 Tiles in 32x32 Tab Scale</Label>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <local:NumDouble x:Name="tile16Double" Value="2" Increment="0.25"  Minimum="1" Maximum="10" FontSize="18"  ValueChanged="tile16Double_ValueChanged"/>
+                    <Label>Tiles in 16x16 Scale</Label>
+                </StackPanel>
+
+                <StackPanel>
+                    <Label HorizontalAlignment="Center">Enemy Tab Config</Label>
+                </StackPanel>
+                <CheckBox x:Name="enemyInvertSpeedCheck" Checked="enemyInvertSpeedCheckChange" Unchecked="enemyInvertSpeedCheckChange">Invert Speeds</CheckBox>
+            </StackPanel>
+        </Grid>
+    </ScrollViewer>
+</Window>

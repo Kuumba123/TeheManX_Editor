@@ -1,0 +1,21 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:local="clr-namespace:TeheManX_Editor.Forms"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="TeheManX_Editor.DataEntry">
+    <Border BorderBrush="LightBlue" BorderThickness="2">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="auto"/>
+            </Grid.ColumnDefinitions>
+            <Button Click="RemoveButton_Click" Margin="2,1" Width="30" HorizontalAlignment="Left">&#10005;</Button>
+            <TextBlock Grid.Column="1" VerticalAlignment="Center" FontSize="18" Foreground="White" Text="Slots:" Margin="0,0,10,0"/>
+            <local:NumInt x:Name="slotCountInt" SpinnerButtonWidth="40" MinWidth="100" Grid.Column="2" FontSize="18" Minimum="0" Maximum="255" ValueChanged="slotCountInt_ValueChanged"></local:NumInt>
+        </Grid>
+    </Border>
+</UserControl>

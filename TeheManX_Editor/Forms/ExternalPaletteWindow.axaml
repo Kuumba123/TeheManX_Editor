@@ -1,0 +1,42 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:TeheManX_Editor.Forms"
+        mc:Ignorable="d"
+        x:Class="TeheManX_Editor.Forms.ExternalPaletteWindow"
+        Title="Palettes" Height="300" Width="500" CanResize="False" WindowStartupLocation="CenterScreen">
+    <Grid Background="#101010">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition Width="auto"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+
+        <StackPanel>
+            <TextBlock x:Name="colorCounTxt" FontSize="19">Color Count:</TextBlock>
+            <TextBlock x:Name="colorAddressTxt" FontSize="19">Color Address:</TextBlock>
+            <TextBlock x:Name="colorIndexTxt" FontSize="19">Color Index:</TextBlock>
+            <Button x:Name="importBtn" Margin="10,5" Click="importBtn_Click">Import Palette Colors</Button>
+            <Button x:Name="exportBtn" Margin="10,5" Click="exportBtn_Click">Export Palette Colors</Button>
+            <Button x:Name="exportAllBtn" Margin="10,5" Click="exportAllBtn_Click">Export All Palettes</Button>
+            <Button x:Name="saveBtn" Margin="10,5" Click="saveBtn_Click">Save Game</Button>
+        </StackPanel>
+
+        <Border Grid.Column="1" BorderBrush="White" BorderThickness="2" HorizontalAlignment="Left" VerticalAlignment="Top">
+            <Grid x:Name="colorGrid" Width="256" Height="256">
+
+            </Grid>
+        </Border>
+
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch" Grid.Column="1" Grid.Row="1">
+            <TextBlock Margin="5" FontSize="18">Palette</TextBlock>
+            <local:NumInt x:Name="palIdInt" Increment="2" Minimum="0" Maximum="510" Value="0" FontSize="17" Width="70" ValueChanged="palId_ValueChanged"></local:NumInt>
+            <TextBlock Margin="5" FontSize="18">Group</TextBlock>
+            <local:NumInt x:Name="groupInt" Increment="2" Minimum="0" Value="0" FontSize="17" Width="50" ValueChanged="groupInt_ValueChanged"></local:NumInt>
+        </StackPanel>
+    </Grid>
+</Window>

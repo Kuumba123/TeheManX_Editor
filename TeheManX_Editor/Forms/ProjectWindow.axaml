@@ -1,0 +1,72 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        xmlns:local="clr-namespace:TeheManX_Editor.Forms"
+        x:Class="TeheManX_Editor.Forms.ProjectWindow"
+        Title="Project Settings" Height="360" Width="397" CanResize="False" WindowStartupLocation="CenterScreen" Closing="Window_Closing">
+    <Grid>
+        <ScrollViewer AllowAutoHide="False">
+            <StackPanel>
+                <Grid x:Name="expandMB4Grid">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition Width="auto"/>
+                    </Grid.ColumnDefinitions>
+                    <Button x:Name="expandBtn" Click="expandBtn_Click">Enable 4MB Expansion</Button>
+                    <Button x:Name="expansionHelpBtn" Click="expansionHelpBtn_Click" Width="30" Grid.Column="1">?</Button>
+                </Grid>
+
+                <CheckBox x:Name="enemyCheck" Checked="CheckBox_Changed">Track Enemy Data in JSON</CheckBox>
+                <CheckBox x:Name="paletteCheck" Checked="CheckBox_Changed">Track Palette Swap Data in JSON</CheckBox>
+                <CheckBox x:Name="checkpointCheck" Checked="CheckBox_Changed">Track Checkpoint Data in JSON</CheckBox>
+                <CheckBox x:Name="cameraCheck" Checked="CheckBox_Changed">Track Camera Data in JSON</CheckBox>
+                <CheckBox x:Name="bgTileCheck" Checked="CheckBox_Changed">Track Background Tiles Settings Data in JSON</CheckBox>
+                <CheckBox x:Name="objTileCheck" Checked="CheckBox_Changed">Track Object Tiles Settings Data in JSON</CheckBox>
+
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Foreground="White" Width="263">Enemy Data Dump Offset</TextBlock>
+                    <local:NumInt FontSize="16" Width="100"  x:Name="enemyOffsetInt" ValueChanged="Int_ValueChanged"></local:NumInt>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Foreground="White" Width="263">Palette Swap Data Dump Offset</TextBlock>
+                    <local:NumInt FontSize="16" Width="100"  x:Name="paletteOffsetInt" ValueChanged="Int_ValueChanged"></local:NumInt>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Foreground="White" Width="263">Palette Swap Color Bank</TextBlock>
+                    <local:NumInt FontSize="16" Width="100"  x:Name="paletteBankInt" ValueChanged="Int_ValueChanged"></local:NumInt>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Foreground="White" Width="263">Checkpoint Data Dump Offset</TextBlock>
+                    <local:NumInt FontSize="16" Width="100"  x:Name="checkpointInt" ValueChanged="Int_ValueChanged"></local:NumInt>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Foreground="White" Width="263">Camera Trigger Data Dump Offset</TextBlock>
+                    <local:NumInt FontSize="16" Width="100"  x:Name="cameraTriggerInt" ValueChanged="Int_ValueChanged"></local:NumInt>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Foreground="White" Width="263">Camera Border Data Dump Offset</TextBlock>
+                    <local:NumInt FontSize="16" Width="100"  x:Name="cameraBorderInt" ValueChanged="Int_ValueChanged"></local:NumInt>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Foreground="White"  Width="263">Background Tile Data Dump Offset</TextBlock>
+                    <local:NumInt FontSize="16" Width="100"  x:Name="bgTileInt" ValueChanged="Int_ValueChanged"></local:NumInt>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Foreground="White" Width="263">Object Tile Data Dump Offset</TextBlock>
+                    <local:NumInt FontSize="16" Width="100"  x:Name="objTileInt" ValueChanged="Int_ValueChanged"></local:NumInt>
+                </StackPanel>
+
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition Width="auto"/>
+                    </Grid.ColumnDefinitions>
+                    <Button x:Name="projectTrackPatchBtn" Click="projectTrackPatchBtn_Click">Apply Local Project Track Patch</Button>
+                    <Button x:Name="projectTrackHelpBtn" Click="projectTrackHelpBtn_Click" Width="30" Grid.Column="1">?</Button>
+                </Grid>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</Window>

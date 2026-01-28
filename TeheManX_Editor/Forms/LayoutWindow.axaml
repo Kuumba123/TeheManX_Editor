@@ -1,0 +1,12 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:local="using:TeheManX_Editor.Forms"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="893" d:DesignHeight="795"
+        x:Class="TeheManX_Editor.Forms.LayoutWindow"
+         Title="All Screens in the Background Layer" Width="893" Height="795" Closing="Window_Closing" Opened="Window_Opened" Topmost="True">
+    <ScrollViewer HorizontalScrollBarVisibility="Auto">
+		<local:SkiaControl x:Name="layoutCanvas" MeasureEvent="layoutCanvas_MeasureEvent" RenderEvent="layoutCanvas_RenderEvent" PointerPressed="layoutCanvas_PointerPressed"/>
+    </ScrollViewer>
+</Window>

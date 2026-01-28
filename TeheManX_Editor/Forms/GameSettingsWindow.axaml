@@ -1,0 +1,79 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        xmlns:local="clr-namespace:TeheManX_Editor.Forms"
+        x:Class="TeheManX_Editor.Forms.GameSettingsWindow"
+        Title="Game Settings" Height="370" Width="365" MaxWidth="365" MinWidth="360" WindowStartupLocation="CenterScreen">
+    <Window.Styles>
+		<Style Selector="local|NumInt">
+			<Setter Property="FontSize" Value="21"/>
+        </Style>
+    </Window.Styles>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition Height="70"/>
+        </Grid.RowDefinitions>
+        <ScrollViewer>
+            <Expander VerticalAlignment="Top" Width="365">
+                <Expander.Header>
+                    <TextBlock>Capsule Settings</TextBlock>
+                </Expander.Header>
+                <StackPanel>
+                    <StackPanel  Orientation="Horizontal">
+                        <local:NumInt x:Name="hadoukenStageInt" ValueChanged="hadoukenStageInt_ValueChanged" Width="90"  Minimum="0" Maximum="255" Value="0" ></local:NumInt>
+                        <Label x:Name="hadoukenStageLbl" >Hadouken Stage</Label>
+                    </StackPanel>
+                    <StackPanel  Orientation="Horizontal" x:Name="hadoukenVistPannel">
+                        <local:NumInt x:Name="revistInt" ValueChanged="revistInt_ValueChanged" Width="90"  Minimum="0" Maximum="255" Value="0" ></local:NumInt>
+                        <Label>Hadouken Revist Count</Label>
+                    </StackPanel>
+                    <Label FontSize="22" HorizontalAlignment="Center">Capsule Stage Settings</Label>
+                    <StackPanel  Orientation="Horizontal">
+                        <local:NumInt x:Name="stageInt" ValueChanged="stageInt_ValueChanged" Width="90" Minimum="0" Value="0"></local:NumInt>
+                        <Label FontSize="21">Selected Stage</Label>
+                    </StackPanel>
+                    <StackPanel  Orientation="Horizontal">
+                        <Label Width="75">Position X</Label>
+                        <local:NumInt x:Name="positionIntX" ValueChanged="positionIntX_ValueChanged" Width="90"  Minimum="0" Maximum="65535" Value="0"></local:NumInt>
+                        <Label Width="75">Position Y</Label>
+                        <local:NumInt x:Name="positionIntY" ValueChanged="positionIntY_ValueChanged" Width="90"  Minimum="0" Maximum="65535" Value="0"></local:NumInt>
+                    </StackPanel>
+                    <StackPanel  Orientation="Horizontal">
+                        <Label Width="75">Camera X</Label>
+                        <local:NumInt x:Name="cameraIntX" ValueChanged="cameraIntX_ValueChanged" Width="90" Minimum="0" Maximum="65535" Value="0"></local:NumInt>
+                        <Label Width="75">Camera Y</Label>
+                        <local:NumInt x:Name="cameraIntY" ValueChanged="cameraIntY_ValueChanged" Width="90" Minimum="0" Maximum="65535" Value="0"></local:NumInt>
+                    </StackPanel>
+                    <StackPanel  Orientation="Horizontal">
+                        <local:NumInt x:Name="armorIndexInt" ValueChanged="armorIndexInt_ValueChanged" Width="90" Minimum="0" Value="0"></local:NumInt>
+                        <Label>Armor Index</Label>
+                        <Button x:Name="helpBtn" Click="helpBtn_Click" Padding="0" Width="20" Height="25">?</Button>
+                    </StackPanel>
+                    <StackPanel  Orientation="Horizontal">
+                        <local:NumInt x:Name="textBoxIdInt" ValueChanged="textBoxIdInt_ValueChanged" Width="90" Minimum="0" Value="0"></local:NumInt>
+                        <Label>Text Box Id</Label>
+                    </StackPanel>
+                    <StackPanel  Orientation="Horizontal">
+                        <local:NumInt x:Name="movementIndexInt" ValueChanged="movementIndexInt_ValueChanged" Width="90" Minimum="0" Value="0"></local:NumInt>
+                        <Label>Upgrade Movement Index</Label>
+                    </StackPanel>
+                    <!--Unkown X3 Property-->
+                    <StackPanel  Orientation="Horizontal" x:Name="unkownPannel">
+                        <local:NumInt x:Name="unkownInt" ValueChanged="unkownInt_ValueChanged" Width="90" Minimum="0" Value="0"></local:NumInt>
+                        <Label>???</Label>
+                    </StackPanel>
+                    <StackPanel  Orientation="Horizontal" x:Name="fixPannelX2">
+                        <Label>Apply MegaMan X2 Camera Fix</Label>
+                        <Button x:Name="applyFixBtn" Click="applyFixBtn_Click" Padding="0">Yes</Button>
+                    </StackPanel>
+                </StackPanel>
+            </Expander>
+        </ScrollViewer>
+        <Canvas Grid.Row="1">
+            <Button Canvas.Top="25" Canvas.Left="260"  Width="70" Height="30" Click="SaveBtn_Click">Save</Button>
+        </Canvas>
+    </Grid>
+</Window>

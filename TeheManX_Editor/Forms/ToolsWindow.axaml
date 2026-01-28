@@ -1,0 +1,95 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        x:Class="TeheManX_Editor.Forms.ToolsWindow"
+        Title="Tools Window" Height="450" Width="450" WindowStartupLocation="CenterScreen" CanResize="False" Closing="Window_Closing">
+    <Window.Styles>
+		<Style Selector="Button">
+			<Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        </Style>
+        <Style Selector="Expander">
+			<Setter Property="Padding" Value="0"/>
+        </Style>
+    </Window.Styles>
+    <Grid>
+        <Grid.ColumnDefinitions>
+			<ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <ScrollViewer>
+            <StackPanel>
+                <Expander x:Name="expandMMX" Width="450">
+                    <Expander.Header>
+                        <TextBlock>MegaMan X Tools</TextBlock>
+                    </Expander.Header>
+
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+                        <Button Click="MMX1_DecompressClick">Decompress Tiles</Button>
+                        <Button Click="MMX1_CompressClick" Grid.Column="1">Compress Tiles</Button>
+                        <Button Click="MMX1_ExtractCompressClick" Grid.Row="1">Extract Compressed Tiles</Button>
+                        <Button Grid.Row="1" Grid.Column="1" Click="MMX1_PaletteEditorClick">Edit Palette</Button>
+                        <Button Grid.Row="2" Grid.ColumnSpan="2" Click="ConfigureGameSettings_Click">Configure Game Settings</Button>
+                    </Grid>
+
+                </Expander>
+                <Expander x:Name="expandMMX2" Width="450">
+                    <Expander.Header>
+                        <TextBlock>MegaMan X2 Tools</TextBlock>
+                    </Expander.Header>
+                    <StackPanel>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+                            <Button Click="MMX2_DecompressClick">Decompress Tiles</Button>
+                            <Button Click="MMX2_CompressClick" Grid.Column="1">Compress Tiles</Button>
+                            <Button Click="MMX2_ExtractCompressClick" Grid.Row="1">Extract Compressed Tiles</Button>
+                            <Button Grid.Row="1" Grid.Column="1" Click="MMX1_PaletteEditorClick">Edit Palette</Button>
+                            <Button Grid.Row="2" Grid.ColumnSpan="2" Click="ConfigureGameSettings_Click">Configure Game Settings</Button>
+                        </Grid>
+                    </StackPanel>
+                </Expander>
+                <Expander x:Name="expandMMX3" Width="450">
+                    <Expander.Header>
+                        <TextBlock>MegaMan X3 Tools</TextBlock>
+                    </Expander.Header>
+                    <StackPanel>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+                            <Button Click="MMX2_DecompressClick">Decompress Tiles</Button>
+                            <Button Click="MMX2_CompressClick" Grid.Column="1">Compress Tiles</Button>
+                            <Button Click="MMX2_ExtractCompressClick" Grid.Row="1">Extract Compressed Tiles</Button>
+                            <Button Grid.Row="1" Grid.Column="1" Click="MMX1_PaletteEditorClick">Edit Palette</Button>
+                            <Button Grid.Row="2" Grid.ColumnSpan="2" Click="ConfigureGameSettings_Click">Configure Game Settings</Button>
+                        </Grid>
+                    </StackPanel>
+                </Expander>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</Window>

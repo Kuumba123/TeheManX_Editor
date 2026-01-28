@@ -1,0 +1,48 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:local="using:TeheManX_Editor.Forms"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        x:Class="TeheManX_Editor.Forms.MainWindow"
+        Title="TeheMan X Editor" Width="1205" Height="930" MinHeight="600" MinWidth="465" Loaded="Window_Loaded" Closing="Window_Closing" PointerPressed="Window_PointerPressed" ClosingBehavior="OwnerWindowOnly">
+    <Grid x:Name="grid">
+		<Grid.RowDefinitions>
+			<RowDefinition Height="Auto"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+
+        <DockPanel VerticalAlignment="Top" Background="{DynamicResource DockPanelBackgroundBrush}">
+			<Button FontSize="12" Background="Transparent" Focusable="False" Click="openBtn_Click" Name="openBtn">Open</Button>
+            <Button FontSize="12" Background="Transparent" Focusable="False" Click="saveBtn_Click" Name="saveBtn">Save</Button>
+            <Button FontSize="12" Background="Transparent" Focusable="False" Click="saveAsBtn_Click" Name="saveAsBtn">Save as</Button>
+            <Button FontSize="12" Background="Transparent" Focusable="False" Click="toolsBtn_Click" Name="toolsBtn">Tools</Button>
+            <Button FontSize="12" Background="Transparent" Focusable="False" Click="aboutBtn_Click" Name="aboutBtn">About</Button>
+            <Button FontSize="12" Background="Transparent" Focusable="False" Click="testBtn_Click" Name="testBtn">Test</Button>
+            <Button FontSize="12" Background="Transparent" Focusable="False" Click="settingsBtn_Click" Name="settingsBtn">Settings</Button>
+            <Button FontSize="12" Background="Transparent" Focusable="False" Click="stagesBtn_Click" Name="stagesBtn">Stages</Button>
+            <Button FontSize="12" Background="Transparent" Focusable="False" Click="projectBtn_Click" Name="projectBtn">Project</Button>
+            <Button FontSize="12" Background="Transparent" Focusable="False" Click="helpBtn_Click" Name="helpBtn">Help</Button>
+            <Button FontSize="12" Background="Transparent" Focusable="False" Click="undoBtn_Click" Name="undoBtn">Undo</Button>
+        </DockPanel>
+
+        <DockControl x:Name="mainDockControl" Grid.Row="1" InitializeLayout="True" InitializeFactory="True" Focusable="True" FocusAdorner="{x:Null}">
+            <DockControl.Factory >
+                <Factory WindowOpened="Factory_WindowOpened" DockableClosed="Factory_DockableClosed"/>
+            </DockControl.Factory>
+            <RootDock>
+                <DocumentDock IsActive="True">
+                    <Document Id="layoutTabId" x:Name="layoutDoc" Title="Layout" CanClose="False"/>
+                    <Document Id="screenTabId" x:Name="screenDoc" Title="Screen" CanClose="False"/>
+                    <Document Id="tile32TabId" x:Name="tile32Doc" Title="32x32" CanClose="False"/>
+                    <Document Id="tile16TabId" x:Name="tile16Doc" Title="16x16" CanClose="False"/>
+                    <Document Id="paletteTabId" x:Name="paletteDoc" Title="Palette" CanClose="False"/>
+                    <Document Id="enemyTabId" x:Name="enemyDoc" Title="Enemy" CanClose="False"/>
+                    <Document Id="spawnTabId" x:Name="spawnDoc" Title="Spawn" CanClose="False"/>
+                    <Document Id="cameraTabId" x:Name="cameraDoc" Title="Camera" CanClose="False"/>
+                    <Document Id="vramTabId" x:Name="vramDoc" Title="VRAM Tiles" CanClose="False"/>
+                </DocumentDock>
+            </RootDock>
+        </DockControl>
+    </Grid>
+</Window>

@@ -1,0 +1,38 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="TeheManX_Editor.Config.App"
+             RequestedThemeVariant="Dark">
+             <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
+  <Application.Resources>
+    <!--The Control Crycling for the docking -->
+
+
+    <ResourceDictionary>
+        <ControlRecycling x:Key="ControlRecyclingKey" TryToUseIdAsKey="True" />
+        <ResourceDictionary.ThemeDictionaries>
+            <ResourceDictionary x:Key="Light">
+            <SolidColorBrush x:Key="GridBackgroundBrush">White</SolidColorBrush>
+            <SolidColorBrush x:Key="DockPanelBackgroundBrush">#F0F1F0</SolidColorBrush>
+        </ResourceDictionary>
+
+        <ResourceDictionary x:Key="Dark">
+          <SolidColorBrush x:Key="GridBackgroundBrush">Black</SolidColorBrush>
+          <SolidColorBrush x:Key="DockPanelBackgroundBrush">#252625</SolidColorBrush>
+        </ResourceDictionary>
+
+      </ResourceDictionary.ThemeDictionaries>
+    </ResourceDictionary>
+  </Application.Resources>
+
+    <Application.Styles>
+        <FluentTheme />
+        <DockFluentTheme />
+        <StyleInclude Source="avares://Avalonia.Controls.ColorPicker/Themes/Fluent/Fluent.xaml" />
+          <!-- Apply background to ALL windows -->
+
+    <!--Specify that we want DockControls to recycling existing controls when docking-->
+    <Style Selector="DockControl">
+      <Setter Property="(ControlRecyclingDataTemplate.ControlRecycling)" Value="{StaticResource ControlRecyclingKey}" />
+    </Style>
+    </Application.Styles>
+</Application>

@@ -1,0 +1,56 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:local="clr-namespace:TeheManX_Editor.Forms"
+             mc:Ignorable="d" d:DesignWidth="1205" d:DesignHeight="930"
+             x:Class="TeheManX_Editor.Forms.LayoutEditor">
+    <Grid Background="{DynamicResource GridBackgroundBrush}">
+		<Grid.ColumnDefinitions>
+            <ColumnDefinition Width="auto"/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+
+        <!--Layout Viewer-->
+        <local:SkiaControl VerticalAlignment="Top" MeasureEvent="layoutImage_MeasureEvent" PointerPressedEvent="layoutImage_PointerPressedEvent" RenderEvent="layoutImage_RenderEvent" x:Name="layoutImage"/>
+
+
+        <!--Selected Screen-->
+        <StackPanel Grid.Column="1" Margin="2,0">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock FontSize="18" FontFamily="Consolas" Padding="3,5,1,5">Backgroud Layer</TextBlock>
+                <Button Name="btn1" Background="Transparent" Click="LayerButton_Click">1</Button>
+                <Button Name="btn2" Background="Transparent" Click="LayerButton_Click">2</Button>
+            </StackPanel>
+            <local:SkiaControl MeasureEvent="selectImage_MeasureEvent" RenderEvent="selectImage_RenderEvent"  x:Name="selectImage" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Top" MaxWidth="768"/>
+            <WrapPanel Orientation="Horizontal">
+                <local:NumInt FontFamily="Consolas" Value="2" Width="69" Height="40" FontSize="33" Maximum="239" MinHeight="0" ValueChanged="screenInt_ValueChanged" x:Name="screenInt" Minimum="0"/>
+
+                <StackPanel Orientation="Horizontal">
+                    <Button Click="gridBtn_Click" x:Name="gridBtn" Margin="8,5,2,5" Padding="8">Show Grid Lines</Button>
+                    <Button Margin="8,5,2,5" Padding="8" VerticalAlignment="Top" HorizontalAlignment="Left" Click="ViewScreens_Click">View All Screens</Button>
+                    <Button Width="30" Height="30" Padding="0" Margin="3" Click="SnapButton_Click">&#128247;</Button>
+                    <Button Width="30" Height="30" Padding="0" Margin="3" Click="Help_Click">?</Button>
+                </StackPanel>
+            </WrapPanel>
+        </StackPanel>
+        <Grid Width="150" HorizontalAlignment="Right" VerticalAlignment="Bottom" Grid.Column="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <Button Padding="11,4" FontFamily="Segoe UI Symbol" Click="UpButton_Click" Grid.Column="1" FontSize="25" Width="40" Height="35" Margin="5">&#8593;</Button>
+            <Button Padding="11,4" FontFamily="Segoe UI Symbol" Click="DownButton_Click" Grid.Column="1" Grid.Row="1" FontSize="25" Width="40" Height="37" Margin="5">&#x2193;</Button>
+            <Button Padding="7,4" FontFamily="Segoe UI Symbol" Click="LeftButton_Click" Grid.Column="0" Grid.RowSpan="2" FontSize="25" Width="40" Height="40" Margin="5">&#x2190;</Button>
+            <Button Padding="7,4" FontFamily="Segoe UI Symbol" Click="RightButton_Click" Grid.Column="2" Grid.RowSpan="2" FontSize="25" Width="40" Height="40" Margin="5">&#x2192;</Button>
+        </Grid>
+    </Grid>
+</UserControl>

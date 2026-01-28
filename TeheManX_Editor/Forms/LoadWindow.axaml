@@ -1,0 +1,24 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:TeheManX_Editor.Forms"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="TeheManX_Editor.Forms.LoadWindow"
+        Title="LoadWindow">
+    <Grid>
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="Auto"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+			<RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Button Click="palBtn_Click" Content="Load Palette"/>
+        <local:NumInt Grid.Column="1" FontSize="18" Minimum="0" Maximum="510" Increment="2" x:Name="paletteInt" Width="85" Value="0"></local:NumInt>
+
+        <Button Click="tileBtn_Click" Grid.Row="1">Load Tiles</Button>
+        <local:NumInt Grid.Row="1" Grid.Column="1" FontSize="18" Minimum="0" Maximum="255" x:Name="tilesInt" Width="85" Value="0"></local:NumInt>
+    </Grid>
+</Window>
