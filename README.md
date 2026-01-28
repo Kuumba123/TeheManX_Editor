@@ -39,3 +39,8 @@ A folder containning the the main xaml + C# code for all the tabs + windows
 
 ### [Resources](TeheManX_Editor/Resources)
 The folder containning various images , patches , styles that need for compiling
+
+## License
+
+This project is licensed under the **MIT License**.  
+See the `LICENSE` file for full details.
