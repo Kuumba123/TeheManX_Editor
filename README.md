@@ -4,13 +4,13 @@
 ![External Palette Editor Pic](TeheManX_Editor/Resources/Repro/IMG_4.PNG)
 
 # TeheMan X Editor
-Level Editor for MegaMan X1-3 written from scratch in .NET C#.
+A MegaMan X1-3 Level Editor for Windows , Linux & MacOS written in .NET C#.
 
 ## Compiling
 1st your gonna need Visaul Studio after cloning the repro. After installing Visual Studio use the Visual Studio Install App
 to install the .NET 8 SDK. Next , open the `TeheManX_Editor.sln` via Visual Studio and set the default project to
-`TeheManX_Editor.sln` and Compile as `Release` then click Start. The EXE should be located in the `bin/Release` folder.
-Or go to publush by right click on the C# Project in Solution explorer and simply publish.
+`TeheManX_Editor`. Then go to publish by right click on the C# Project in Solution explorer and simply publish 
+for your respective operating system.
 
 ## Source Code
 * [BGPalette.cs](TeheManX_Editor/BGPalette.cs) - a class represnting the swapped Palette Info
@@ -23,7 +23,10 @@ Or go to publush by right click on the C# Project in Solution explorer and simpl
 * [GameProject.cs](TeheManX_Editor/GameProject.cs) - the file containging the Game Project Settings
 * [Layout.cs](TeheManX_Editor/Layout.cs) - contains the classes for saving the editors layout
 * [Level.cs](TeheManX_Editor/Level.cs) - contains the methods needed to help draw and read various level data.
+* [MaxRectsPacker.cs](TeheManX_Editor/MaxRectsPacker.cs) - a class representing the MaxReacts SSFF rectangle packer
+* [ObjectIcon.cs](TeheManX_Editor/ObjectIcon.cs) - the class holding info on sprite info for the enemy tab
 * [ObjectSetting.cs](TeheManX_Editor/ObjectSetting.cs) - a class represnting the swapped Object Tile Info
+* [Program.cs](TeheManX_Editor/Program.cs) - your standard Program class for C# Projects.
 * [Settings.cs](TeheManX_Editor/Settings.cs) - the file containning the Settings for the editor
 * [SNES.cs](TeheManX_Editor/SNES.cs) - a static class containning various functions and tools used through out the editor
 * [Undo.cs](TeheManX_Editor/Undo.cs) - the class representing an Undo
