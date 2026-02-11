@@ -279,6 +279,9 @@ public partial class EnemyEditor : UserControl
             int cameraX = viewerX;
             int cameraY = viewerY;
 
+            int viewWidth = Math.Max((int)(e.Bounds.Width / scale), 256);
+            int viewHeight = Math.Max((int)(e.Bounds.Height / scale), 256);
+
             for (int i = 0; i < SpawnEditor.Checkpoints[id].Count; i++) //Draw Checkpoints (Camera + MegaMan Location)
             {
                 int drawX = SpawnEditor.Checkpoints[id][i].CameraX + -cameraX;
@@ -307,34 +310,43 @@ public partial class EnemyEditor : UserControl
             for (int i = 0; i < Level.Enemies[id].Count; i++) //Draw Enemies
             {
                 Enemy en = Level.Enemies[id][i];
-                int drawX = en.X + -cameraX;
-                int drawY = en.Y + -cameraY;
+                int enemyX = en.X;
+                int enemyY = en.Y;
+                int drawX = enemyX + -cameraX;
+                int drawY = enemyY + -cameraY;
 
                 ObjectIcon icon = Level.GetObjectIcon(en.Id, en.Type);
 
                 if (icon != null)
                 {
-                    icon.DrawCentre(canvas, drawX, drawY + 1); //Have to add 1 cause of weird OAM qwerk
+                    if (icon.Intersects(enemyX, enemyY + 1, cameraX, cameraY, viewWidth, viewHeight))
+                        icon.DrawCentre(canvas, drawX, drawY + 1); //Have to add 1 cause of weird OAM qwerk
                 }
                 else
                 {
-                    canvas.Save(); //Save Canvas State
+                    bool visable = enemyX < cameraX + viewWidth && enemyX + 16 > cameraX && enemyY < cameraY + viewHeight && enemyY + 16 > cameraY;
 
-                    canvas.ClipRect(new SKRect(drawX, drawY, drawX + 16, drawY + 16));
-                    canvas.DrawRect(drawX, drawY, 16, 16, labelBackPaint);
+                    if (visable)
+                    {
+                        canvas.Save(); //Save Canvas State
 
-                    string text = HexText[en.Id];
+                        canvas.ClipRect(new SKRect(drawX, drawY, drawX + 16, drawY + 16));
 
-                    float textWidth = 2 * CharWidth; // always 2 chars
-                    float x = drawX + (16 - textWidth) / 2f;
-                    float y = drawY + (16 - TextHeight) / 2f - Metrics.Ascent;
+                        canvas.DrawRect(drawX, drawY, 16, 16, labelBackPaint);
 
-                    canvas.DrawText(text, x, y, labelFrontPaint);
+                        string text = HexText[en.Id];
 
-                    if (en.Type < 5)
-                        canvas.DrawRect(drawX + 0.5f, drawY + 0.5f, 15, 15, enemyBorderPaints[en.Type]);
+                        float textWidth = 2 * CharWidth; // always 2 chars
+                        float x = drawX + (16 - textWidth) / 2f;
+                        float y = drawY + (16 - TextHeight) / 2f - Metrics.Ascent;
 
-                    canvas.Restore(); //Restore Canvas State
+                        canvas.DrawText(text, x, y, labelFrontPaint);
+
+                        if (en.Type < 5)
+                            canvas.DrawRect(drawX + 0.5f, drawY + 0.5f, 15, 15, enemyBorderPaints[en.Type]);
+
+                        canvas.Restore(); //Restore Canvas State
+                    }
 
                     string name = Level.GetObjectName(en.Id, en.Type);
 

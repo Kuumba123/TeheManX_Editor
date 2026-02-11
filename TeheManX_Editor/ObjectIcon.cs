@@ -1,5 +1,6 @@
 ﻿using SkiaSharp;
 using System;
+using System.Runtime.CompilerServices;
 
 namespace TeheManX_Editor
 {
@@ -59,12 +60,14 @@ namespace TeheManX_Editor
         #endregion Constructors
 
         #region Methods
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Draw(SKCanvas canvas, float x, float y) // Draws the sprite with via top-left corner at (x, y)
         {
             SKRect src = new SKRect(BitmapX, BitmapY, BitmapX + Width, BitmapY + Height);
             SKRect dst = new SKRect(x, y, x + Width, y + Height);
             canvas.DrawBitmap(SpriteBitmap, src, dst);
         }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void DrawCentre(SKCanvas canvas, float x, float y)
         {
             SKRect src = new SKRect(BitmapX, BitmapY, BitmapX + Width, BitmapY + Height);
@@ -73,6 +76,26 @@ namespace TeheManX_Editor
             SKRect dst = new SKRect(drawX, drawY, drawX + Width, drawY + Height);
             canvas.DrawBitmap(SpriteBitmap, src, dst);
         }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool Intersects(int centerX, int centerY, int otherOffsetX, int otherOffsetY, int otherWidth, int otherHeight)
+        {
+            // Compute icon's world bounds from center
+            int iconLeft = centerX - (Width / 2);
+            int iconTop = centerY - (Height / 2);
+            int iconRight = centerX + (Width / 2);
+            int iconBottom = centerY + (Height / 2);
+
+            // Compute other rectangle's bounds
+            int otherRight = otherOffsetX + otherWidth;
+            int otherBottom = otherOffsetY + otherHeight;
+
+            // AABB collision check
+            return (iconLeft < otherRight &&
+                    iconRight > otherOffsetX &&
+                    iconTop < otherBottom &&
+                    iconBottom > otherOffsetY);
+        }
+
         public void ExtractSpriteData(int spriteId, int spriteDataOffset, int tileIdCMP)
         {
             SpriteId = spriteId;
