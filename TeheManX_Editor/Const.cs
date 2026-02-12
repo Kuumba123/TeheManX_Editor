@@ -93,6 +93,10 @@ namespace TeheManX_Editor
         public static int MegaManTilesOffset; //Offset to MegaMan X sprite tiles
         public static int[] MegaManGreenChargeShotTilesOffset = new int[2]; //Offset to MegaMan X Pink Green Shot sprite tiles
 
+        public static int PaletteAnimeInfoOffset; //list of 16-bit pointers to palette animes
+        public static int PaletteAnimeBoundsOffset; //Only does X position check
+        public static int PaletteAnimeCount;
+
         public static int[] LayoutPointersOffset = new int[2]; //Layout Pointers Offset to compressed data
         public static int[] ScreenDataPointersOffset = new int[2];
         public static int[] Tile32DataPointersOffset = new int[2];
@@ -200,6 +204,9 @@ namespace TeheManX_Editor
             public const int MegaManTilesOffset = 0x170000; //Offset to MegaMan X sprite tiles
             public static readonly int[] MegaManGreenChargeShotTilesOffset = { 0x178400, 0x178500 }; //Offset to MegaMan X Pink Green Shot sprite tiles
 
+            public const int PaletteAnimeInfoOffset = 0x28022; //list of 16-bit pointers to palette animes
+            public const int PaletteAnimeCount = 0x1E;
+
             public static readonly int[] LayoutPointersOffset = { 0x30D24, 0x30F4F }; //Layout Pointers Offset to compressed data
             public static readonly int[] ScreenDataPointersOffset = { 0x30D93, 0x30FBE };
             public static readonly int[] Tile32DataPointersOffset = { 0x30E02, 0x3102D };
@@ -231,6 +238,8 @@ namespace TeheManX_Editor
                 public const int CapsuleTextOffset = 0x0354E3;
 
                 public const int ObjectSpriteInfoOffset = 0x325E4;
+
+                public const int PaletteAnimeBoundsOffset = 0x36324; //Only does X position check
             }
             internal static class JP // Japanese Version
             {
@@ -251,6 +260,8 @@ namespace TeheManX_Editor
                 public const int CapsuleTextOffset = 0x0354E5;
 
                 public const int ObjectSpriteInfoOffset = 0x325E7;
+
+                public const int PaletteAnimeBoundsOffset = 0x36327;
             }
 
             public static readonly FrozenDictionary<int, ObjectIcon> ItemIcons =
@@ -507,6 +518,9 @@ namespace TeheManX_Editor
 
             public const int MegaManTilesOffset = 0x168000; //Offset to MegaMan X sprite tiles
 
+            public const int PaletteAnimeInfoOffset = 0x28000; //list of 16-bit pointers to palette animes
+            public const int PaletteAnimeCount = 0x48;
+
             public static readonly int[] LayoutPointersOffset = { 0x030888, 0x30AB3 };
             public static readonly int[] ScreenDataPointersOffset = { 0x0308F7, 0x30B22 };
             public static readonly int[] Tile32DataPointersOffset = { 0x030966, 0x30B91 };
@@ -533,6 +547,8 @@ namespace TeheManX_Editor
                 public const int OstrichIdOffset = 0x14937F;
 
                 public const int ObjectSpriteInfoOffset = 0x3234D;
+
+                public const int PaletteAnimeBoundsOffset = 0x36E5B;
             }
             internal static class JP // Japanese Version
             {
@@ -553,6 +569,8 @@ namespace TeheManX_Editor
                 public const int OstrichIdOffset = 0x149387;
 
                 public const int ObjectSpriteInfoOffset = 0x3234E;
+
+                public const int PaletteAnimeBoundsOffset = 0x36E5C;
             }
 
             public static readonly FrozenDictionary<int, ObjectIcon> ItemIcons =
@@ -730,6 +748,9 @@ namespace TeheManX_Editor
 
             public const int MegaManTilesOffset = 0x168000; //Offset to MegaMan X sprite tiles
             public static readonly int[] MegaManGreenChargeShotTilesOffset = { 0x1E0400, 0x1E0500 }; //Offset to MegaMan X Pink Green Shot sprite tiles
+
+            public const int PaletteAnimeInfoOffset = 0x28000; //list of 16-bit pointers to palette animes
+            public const int PaletteAnimeCount = 0x68;
 
             public static readonly int[] LayoutPointersOffset = { 0x309B3, 0x30BDE };
             public static readonly int[] ScreenDataPointersOffset = { 0x30A22, 0x30C4D };
@@ -911,6 +932,8 @@ namespace TeheManX_Editor
                 public const int CapsuleTextOffset = 0x034EED;
 
                 public const int ObjectSpriteInfoOffset = 0x3628E;
+
+                public const int PaletteAnimeBoundsOffset = 0x35BE1;
             }
             internal class JP
             {
@@ -927,6 +950,8 @@ namespace TeheManX_Editor
                 public const int CapsuleTextOffset = 0x034EEE;
 
                 public const int ObjectSpriteInfoOffset = 0x3628F;
+
+                public const int PaletteAnimeBoundsOffset = 0x35BE2;
             }
         }
         public static void AssignProperties(GameId gameId, GameVersion gameVersion, bool expanded)
@@ -979,6 +1004,9 @@ namespace TeheManX_Editor
 
                 SpriteArrangmentPointersOffset = MegaManX.SpriteArrangmentPointersOffset;
 
+                PaletteAnimeInfoOffset = MegaManX.PaletteInfoOffset;
+                PaletteAnimeCount = MegaManX.PaletteAnimeCount;
+
                 ItemIcons = MegaManX.ItemIcons;
                 EnemyIcons = MegaManX.EnemyIcons;
 
@@ -1000,6 +1028,7 @@ namespace TeheManX_Editor
                     ObjectTileInfoOffset = MegaManX.NA.ObjectTileInfoOffset;
                     CompressedTilesSwapInfoOffset = MegaManX.NA.CompressedTilesSwapInfoOffset;
                     ObjectSpriteInfoOffset = MegaManX.NA.ObjectSpriteInfoOffset;
+                    PaletteAnimeBoundsOffset = MegaManX.NA.PaletteAnimeBoundsOffset;
                 }
                 else
                 {
@@ -1013,6 +1042,7 @@ namespace TeheManX_Editor
                     ObjectTileInfoOffset = MegaManX.JP.ObjectTileInfoOffset;
                     CompressedTilesSwapInfoOffset = MegaManX.JP.CompressedTilesSwapInfoOffset;
                     ObjectSpriteInfoOffset = MegaManX.JP.ObjectSpriteInfoOffset;
+                    PaletteAnimeBoundsOffset = MegaManX.JP.PaletteAnimeBoundsOffset;
                 }
             }
             else if (gameId == GameId.MegaManX2)
@@ -1066,6 +1096,9 @@ namespace TeheManX_Editor
 
                 SpriteArrangmentPointersOffset = MegaManX2.SpriteArrangmentPointersOffset;
 
+                PaletteAnimeInfoOffset = MegaManX2.PaletteInfoOffset;
+                PaletteAnimeCount = MegaManX2.PaletteAnimeCount;
+
                 ItemIcons = MegaManX2.ItemIcons;
                 EnemyIcons = MegaManX2.EnemyIcons;
 
@@ -1084,6 +1117,7 @@ namespace TeheManX_Editor
                     BackgroundTileInfoOffset = MegaManX2.NA.BackgroundTileInfoOffset;
                     BackgroundPaletteOffset = MegaManX2.NA.BackgroundPaletteOffset;
                     ObjectSpriteInfoOffset = MegaManX2.NA.ObjectSpriteInfoOffset;
+                    PaletteAnimeBoundsOffset = MegaManX2.NA.PaletteAnimeBoundsOffset;
                 }
                 else
                 {
@@ -1094,6 +1128,7 @@ namespace TeheManX_Editor
                     BackgroundTileInfoOffset = MegaManX2.JP.BackgroundTileInfoOffset;
                     BackgroundPaletteOffset = MegaManX2.JP.BackgroundPaletteOffset;
                     ObjectSpriteInfoOffset = MegaManX2.JP.ObjectSpriteInfoOffset;
+                    PaletteAnimeBoundsOffset = MegaManX2.JP.PaletteAnimeBoundsOffset;
                 }
             }
             else if (gameId == GameId.MegaManX3)
@@ -1149,6 +1184,9 @@ namespace TeheManX_Editor
 
                 SpriteArrangmentPointersOffset = MegaManX3.SpriteArrangmentPointersOffset;
 
+                PaletteAnimeInfoOffset = MegaManX3.PaletteInfoOffset;
+                PaletteAnimeCount = MegaManX3.PaletteAnimeCount;
+
                 ItemIcons = MegaManX3.ItemIcons;
                 EnemyIcons = MegaManX3.EnemyIcons;
 
@@ -1166,6 +1204,7 @@ namespace TeheManX_Editor
                     BackgroundTileInfoOffset = MegaManX3.NA.BackgroundTileInfoOffset;
                     BackgroundPaletteOffset = MegaManX3.NA.BackgroundPaletteOffset;
                     ObjectSpriteInfoOffset = MegaManX3.NA.ObjectSpriteInfoOffset;
+                    PaletteAnimeBoundsOffset = MegaManX3.NA.PaletteAnimeBoundsOffset;
                 }
                 else
                 {
@@ -1175,6 +1214,7 @@ namespace TeheManX_Editor
                     BackgroundTileInfoOffset = MegaManX3.JP.BackgroundTileInfoOffset;
                     BackgroundPaletteOffset = MegaManX3.JP.BackgroundPaletteOffset;
                     ObjectSpriteInfoOffset = MegaManX3.JP.ObjectSpriteInfoOffset;
+                    PaletteAnimeBoundsOffset = MegaManX3.JP.PaletteAnimeBoundsOffset;
                 }
             }
 
