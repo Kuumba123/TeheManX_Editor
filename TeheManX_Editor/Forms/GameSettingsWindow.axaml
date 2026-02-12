@@ -10,6 +10,9 @@
 		<Style Selector="local|NumInt">
 			<Setter Property="FontSize" Value="21"/>
         </Style>
+        <Style Selector="Expander">
+			<Setter Property="Padding" Value="0"/>
+        </Style>
     </Window.Styles>
     <Grid>
         <Grid.RowDefinitions>
