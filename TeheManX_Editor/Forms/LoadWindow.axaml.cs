@@ -1,19 +1,12 @@
-using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
-using Avalonia.Markup.Xaml;
 using System;
 using System.Buffers.Binary;
-using System.Threading.Tasks;
 
 namespace TeheManX_Editor.Forms;
 
 public partial class LoadWindow : Window
 {
-    #region Properties
-    bool shouldUpdate = false;
-    #endregion Properties
-
     #region Constructor
     public LoadWindow()
     {
@@ -69,7 +62,22 @@ public partial class LoadWindow : Window
             }
             infoOffset += 4;
         }
-        shouldUpdate = true;
+
+        MainWindow.window.layoutE.DrawLayout();
+        MainWindow.window.layoutE.DrawScreen();
+        MainWindow.window.screenE.DrawScreen();
+        MainWindow.window.screenE.DrawTiles();
+        MainWindow.window.screenE.DrawTile();
+        MainWindow.window.tile32E.DrawTiles();
+        MainWindow.window.tile32E.DrawTile();
+        MainWindow.window.tile32E.Draw16xTiles();
+        MainWindow.window.tile16E.Draw16xTiles();
+        MainWindow.window.tile16E.DrawTile();
+        MainWindow.window.tile16E.DrawVramTiles();
+        MainWindow.window.paletteE.DrawVramTiles();
+        MainWindow.window.paletteE.DrawPalette();
+        MainWindow.window.enemyE.DrawLayout();
+
         await MessageBox.Show(MainWindow.window,"Palette loaded!");
     }
     private async void tileBtn_Click(object? sender, RoutedEventArgs e)
@@ -173,13 +181,24 @@ public partial class LoadWindow : Window
                 return;
             }
         }
-        shouldUpdate = true;
+
         Level.DecodeAllTiles();
+
+        MainWindow.window.layoutE.DrawLayout();
+        MainWindow.window.layoutE.DrawScreen();
+        MainWindow.window.screenE.DrawScreen();
+        MainWindow.window.screenE.DrawTiles();
+        MainWindow.window.screenE.DrawTile();
+        MainWindow.window.tile32E.DrawTiles();
+        MainWindow.window.tile32E.DrawTile();
+        MainWindow.window.tile32E.Draw16xTiles();
+        MainWindow.window.tile16E.Draw16xTiles();
+        MainWindow.window.tile16E.DrawTile();
+        MainWindow.window.tile16E.DrawVramTiles();
+        MainWindow.window.paletteE.DrawVramTiles();
+        MainWindow.window.enemyE.DrawLayout();
+
         await MessageBox.Show(MainWindow.window, "Tiles loaded!");
-    }
-    private void Window_Closed(object sender, EventArgs e)
-    {
-        if (shouldUpdate) MainWindow.window.Update();
     }
     #endregion Events
 }
