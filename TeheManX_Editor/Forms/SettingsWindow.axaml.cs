@@ -1,3 +1,4 @@
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
@@ -7,6 +8,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using TeheManX_Editor.Config;
 
 namespace TeheManX_Editor.Forms;
 
@@ -23,6 +25,7 @@ public partial class SettingsWindow : Window
         InitializeComponent();
         emuPathBox.Text = MainWindow.settings.EmuPath;
         saveOnTestCheck.IsChecked = MainWindow.settings.SaveOnTest;
+        lightButton.IsChecked = MainWindow.settings.Theme == 1;
         displayInt.Value = MainWindow.settings.ReferanceWidth;
         dontUpdateCheck.IsChecked = MainWindow.settings.DontUpdate;
         fixedCheck.IsChecked = MainWindow.settings.UseFixedScale;
@@ -96,6 +99,24 @@ public partial class SettingsWindow : Window
         if (!enable)
             return;
         MainWindow.settings.SaveOnTest = false;
+        edited = true;
+    }
+    private void darkButton_Checked(object? sender, RoutedEventArgs e)
+    {
+        if (!enable) return;
+
+        App app = (App)Application.Current;
+        app.RequestedThemeVariant = Avalonia.Styling.ThemeVariant.Dark;
+        MainWindow.settings.Theme = 0;
+        edited = true;
+    }
+    private void lightButton_Checked(object? sender, RoutedEventArgs e)
+    {
+        if (!enable) return;
+
+        App app = (App)Application.Current;
+        app.RequestedThemeVariant = Avalonia.Styling.ThemeVariant.Light;
+        MainWindow.settings.Theme = 1;
         edited = true;
     }
     private void displayInt_ValueChanged(object sender, int e)

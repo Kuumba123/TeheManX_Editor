@@ -712,7 +712,7 @@ public partial class SpawnEditor : UserControl
             SizeToContent = SizeToContent.WidthAndHeight,
             WindowStartupLocation = WindowStartupLocation.CenterOwner,
         };
-        TextBlock textBlock = new TextBlock() { Text = $"Max Total Check Points: {Const.MaxTotalCheckpoints}", FontSize = 18, Foreground = Brushes.White, FontFamily = new FontFamily("Consolas") };
+        TextBlock textBlock = new TextBlock() { Text = $"Max Total Check Points: {Const.MaxTotalCheckpoints}", FontSize = 18, FontFamily = new FontFamily("Consolas") };
         NumInt numInt = new NumInt() { Margin = new Thickness(5), Minimum = 1, Maximum = 0xFF, Value = spawnInt.Maximum + 1, Width = 100, FontFamily = new FontFamily("Consolas"), FontSize = 16 };
         Grid.SetColumn(numInt, 1);
         Grid.SetRow(numInt, 1);
@@ -753,7 +753,6 @@ public partial class SpawnEditor : UserControl
         };
         Grid.SetRow(confirmBtn, 1);
         Grid grid = new Grid();
-        grid.Background = Brushes.Black;
         grid.ColumnDefinitions.Add(new ColumnDefinition());
         grid.ColumnDefinitions.Add(new ColumnDefinition());
         grid.RowDefinitions.Add(new RowDefinition());

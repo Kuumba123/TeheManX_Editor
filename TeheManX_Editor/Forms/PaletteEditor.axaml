@@ -53,7 +53,7 @@
                 </StackPanel>
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Width="201" FontSize="17"  FontFamily="Consolas">16 bit Color Address:</TextBlock>
-                    <local:NumInt Width="70" FontSize="18"  Background="Black" x:Name="colorAddressInt" ValueChanged="colorAddressInt_ValueChanged"></local:NumInt>
+                    <local:NumInt Width="70" FontSize="18" x:Name="colorAddressInt" ValueChanged="colorAddressInt_ValueChanged"></local:NumInt>
                 </StackPanel>
                 <Button x:Name="dumpPalBtn" Click="DumpPaletteBtn_Click">Dump Palettes</Button>
             </StackPanel>

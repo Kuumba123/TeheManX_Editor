@@ -14,6 +14,8 @@ public partial class LayoutWindow : Window
     const int GridLineWidth = 2;
     public static readonly SKPaint cellTextPaint = new SKPaint() { Color = SKColors.White, TextSize = 15, Typeface = SKTypeface.FromFamilyName("Consolas"), IsAntialias = true };
     public static readonly SKPaint cellBackPaint = new SKPaint() { Color = new SKColor(0x10, 0x10, 0x10), Style = SKPaintStyle.Fill, IsAntialias = false };
+    public static readonly SKPaint cellTextLightPaint = new SKPaint() { Color = SKColors.Black, TextSize = 15, Typeface = SKTypeface.FromFamilyName("Consolas"), IsAntialias = true };
+    public static readonly SKPaint cellBackLightPaint = new SKPaint() { Color = new SKColor(0xEF, 0xEF, 0xEF), Style = SKPaintStyle.Fill, IsAntialias = false };
     public static readonly SKPaint cell2BackPaint = new SKPaint() { Color = new SKColor(0x2F, 0x4F, 0x4F), Style = SKPaintStyle.Fill, IsAntialias = false };
     #endregion Constants
 
@@ -55,9 +57,24 @@ public partial class LayoutWindow : Window
     private void layoutCanvas_RenderEvent(object? sender, SkiaCanvasEventArgs e)
     {
         SKCanvas canvas = e.Canvas;
-        e.Canvas.Clear(SKColors.Black);
 
-        int drawY = GridLineWidth;
+        SKPaint textPaint = null;
+        SKPaint backPaint = null;
+
+        if (MainWindow.settings.Theme == 0)
+        {
+            textPaint = cellTextPaint;
+            backPaint = cellBackPaint;
+            e.Canvas.Clear(SKColors.Black);
+        }
+        else
+        {
+            textPaint = cellTextLightPaint;
+            backPaint = cellBackLightPaint;
+            e.Canvas.Clear(SKColors.White);
+        }
+
+            int drawY = GridLineWidth;
 
         for (int y = 0; y < 33; y++)
         {
@@ -78,7 +95,7 @@ public partial class LayoutWindow : Window
                 }
                 else
                 {
-                    cellPaint = cellBackPaint;
+                    cellPaint = backPaint;
                     cellText = Level.Layout[Level.Id, Level.BG, x - 1 + (y - 1) * 32].ToString("X");
                 }
                 canvas.ClipRect(new SKRect(drawX, drawY, drawX + CellWidth, drawY + CellHeight));
@@ -86,14 +103,14 @@ public partial class LayoutWindow : Window
 
                 // Measure text
                 SKRect textBounds = new SKRect();
-                cellTextPaint.MeasureText(cellText, ref textBounds);
+                textPaint.MeasureText(cellText, ref textBounds);
 
                 // Compute centered position
                 float textX = drawX + (CellWidth - textBounds.Width) / 2f - textBounds.Left;
                 float textY = drawY + (CellHeight + textBounds.Height) / 2f - textBounds.Bottom;
 
                 // Draw (already clipped to 16x16)
-                canvas.DrawText(cellText, textX, textY, cellTextPaint);
+                canvas.DrawText(cellText, textX, textY, textPaint);
 
                 canvas.Restore();
 

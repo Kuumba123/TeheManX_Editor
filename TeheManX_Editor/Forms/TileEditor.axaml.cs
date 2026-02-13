@@ -1162,7 +1162,6 @@ public partial class TileEditor : UserControl
         grid.Children.Add(scrollViewer);
         grid.Children.Add(confirmBtn);
         grid.Children.Add(addBtn);
-        grid.Background = Brushes.Black;
         window.Content = grid;
         await window.ShowDialog(MainWindow.window);
     }
@@ -1464,7 +1463,6 @@ public partial class TileEditor : UserControl
         grid.Children.Add(scrollViewer);
         grid.Children.Add(confirmBtn);
         grid.Children.Add(addBtn);
-        grid.Background = Brushes.Black;
         window.Content = grid;
         await window.ShowDialog(MainWindow.window);
     }

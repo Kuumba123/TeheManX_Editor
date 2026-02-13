@@ -22,6 +22,7 @@ using System.Net.Http;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
+using TeheManX_Editor.Config;
 
 namespace TeheManX_Editor.Forms
 {
@@ -129,6 +130,13 @@ namespace TeheManX_Editor.Forms
                 try
                 {
                     settings = JsonConvert.DeserializeObject<Settings>(File.ReadAllText("Settings.json"));
+
+                    if (settings.Theme != 0)
+                    {
+                        App app = (App)Application.Current;
+                        if (settings.Theme == 1)
+                            app.RequestedThemeVariant = Avalonia.Styling.ThemeVariant.Light;
+                    }
                 }
                 catch
                 {

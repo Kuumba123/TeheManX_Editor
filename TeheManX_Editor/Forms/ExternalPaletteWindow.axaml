@@ -6,7 +6,7 @@
         mc:Ignorable="d"
         x:Class="TeheManX_Editor.Forms.ExternalPaletteWindow"
         Title="Palettes" Height="300" Width="500" CanResize="False" WindowStartupLocation="CenterScreen">
-    <Grid Background="#101010">
+    <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>
             <ColumnDefinition Width="auto"/>

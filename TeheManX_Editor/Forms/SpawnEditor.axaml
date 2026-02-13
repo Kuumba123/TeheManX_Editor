@@ -9,7 +9,6 @@
         <Style Selector="TextBlock">
             <Setter Property="FontFamily" Value="Consolas" />
             <Setter Property="FontSize" Value="22" />
-            <Setter Property="Foreground" Value="White"/>
             <Setter Property="IsHitTestVisible" Value="False"/>
         </Style>
         <Style Selector="local|NumInt">

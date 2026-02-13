@@ -885,7 +885,6 @@ public partial class PaletteEditor : UserControl
         grid.Children.Add(scrollViewer);
         grid.Children.Add(confirmBtn);
         grid.Children.Add(addBtn);
-        grid.Background = Brushes.Black;
         window.Content = grid;
         await window.ShowDialog(MainWindow.window);
     }

@@ -44,8 +44,10 @@
                 <CheckBox x:Name="saveOnTestCheck" Checked="saveOnTestCheck_Checked" Unchecked="saveOnTestCheck_Unchecked">Save on Test</CheckBox>
                 <CheckBox x:Name="dontUpdateCheck" Checked="dontUpdateCheck_Change" Unchecked="dontUpdateCheck_Change">Dont check for Updates</CheckBox>
 
+                <Label HorizontalAlignment="Center">GUI Config</Label>
                 <StackPanel>
-                    <Label HorizontalAlignment="Center">GUI Config</Label>
+					<RadioButton x:Name="darkButton" Checked="darkButton_Checked" IsChecked="True" Content="Dark Theme" Padding="2"/>
+                    <RadioButton x:Name="lightButton" Checked="lightButton_Checked" Content="Light Theme" Padding="2"/>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal">
                     <local:NumInt FontSize="22" x:Name="displayInt" ValueChanged="displayInt_ValueChanged" IsHex="False"  Minimum="0" Maximum="9000" Height="32" Width="55"></local:NumInt>
