@@ -1,5 +1,4 @@
-﻿using Avalonia.Controls.ApplicationLifetimes;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using SkiaSharp;
 using System;
 using System.Buffers.Binary;
@@ -362,7 +361,7 @@ namespace TeheManX_Editor
             catch (Exception e)
             {
                 await MessageBox.Show(MainWindow.window , $"Stage {stage:X} Layer {layer + 1} Layout Data Corrupted?\n" + e.Message, "ERROR");
-                ((IClassicDesktopStyleApplicationLifetime)(Avalonia.Application.Current.ApplicationLifetime)).Shutdown();
+                Environment.Exit(1);
             }
         }
         static void GetLayoutDimensions(byte[] layout, out byte width, out byte height)
@@ -695,7 +694,7 @@ namespace TeheManX_Editor
                         if (Enemies[i].Count == 0xCC /* Max Amount of Enemies*/)
                         {
                             await MessageBox.Show(MainWindow.window, $"Incorrect Enemy Data Format for Stage {stage:X}");
-                            //Avalonia.Application.Current?.Shutdown();
+                            Environment.Exit(1);
                         }
 
                         Enemy en = new Enemy();
@@ -730,7 +729,7 @@ namespace TeheManX_Editor
             }catch(Exception e)
             {
                 await MessageBox.Show(MainWindow.window, $"Stage {stage:X} Enemy Data Corrupted?\n" + e.Message, "ERROR");
-                ((IClassicDesktopStyleApplicationLifetime)(Avalonia.Application.Current.ApplicationLifetime)).Shutdown();
+                Environment.Exit(1);
             }
         }
         private static byte[] CreateEnemyData(List<Enemy> enemyList)
@@ -1227,7 +1226,7 @@ namespace TeheManX_Editor
                 catch (Exception)
                 {
                     await MessageBox.Show(MainWindow.window ,$"Error happened when loading Tile Graphics from ROM offset 0x{palInfoOffset:X} via Id 0x{palId:X}\nCorrupted ROM ?", "ERROR");
-                    ((IClassicDesktopStyleApplicationLifetime)(Avalonia.Application.Current.ApplicationLifetime)).Shutdown();
+                    Environment.Exit(1);
                 }
 
                 //Next Transfer
@@ -1289,7 +1288,7 @@ namespace TeheManX_Editor
                 catch (Exception e)
                 {
                     await MessageBox.Show(MainWindow.window, $"Error happened when decompress - {compressedTileId:X}" + " Tile Graphics" + e.Message + "\nCorrupted ROM ?", "ERROR");
-                    ((IClassicDesktopStyleApplicationLifetime)(Avalonia.Application.Current.ApplicationLifetime)).Shutdown();
+                    Environment.Exit(1);
                 }
             }
             else
@@ -1346,7 +1345,7 @@ namespace TeheManX_Editor
                 catch (Exception e)
                 {
                     await MessageBox.Show(MainWindow.window, $"Error happened when decompress - {compressedTileId:X}" + " Tile Graphics" + e.Message + "\nCorrupted ROM ?", "ERROR");
-                    ((IClassicDesktopStyleApplicationLifetime)(Avalonia.Application.Current.ApplicationLifetime)).Shutdown();
+                    Environment.Exit(1);
                 }
             }
 
@@ -1397,7 +1396,7 @@ namespace TeheManX_Editor
                 catch (Exception e)
                 {
                     await MessageBox.Show(MainWindow.window, $"Error happened when decompress - {compressedTileId:X}" + " Tile Graphics" + e.Message + "\nCorrupted ROM ?", "ERROR");
-                    ((IClassicDesktopStyleApplicationLifetime)(Avalonia.Application.Current.ApplicationLifetime)).Shutdown();
+                    Environment.Exit(1);
                 }
             }
             else
@@ -1452,7 +1451,7 @@ namespace TeheManX_Editor
                 catch (Exception e)
                 {
                     await MessageBox.Show(MainWindow.window, $"Error happened when decompress - {compressedTileId:X}" + " Tile Graphics" + e.Message + "\nCorrupted ROM ?", "ERROR");
-                    ((IClassicDesktopStyleApplicationLifetime)(Avalonia.Application.Current.ApplicationLifetime)).Shutdown();
+                    Environment.Exit(1);
                 }
             }
 
@@ -1670,7 +1669,7 @@ namespace TeheManX_Editor
                         //Sprite takes up more then the size of the page
                         //This should never happen...
                         await MessageBox.Show(MainWindow.window, "Exceeded Max amount of Texture Pages!", "ERROR");
-                        ((IClassicDesktopStyleApplicationLifetime)(Avalonia.Application.Current.ApplicationLifetime)).Shutdown();
+                        Environment.Exit(1);
                     }
 
                     icon.DumpSpriteToBitmap(ObjectSpriteTiles[freePageIndex], results.x, results.y, TemporaryTiles, palette);
