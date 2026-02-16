@@ -328,7 +328,10 @@ public partial class TileEditor : UserControl
                         byte G = (byte)(color / 32 % 32 * 8);
                         byte B = (byte)(color / 1024 % 32 * 8);
 
-                        Palette[((colorIndex + c) >> 4) & 0xF, (colorIndex + c) & 0xF] = Color.FromRgb(R, G, B);
+                        int row = ((colorIndex + c) >> 4) & 0x7;  // 0–7
+                        int col = (colorIndex + c) & 0xF;         // 0–15
+
+                        Palette[row, col] = Color.FromRgb(R, G, B);
                     }
                     infoOffset += 4;
                 }
