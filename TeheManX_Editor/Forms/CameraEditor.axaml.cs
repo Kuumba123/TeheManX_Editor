@@ -1,6 +1,5 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
-using Avalonia.Media;
 using System;
 using System.Buffers.Binary;
 using System.Collections.Generic;
@@ -342,7 +341,7 @@ public partial class CameraEditor : UserControl
 
                 while (sortedOffsets[index] == sortedOffsets[index + 1])
                     index++;
-                maxAmounts[i] = ((sortedOffsets[index + 1] - toFindOffset) / 2);
+                maxAmounts[i] = Math.Min(((sortedOffsets[index + 1] - toFindOffset) / 2), 256);
             }
             else //Last Stage
             {
@@ -371,7 +370,7 @@ public partial class CameraEditor : UserControl
                     }
                 }
 
-                maxAmounts[i] = max;
+                maxAmounts[i] = Math.Min(max, 256);
             }
         }
     }
@@ -734,8 +733,13 @@ public partial class CameraEditor : UserControl
         Grid.SetRow(confirmBtn, 2);
 
         Button addBtn = new Button() { Content = "Add Setting" };
-        addBtn.Click += (s, e) =>
+        addBtn.Click += async (s, e) =>
         {
+            if (stackPanel.Children.Count >= 256)
+            {
+                await MessageBox.Show(window, "Max amount of Camera Triggers is 256!");
+                return;
+            }
             int newIndex = trueCopy.Count;
             CameraTrigger camTrigger = new CameraTrigger();
             camTrigger.BorderSettings.Add(1);

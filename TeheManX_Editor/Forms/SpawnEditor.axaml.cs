@@ -67,7 +67,7 @@ public partial class SpawnEditor : UserControl
                     ushort lastOffset = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(Id * 2 + Const.CheckpointOffset));
                     maxCheckpoints = ((firstDataOffset - lastOffset) / 2);
                 }
-                checkpointAmount[Id] = maxCheckpoints;
+                checkpointAmount[Id] = Math.Min(maxCheckpoints, 256);
             }
             for (int Id = 0; Id < maxLevels; Id++)
             {
@@ -713,7 +713,7 @@ public partial class SpawnEditor : UserControl
             WindowStartupLocation = WindowStartupLocation.CenterOwner,
         };
         TextBlock textBlock = new TextBlock() { Text = $"Max Total Check Points: {Const.MaxTotalCheckpoints}", FontSize = 18, FontFamily = new FontFamily("Consolas") };
-        NumInt numInt = new NumInt() { Margin = new Thickness(5), Minimum = 1, Maximum = 0xFF, Value = spawnInt.Maximum + 1, Width = 100, FontFamily = new FontFamily("Consolas"), FontSize = 16 };
+        NumInt numInt = new NumInt() { Margin = new Thickness(5), Minimum = 1, Maximum = 0x100, Value = spawnInt.Maximum + 1, Width = 100, FontFamily = new FontFamily("Consolas"), FontSize = 16 };
         Grid.SetColumn(numInt, 1);
         Grid.SetRow(numInt, 1);
         Button confirmBtn = new Button() { Content = "OK", Width = 75, Height = 30, Margin = new Thickness(5) };

@@ -270,7 +270,7 @@ public partial class PaletteEditor : UserControl
 
                 while (sortedOffsets[index] == sortedOffsets[index + 1])
                     index++;
-                maxAmounts[i] = ((sortedOffsets[index + 1] - toFindOffset) / 2);
+                maxAmounts[i] = Math.Min((sortedOffsets[index + 1] - toFindOffset) / 2, 256);
             }
             else //Last Stage
             {
@@ -299,7 +299,7 @@ public partial class PaletteEditor : UserControl
                     }
                 }
 
-                maxAmounts[i] = max;
+                maxAmounts[i] = Math.Min(max, 256);
             }
         }
     }
@@ -862,8 +862,13 @@ public partial class PaletteEditor : UserControl
         Grid.SetRow(confirmBtn, 2);
 
         Button addBtn = new Button() { Content = "Add Setting" };
-        addBtn.Click += (s, e) =>
+        addBtn.Click += async (s, e) =>
         {
+            if (stackPanel.Children.Count >= 256)
+            {
+                await MessageBox.Show(window, "Max amount of Palette Swaps is 256!");
+                return;
+            }
             int newIndex = trueCopy.Count;
             BGPaletteSlot slot = new BGPaletteSlot();
             slot.Address = 0x8000;

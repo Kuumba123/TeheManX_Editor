@@ -544,7 +544,7 @@ public partial class TileEditor : UserControl
 
                 while (sortedOffsets[index] == sortedOffsets[index + 1])
                     index++;
-                maxAmounts[i] = ((sortedOffsets[index + 1] - toFindOffset) / 2);
+                maxAmounts[i] = Math.Min((sortedOffsets[index + 1] - toFindOffset) / 2 , 256);
             }
             else //Last Stage
             {
@@ -564,7 +564,7 @@ public partial class TileEditor : UserControl
                         tempOffset += 2;
                     }
                     ushort currentOffset = offsets[i];
-                    maxAmounts[i] = ((lowestPointer - currentOffset) / 2);
+                    maxAmounts[i] = Math.Min((lowestPointer - currentOffset) / 2, 256);
                 }
                 else //MegaMan X Special Case (math just doesnt work cause of how they jumbled around the pointers)
                     maxAmounts[i] = 1;
@@ -788,7 +788,7 @@ public partial class TileEditor : UserControl
 
                 while (sortedOffsets[index] == sortedOffsets[index + 1])
                     index++;
-                maxAmounts[i] = ((sortedOffsets[index + 1] - toFindOffset) / 2);
+                maxAmounts[i] = Math.Min(((sortedOffsets[index + 1] - toFindOffset) / 2), 256);
             }
             else //Last Stage
             {
@@ -817,7 +817,7 @@ public partial class TileEditor : UserControl
                     }
                 }
 
-                maxAmounts[i] = max;
+                maxAmounts[i] = Math.Min(max, 256);
             }
         }
     }
@@ -1139,8 +1139,13 @@ public partial class TileEditor : UserControl
         Grid.SetRow(confirmBtn, 2);
 
         Button addBtn = new Button() { Content = "Add Setting" };
-        addBtn.Click += (s, e) =>
+        addBtn.Click += async (s, e) =>
         {
+            if (stackPanel.Children.Count >= 256)
+            {
+                await MessageBox.Show(window, "Max amount of BG Tiles Settings is 256!");
+                return;
+            }
             int newIndex = trueCopy.Count;
             BGSlot slot = new BGSlot();
             slot.Length = 32;
@@ -1441,8 +1446,13 @@ public partial class TileEditor : UserControl
         Grid.SetRow(confirmBtn, 2);
 
         Button addBtn = new Button() { Content = "Add Setting" };
-        addBtn.Click += (s, e) =>
+        addBtn.Click += async (s, e) =>
         {
+            if (stackPanel.Children.Count >= 256)
+            {
+                await MessageBox.Show(window, "Max amount of Object Tiles Settings is 256!");
+                return;
+            }
             int newIndex = trueCopy.Count;
             ObjectSlot slot = new ObjectSlot(); //Default is a Heart Tank
             slot.TileId = 0x36;
