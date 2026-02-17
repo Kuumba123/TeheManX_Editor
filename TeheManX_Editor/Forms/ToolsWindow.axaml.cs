@@ -556,7 +556,7 @@ public partial class ToolsWindow : Window
 
         IReadOnlyList<IStorageFile> result = await storageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
         {
-            Title = "Open a file containing Tiles for MegaMan X",
+            Title = "Open a file containing Tiles for MegaMan X2/X3",
             AllowMultiple = false
         });
 
@@ -574,11 +574,17 @@ public partial class ToolsWindow : Window
             {
                 const int WINDOW_SIZE = 0x3FF;
                 const int MAX_LENGTH = 0x3F;
+                //const int MAX_JUMPS = 32;
 
                 try
                 {
                     byte[] inputData = await File.ReadAllBytesAsync(file.Path.LocalPath);
                     int dataLength = inputData.Length;
+
+                    Dictionary<int, int> head = new Dictionary<int, int>();
+                    // 'prev' stores the link to the older index for that same hash
+                    int[] prev = GC.AllocateUninitializedArray<int>(dataLength, pinned: false);
+                    Array.Fill(prev, -1);
 
                     List<(int distance, int length, byte nextChar)> compressedData = new List<(int distance, int length, byte nextChar)>(dataLength / 4);
                     List<byte> compressedBytes = new List<byte>(dataLength);
@@ -590,35 +596,71 @@ public partial class ToolsWindow : Window
                         int matchLength = 0;
                         int matchDistance = 0;
 
-                        // Look back within the window to find the longest match
-                        for (int j = 1; j <= Math.Min(WINDOW_SIZE, i); j++)
+                        /*Attempt to find a match using the hash chain!*/
+                        if (i + 2 < dataLength)
                         {
-                            int substringLength = 0;
+                            int hash = (inputData[i] << 16) | (inputData[i + 1] << 8) | inputData[i + 2];
 
-                            while (substringLength < Math.Min(Math.Min(dataLength - i, WINDOW_SIZE), MAX_LENGTH) &&
-                                   (i - j + substringLength) >= 0 &&
-                                   (i + substringLength) < dataLength &&
-                                   inputData[i - j + substringLength] == inputData[i + substringLength])
+                            if (head.TryGetValue(hash, out int matchIdx))
                             {
-                                substringLength++;
-                            }
+                                int currentMatch = matchIdx;
+                                int chainJumps = 0;
 
-                            if (substringLength > matchLength)
-                            {
-                                matchLength = substringLength;
-                                matchDistance = j;
+                                // Walk the chain backward
+                                while (currentMatch != -1 && (i - currentMatch) <= WINDOW_SIZE /*&& chainJumps < MAX_JUMPS*/)
+                                {
+                                    int length = 0;
+                                    int maxPossible = Math.Min(dataLength - i, MAX_LENGTH);
+
+                                    while (length < maxPossible && inputData[currentMatch + length] == inputData[i + length])
+                                    {
+                                        length++;
+                                    }
+
+                                    if (length > matchLength)
+                                    {
+                                        matchLength = length;
+                                        matchDistance = i - currentMatch;
+                                    }
+
+                                    // Jump to the previous occurrence of this hash
+                                    currentMatch = prev[currentMatch];
+                                    chainJumps++;
+                                }
                             }
                         }
 
-                        // Add match tuple
-                        if (matchLength > 2 && (i + matchLength) < dataLength && (dataLength - i) > 3)
+                        // check the results! If we found a match of length 3 or more, we will encode it as (Distance, Length).
+                        if (matchLength >= 3)
                         {
-                            compressedData.Add((matchDistance, matchLength, inputData[i + matchLength]));
-                            i += matchLength;
+                            // We found a match! Add the (Distance, Length) tuple
+                            compressedData.Add((matchDistance, matchLength, 0));
+
+                            // IMPORTANT: Update the hash chain for EVERY byte we are skipping
+                            // so that the dictionary stays complete.
+                            for (int k = 0; k < matchLength; k++)
+                            {
+                                if (i + 2 < dataLength)
+                                {
+                                    int h = (inputData[i] << 16) | (inputData[i + 1] << 8) | inputData[i + 2];
+                                    prev[i] = head.ContainsKey(h) ? head[h] : -1;
+                                    head[h] = i;
+                                }
+                                i++; // Move pointer forward
+                            }
                         }
                         else
                         {
+                            // No match found (or match too short). Output a literal byte.
                             compressedData.Add((0, 0, inputData[i]));
+
+                            // Still update the hash chain for this single byte
+                            if (i + 2 < dataLength)
+                            {
+                                int h = (inputData[i] << 16) | (inputData[i + 1] << 8) | inputData[i + 2];
+                                prev[i] = head.ContainsKey(h) ? head[h] : -1;
+                                head[h] = i;
+                            }
                             i++;
                         }
                     }
