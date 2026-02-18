@@ -1286,6 +1286,11 @@ namespace TeheManX_Editor.Forms
         {
             if (SNES.rom == null)
                 return;
+            if (window.screenE.mode16)
+            {
+                await MessageBox.Show(window, "You must exit 16x16 Mode before you can change your project settings!");
+                return;
+            }
             ProjectWindow project = new ProjectWindow();
             await project.ShowDialog(window);
         }

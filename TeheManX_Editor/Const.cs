@@ -1012,10 +1012,6 @@ namespace TeheManX_Editor
 
                 EffectNames = MegaManX.EffectNames;
 
-                LayoutLength = MegaManX.LayoutLength;
-                Tile32Count = MegaManX.Tile32Count;
-                Tile16Count = MegaManX.Tile16Count;
-
                 if (gameVersion == GameVersion.NA)
                 {
                     LoadTileSetInfoOffset = MegaManX.NA.LoadTileSetInfoOffset;
@@ -1104,10 +1100,6 @@ namespace TeheManX_Editor
 
                 EffectNames = MegaManX2.EffectNames;
 
-                LayoutLength = MegaManX2.LayoutLength;
-                Tile32Count = MegaManX2.Tile32Count;
-                Tile16Count = MegaManX2.Tile16Count;
-
                 if (gameVersion == GameVersion.NA)
                 {
                     LoadTileSetInfoOffset = MegaManX2.NA.LoadTileSetInfoOffset;
@@ -1192,10 +1184,6 @@ namespace TeheManX_Editor
 
                 EffectNames = MegaManX3.EffectNames;
 
-                LayoutLength = MegaManX3.LayoutLength;
-                Tile32Count = MegaManX3.Tile32Count;
-                Tile16Count = MegaManX3.Tile16Count;
-
                 if (gameVersion == GameVersion.NA)
                 {
                     LoadTileSetInfoOffset = MegaManX3.NA.LoadTileSetInfoOffset;
@@ -1218,8 +1206,31 @@ namespace TeheManX_Editor
                 }
             }
 
+            AssignLimits(gameId);
+
             if (expanded)
                 AssignExpand();
+        }
+        public static void AssignLimits(GameId gameId)
+        {
+            if (gameId == GameId.MegaManX)
+            {
+                LayoutLength = MegaManX.LayoutLength;
+                Tile32Count = MegaManX.Tile32Count;
+                Tile16Count = MegaManX.Tile16Count;
+            }
+            else if (gameId == GameId.MegaManX2)
+            {
+                LayoutLength = MegaManX2.LayoutLength;
+                Tile32Count = MegaManX2.Tile32Count;
+                Tile16Count = MegaManX2.Tile16Count;
+            }
+            else if (gameId == GameId.MegaManX3)
+            {
+                LayoutLength = MegaManX3.LayoutLength;
+                Tile32Count = MegaManX3.Tile32Count;
+                Tile16Count = MegaManX3.Tile16Count;
+            }
         }
         public static void AssignExpand()
         {

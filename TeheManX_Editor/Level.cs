@@ -908,6 +908,12 @@ namespace TeheManX_Editor
             try
             {
                 Project = JsonConvert.DeserializeObject<GameProject>(await File.ReadAllTextAsync(combinedPath));
+
+                if (Project.Tile32Count != null)
+                    Const.Tile32Count = Project.Tile32Count;
+
+                if (Project.Tile16Count != null)
+                    Const.Tile16Count = Project.Tile16Count;
             }
             catch
             {
@@ -1093,7 +1099,7 @@ namespace TeheManX_Editor
              * Enemy Export
              */
 
-            if ((saveJson || Project.Enemies != null) && writeJson)
+            if ((saveJson || Project.Enemies != null || Project.Tile32Count != null || Project.Tile16Count != null) && writeJson)
             {
                 string json = JsonConvert.SerializeObject(Project);
                 string jsonFileName = $"TeheManX{(int)Const.Id + 1}_{Const.Version}_Project.json";

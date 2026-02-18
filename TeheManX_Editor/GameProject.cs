@@ -19,5 +19,7 @@ namespace TeheManX_Editor
         public List<List<BGSetting>> BGSettings { get; set; }
         public int ObjectTilesInfoOffset { get; set; }
         public List<List<ObjectSetting>> ObjectSettings { get; set; }
+        public int[,] Tile32Count { get; set; }
+        public int[,] Tile16Count { get; set; }
     }
 }

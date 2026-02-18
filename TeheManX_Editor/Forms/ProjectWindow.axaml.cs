@@ -11,7 +11,10 @@ public partial class ProjectWindow : Window
 {
     #region Properties
     bool edited;
+    bool tileLengthEdited;
     bool enable;
+    int[,] Tile32Count;
+    int[,] Tile16Count;
     #endregion Properties
 
     #region Constructors
@@ -19,25 +22,40 @@ public partial class ProjectWindow : Window
     {
         InitializeComponent();
 
-        if (Level.Project != null)
-        {
-            enemyCheck.IsChecked = Level.Project.Enemies != null;
-            paletteCheck.IsChecked = Level.Project.BGPalettes != null;
-            checkpointCheck.IsChecked = Level.Project.Checkpoints != null;
-            cameraCheck.IsChecked = Level.Project.CameraTriggers != null;
-            bgTileCheck.IsChecked = Level.Project.BGSettings != null;
-            objTileCheck.IsChecked = Level.Project.ObjectSettings != null;
+        enemyCheck.IsChecked = Level.Project.Enemies != null;
+        paletteCheck.IsChecked = Level.Project.BGPalettes != null;
+        checkpointCheck.IsChecked = Level.Project.Checkpoints != null;
+        cameraCheck.IsChecked = Level.Project.CameraTriggers != null;
+        bgTileCheck.IsChecked = Level.Project.BGSettings != null;
+        objTileCheck.IsChecked = Level.Project.ObjectSettings != null;
 
-            enemyOffsetInt.Value = Level.Project.EnemyOffset;
-            paletteOffsetInt.Value = Level.Project.PaletteInfoOffset;
-            paletteBankInt.Value = Level.Project.PaletteColorBank;
-            checkpointInt.Value = Level.Project.CheckpointOffset;
-            cameraTriggerInt.Value = Level.Project.CameraTriggersOffset;
-            cameraBorderInt.Value = Level.Project.CameraBordersOffset;
-            bgTileInt.Value = Level.Project.BackgroundTilesInfoOffset;
-            objTileInt.Value = Level.Project.ObjectTilesInfoOffset;
+        enemyOffsetInt.Value = Level.Project.EnemyOffset;
+        paletteOffsetInt.Value = Level.Project.PaletteInfoOffset;
+        paletteBankInt.Value = Level.Project.PaletteColorBank;
+        checkpointInt.Value = Level.Project.CheckpointOffset;
+        cameraTriggerInt.Value = Level.Project.CameraTriggersOffset;
+        cameraBorderInt.Value = Level.Project.CameraBordersOffset;
+        bgTileInt.Value = Level.Project.BackgroundTilesInfoOffset;
+        objTileInt.Value = Level.Project.ObjectTilesInfoOffset;
+
+        bool tileLengthInfo = false;
+        if (Level.Project.Tile32Count != null || Level.Project.Tile16Count != null)
+        {
+            Tile32Count = Level.Project.Tile32Count;
+            Tile16Count = Level.Project.Tile16Count;
+            tileLengthCheck.IsChecked = true;
+        }
+        else
+        {
+            Tile32Count = (int[,])Const.Tile32Count.Clone();
+            Tile16Count = (int[,])Const.Tile16Count.Clone();
         }
 
+        int id = stageInt.Value;
+        int l = layer1Btn.IsChecked == true ? 0 : 1;
+        tile32Int.Value = Tile32Count[id, l];
+        tile16Int.Value = Tile16Count[id, 0];
+        screenInt.Value = Const.ScreenCount[id, l];
         enable = true;
     }
     #endregion Constructors
@@ -45,161 +63,129 @@ public partial class ProjectWindow : Window
     #region Events
     private async void Window_Closing(object sender, WindowClosingEventArgs e)
     {
-        if (!edited)
-            return;
+        if (edited || tileLengthEdited)
+            SNES.edit = true;
 
-        if (enemyOffsetInt.Value == null)
+        if (edited)
         {
-            await MessageBox.Show(this, "Invalid Enemy Offset", "ERROR");
-            e.Cancel = true;
-            return;
-        }
-        if (paletteOffsetInt.Value == null)
-        {
-            await MessageBox.Show(this, "Invalid Palette Swap Info Offset", "ERROR");
-            e.Cancel = true;
-            return;
-        }
-
-        if (paletteBankInt.Value == null)
-        {
-            await MessageBox.Show(this, "Invalid Palette Swap Bank", "ERROR");
-            e.Cancel = true;
-            return;
-        }
-
-        if (checkpointInt.Value == null)
-        {
-            await MessageBox.Show(this, "Invalid Checkpoint Offset", "ERROR");
-            e.Cancel = true;
-            return;
-        }
-        if (cameraTriggerInt.Value == null)
-        {
-            await MessageBox.Show(this, "Invalid Camera Trigger Offset", "ERROR");
-            e.Cancel = true;
-            return;
-        }
-        if (cameraBorderInt.Value == null)
-        {
-            await MessageBox.Show(this, "Invalid Camera Border Offset", "ERROR");
-            e.Cancel = true;
-            return;
-        }
-        if (bgTileInt.Value == null)
-        {
-            await MessageBox.Show(this, "Invalid Background Tile Setting Info Offset", "ERROR");
-            e.Cancel = true;
-            return;
-        }
-        if (objTileInt.Value == null)
-        {
-            await MessageBox.Show(this, "Invalid Object Tile Setting Info Offset", "ERROR");
-            e.Cancel = true;
-            return;
-        }
-        if (await MessageBox.Show(this, "Are sure your okay with this configuration?", "WARNING", MessageBoxButton.YesNo))
-        {
-            e.Cancel = true;
-            return;
-        }
-
-        //Enemy
-        if (enemyCheck.IsChecked == true)
-        {
-            Level.Project.Enemies = Level.Enemies;
-            Level.Project.EnemyOffset = (int)enemyOffsetInt.Value;
-        }
-        else
-            Level.Project.Enemies = null;
-
-        //Palette
-        if (paletteCheck.IsChecked == true)
-        {
-            Level.Project.BGPalettes = PaletteEditor.BGPalettes;
-            Level.Project.PaletteInfoOffset = (int)paletteOffsetInt.Value;
-            Level.Project.PaletteColorBank = (int)paletteBankInt.Value;
-        }
-        else
-        {
-            Level.Project.BGPalettes = null;
-            MainWindow.window.paletteE.CollectData();
-        }
-        MainWindow.window.paletteE.AssignLimits();
-
-        //Checkpoint
-        if (checkpointCheck.IsChecked == true)
-        {
-            Level.Project.Checkpoints = SpawnEditor.Checkpoints;
-            Level.Project.CheckpointOffset = (int)checkpointInt.Value;
-        }
-        else
-        {
-            Level.Project.Checkpoints = null;
-            MainWindow.window.spawnE.CollectData();
-        }
-        MainWindow.window.spawnE.SetSpawnSettings();
-
-        //Camera
-        if (cameraCheck.IsChecked == true)
-        {
-            Level.Project.CameraTriggers = CameraEditor.CameraTriggers;
-            Level.Project.CameraTriggersOffset = (int)cameraTriggerInt.Value;
-            Level.Project.CameraBordersOffset = (int)cameraBorderInt.Value;
-
-            if (CameraEditor.CameraBorderSettings.Length < 255)
+            //Enemy
+            if (enemyCheck.IsChecked == true)
             {
-                Array.Resize(ref CameraEditor.CameraBorderSettings, 255);
-
-                //Fix up new Empty Entries
-                for (int i = 0; i < CameraEditor.CameraBorderSettings.Length; i++)
-                {
-                    if (CameraEditor.CameraBorderSettings[i] != 0) continue;
-                    CameraEditor.CameraBorderSettings[i] = Const.CameraBorderLeftWRAM;
-                }
+                Level.Project.Enemies = Level.Enemies;
+                Level.Project.EnemyOffset = enemyOffsetInt.Value;
             }
-            for (int i = 0; i < 4; i++)
-                MainWindow.window.camE.borderInts[i].Maximum = 254;
-            Level.Project.CameraBorderSettings = CameraEditor.CameraBorderSettings;
-        }
-        else
-        {
-            Level.Project.CameraTriggers = null;
-            Array.Resize(ref CameraEditor.CameraBorderSettings, Const.MaxTotalCameraSettings); //need to resize in case they dont want json any more.
-            for (int i = 0; i < 4; i++)
-                MainWindow.window.camE.borderInts[i].Maximum = Const.MaxTotalCameraSettings - 1;
-            MainWindow.window.camE.borderSettingInt.Value = 0;
-            MainWindow.window.camE.borderSettingInt.Maximum = Const.MaxTotalCameraSettings - 1;
-            MainWindow.window.camE.CollectData();
-        }
-        MainWindow.window.camE.AssignTriggerLimits();
+            else
+                Level.Project.Enemies = null;
 
-        //Background Tiles
-        if (bgTileCheck.IsChecked == true)
-        {
-            Level.Project.BGSettings = TileEditor.BGSettings;
-            Level.Project.BackgroundTilesInfoOffset = (int)bgTileInt.Value;
-        }
-        else
-        {
-            Level.Project.BGSettings = null;
-            MainWindow.window.tileE.CollectBGData();
+            //Palette
+            if (paletteCheck.IsChecked == true)
+            {
+                Level.Project.BGPalettes = PaletteEditor.BGPalettes;
+                Level.Project.PaletteInfoOffset = paletteOffsetInt.Value;
+                Level.Project.PaletteColorBank = paletteBankInt.Value;
+            }
+            else
+            {
+                Level.Project.BGPalettes = null;
+                MainWindow.window.paletteE.CollectData();
+            }
+            MainWindow.window.paletteE.AssignLimits();
+
+            //Checkpoint
+            if (checkpointCheck.IsChecked == true)
+            {
+                Level.Project.Checkpoints = SpawnEditor.Checkpoints;
+                Level.Project.CheckpointOffset = checkpointInt.Value;
+            }
+            else
+            {
+                Level.Project.Checkpoints = null;
+                MainWindow.window.spawnE.CollectData();
+            }
+            MainWindow.window.spawnE.SetSpawnSettings();
+
+            //Camera
+            if (cameraCheck.IsChecked == true)
+            {
+                Level.Project.CameraTriggers = CameraEditor.CameraTriggers;
+                Level.Project.CameraTriggersOffset = cameraTriggerInt.Value;
+                Level.Project.CameraBordersOffset = cameraBorderInt.Value;
+
+                if (CameraEditor.CameraBorderSettings.Length < 255)
+                {
+                    Array.Resize(ref CameraEditor.CameraBorderSettings, 255);
+
+                    //Fix up new Empty Entries
+                    for (int i = 0; i < CameraEditor.CameraBorderSettings.Length; i++)
+                    {
+                        if (CameraEditor.CameraBorderSettings[i] != 0) continue;
+                        CameraEditor.CameraBorderSettings[i] = Const.CameraBorderLeftWRAM;
+                    }
+                }
+                for (int i = 0; i < 4; i++)
+                    MainWindow.window.camE.borderInts[i].Maximum = 254;
+                Level.Project.CameraBorderSettings = CameraEditor.CameraBorderSettings;
+            }
+            else
+            {
+                Level.Project.CameraTriggers = null;
+                Array.Resize(ref CameraEditor.CameraBorderSettings, Const.MaxTotalCameraSettings); //need to resize in case they dont want json any more.
+                for (int i = 0; i < 4; i++)
+                    MainWindow.window.camE.borderInts[i].Maximum = Const.MaxTotalCameraSettings - 1;
+                MainWindow.window.camE.borderSettingInt.Value = 0;
+                MainWindow.window.camE.borderSettingInt.Maximum = Const.MaxTotalCameraSettings - 1;
+                MainWindow.window.camE.CollectData();
+            }
+            MainWindow.window.camE.AssignTriggerLimits();
+
+            //Background Tiles
+            if (bgTileCheck.IsChecked == true)
+            {
+                Level.Project.BGSettings = TileEditor.BGSettings;
+                Level.Project.BackgroundTilesInfoOffset = bgTileInt.Value;
+            }
+            else
+            {
+                Level.Project.BGSettings = null;
+                MainWindow.window.tileE.CollectBGData();
+            }
+
+            //Object Tiles
+            if (objTileCheck.IsChecked == true)
+            {
+                Level.Project.ObjectSettings = TileEditor.ObjectSettings;
+                Level.Project.ObjectTilesInfoOffset = objTileInt.Value;
+            }
+            else
+            {
+                Level.Project.ObjectSettings = null;
+                MainWindow.window.tileE.CollectOBJData();
+            }
+
+            MainWindow.window.tileE.AssignLimits();
+            SNES.edit = true;
         }
 
-        //Object Tiles
-        if (objTileCheck.IsChecked == true)
+        if (tileLengthEdited)
         {
-            Level.Project.ObjectSettings = TileEditor.ObjectSettings;
-            Level.Project.ObjectTilesInfoOffset = (int)objTileInt.Value;
-        }
-        else
-        {
-            Level.Project.ObjectSettings = null;
-            MainWindow.window.tileE.CollectOBJData();
-        }
+            if (tileLengthCheck.IsChecked == true)
+            {
+                Level.Project.Tile32Count = Tile32Count;
+                Level.Project.Tile16Count = Tile16Count;
+                Const.Tile32Count = Tile32Count;
+                Const.Tile16Count = Tile16Count;
+            }
+            else
+            {
+                Level.Project.Tile32Count = null;
+                Level.Project.Tile16Count = null;
+                Const.AssignLimits(Const.Id);
+            }
 
-        MainWindow.window.tileE.AssignLimits();
-        SNES.edit = true;
+            MainWindow.window.screenE.AssignLimits();
+            MainWindow.window.tile32E.AssignLimits();
+            MainWindow.window.tile16E.AssignLimits();
+        }
     }
     private async void expandBtn_Click(object sender, RoutedEventArgs e)
     {
@@ -437,7 +423,7 @@ public partial class ProjectWindow : Window
         await MessageBox.Show(this, "The expansion was applied for Layout , Screen , 32x32 , 16x16 tabs!");
 
         //MegaMan X Copy Protection related code
-        if (Const.Id == Const.GameId.MegaManX && await MessageBox.Show(this, "Would apply the patch that disables the cart size checks?", "", MessageBoxButton.YesNo))
+        if (Const.Id == Const.GameId.MegaManX && await MessageBox.Show(this, "Would apply the patch that disables the cart size checks?", "Copyright Patch", MessageBoxButton.YesNo))
         {
             int[] writeOffsets;
 
@@ -477,6 +463,73 @@ public partial class ProjectWindow : Window
         if (!enable)
             return;
         edited = true;
+    }
+    private void stageInt_ValueChanged(object? sender, int e)
+    {
+        if (!enable)
+            return;
+        enable = false;
+        int id = stageInt.Value;
+        int l = layer1Btn.IsChecked == true ? 0 : 1;
+        tile32Int.Value = Tile32Count[id, l];
+        tile16Int.Value = Tile16Count[id, 0];
+        screenInt.Value = Const.ScreenCount[id, l];
+        enable = true;
+    }
+    private void layer1Btn_Checked(object? sender, RoutedEventArgs e)
+    {
+        if (!enable)
+            return;
+        enable = false;
+        int id = stageInt.Value;
+        int l = 0;
+        tile32Int.Value = Tile32Count[id, l];
+        tile16Int.Value = Tile16Count[id, 0];
+        enable = true;
+    }
+    private void layer2Btn_Checked(object? sender, RoutedEventArgs e)
+    {
+        if (!enable)
+            return;
+        enable = false;
+        int id = stageInt.Value;
+        int l = 1;
+        tile32Int.Value = Tile32Count[id, l];
+        tile16Int.Value = Tile16Count[id, 0];
+        enable = true;
+    }
+    private void tile32Int_ValueChanged(object? sender, int e)
+    {
+        if (!enable)
+            return;
+        int id = stageInt.Value;
+        int l = layer1Btn.IsChecked == true ? 0 : 1;
+        Tile32Count[id, l] = e;
+        tileLengthEdited = true;
+    }
+    private void tile16Int_ValueChanged(object? sender, int e)
+    {
+        if (!enable)
+            return;
+        int id = stageInt.Value;
+        Tile16Count[id, 0] = e;
+        Tile16Count[id, 1] = e;
+        tileLengthEdited = true;
+    }
+    private async void screenBtn_Click(object? sender, RoutedEventArgs e)
+    {
+        if (!enable) return;
+
+        int id = stageInt.Value;
+        int l = layer1Btn.IsChecked == true ? 0 : 1;
+        Const.ScreenCount[id, l] = screenInt.Value;
+
+        SNES.edit = true;
+
+        MainWindow.window.layoutE.AssignLimits();
+        MainWindow.window.screenE.AssignLimits();
+
+        await MessageBox.Show(this, "Screen count was updated!");
     }
     #endregion Events
 }
