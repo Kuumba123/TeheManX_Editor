@@ -411,7 +411,20 @@ public partial class EnemyEditor : UserControl
 
         canvas.Restore();
 
-        string cameraText = $"X:{viewerX:X4} Y:{viewerY:X4}";
+        string cameraText = string.Create(13, (viewerX, viewerY), (buffer, state) =>
+        {
+            // 1. Write "X:"
+            "X:".AsSpan().CopyTo(buffer);
+
+            // 2. Write viewerX as Hex (X4) starting at index 2
+            state.viewerX.TryFormat(buffer.Slice(2, 4), out _, "X4");
+
+            // 3. Write " Y:" starting at index 6
+            " Y:".AsSpan().CopyTo(buffer.Slice(6));
+
+            // 4. Write viewerY as Hex (X4) starting at index 9
+            state.viewerY.TryFormat(buffer.Slice(9, 4), out _, "X4");
+        });
 
         canvas.DrawText(cameraText, 5, 0 - labelBigStrokePaint.FontMetrics.Ascent, labelBigStrokePaint);
         canvas.DrawText(cameraText, 5, 0 - labelBigFillPaint.FontMetrics.Ascent, labelBigFillPaint);

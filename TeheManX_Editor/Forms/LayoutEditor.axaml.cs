@@ -130,7 +130,24 @@ public partial class LayoutEditor : UserControl
         if (ShowLayoutGrid)
             MainWindow.DrawGrid(canvas, destRect.Width, destRect.Height, 3, 3);
 
-        string cameraText = $"X:{viewerX >> 8:X2} Y:{viewerY >> 8:X2}";
+        // Pre-calculate the shifted values to keep the lambda clean
+        int shiftX = viewerX >> 8;
+        int shiftY = viewerY >> 8;
+
+        string cameraText = string.Create(9, (shiftX, shiftY), (buffer, state) =>
+        {
+            // 1. Write "X:"
+            "X:".AsSpan().CopyTo(buffer);
+
+            // 2. Write shifted X as Hex (X2) into index 2 (length 2)
+            state.shiftX.TryFormat(buffer.Slice(2, 2), out _, "X2");
+
+            // 3. Write " Y:" starting at index 4
+            " Y:".AsSpan().CopyTo(buffer.Slice(4));
+
+            // 4. Write shifted Y as Hex (X2) starting at index 7 (length 2)
+            state.shiftY.TryFormat(buffer.Slice(7, 2), out _, "X2");
+        });
 
         canvas.DrawText(cameraText, 5, 0 - EnemyEditor.labelBigStrokePaint.FontMetrics.Ascent, EnemyEditor.labelBigStrokePaint);
         canvas.DrawText(cameraText, 5, 0 - EnemyEditor.labelBigFillPaint.FontMetrics.Ascent, EnemyEditor.labelBigFillPaint);
