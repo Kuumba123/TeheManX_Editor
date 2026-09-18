@@ -1096,6 +1096,42 @@ namespace TeheManX_Editor
             }
 
             /*
+             * Palette Anime Export
+             */
+
+            if (Project.PaletteAnimes == null) //Using data in game
+            {
+                List<PaletteAnime> sourceSettings = AnimeEditor.PaletteAnimes;
+
+                int[] shared = new int[sourceSettings.Count];
+                AnimeEditor.GetSharedAnimeInfo(sourceSettings, shared);
+
+                //Export Palette Animes
+                byte[] exportData = AnimeEditor.CreateAnimeInfoData(sourceSettings, shared, SNES.OffsetToCpu(Const.PaletteAnimeInfoOffset));
+                Array.Copy(exportData, 0, SNES.rom, Const.PaletteAnimeInfoOffset, exportData.Length);
+                exportData = AnimeEditor.CreateAnimeBoundsData(sourceSettings);
+                Array.Copy(exportData, 0, SNES.rom, Const.PaletteAnimeBoundsOffset, exportData.Length);
+            }
+            else
+            {
+                saveJson = true;
+
+                if (Project.PaletteAnimeInfoOffset != 0)
+                {
+                    int[] shared = new int[Project.PaletteAnimes.Count];
+                    AnimeEditor.GetSharedAnimeInfo(Project.PaletteAnimes, shared);
+                    byte[] exportData = AnimeEditor.CreateAnimeInfoData(Project.PaletteAnimes, shared , SNES.OffsetToCpu(Project.PaletteAnimeInfoOffset));
+                    Array.Copy(exportData, 0, SNES.rom, Project.PaletteAnimeInfoOffset, exportData.Length);
+                }
+
+                if (Project.PaletteAnimeBoundsOffset != 0)
+                {
+                    byte[] exportData = AnimeEditor.CreateAnimeBoundsData(Project.PaletteAnimes);
+                    Array.Copy(exportData, 0, SNES.rom, Project.PaletteAnimeBoundsOffset, exportData.Length);
+                }
+            }
+
+            /*
              * Enemy Export
              */
 
@@ -1705,21 +1741,23 @@ namespace TeheManX_Editor
         }
         public static string GetObjectName(byte id, byte type)
         {
+            string name = null;
+
             switch (type)
             {
                 case 0:
 
                     break;
                 case 1:
+                    Const.MiscNames.TryGetValue(id, out name);
                     break;
                 case 2:
-                    if (Const.EffectNames.ContainsKey(id))
-                        return Const.EffectNames[id];
+                    Const.EffectNames.TryGetValue(id, out name);
                     break;
                 default:
                     break;
             }
-            return null;
+            return name;
         }
         #endregion Methods
     }

@@ -41,6 +41,7 @@
                     <Document Id="spawnTabId" x:Name="spawnDoc" Title="Spawn" CanClose="False"/>
                     <Document Id="cameraTabId" x:Name="cameraDoc" Title="Camera" CanClose="False"/>
                     <Document Id="vramTabId" x:Name="vramDoc" Title="VRAM Tiles" CanClose="False"/>
+                    <Document Id="animeTabId" x:Name="animeDoc" Title="Anime" CanClose="False"/>
                 </DocumentDock>
             </RootDock>
         </DockControl>

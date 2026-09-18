@@ -2,7 +2,7 @@
 {
     class Layout
     {
-        public static readonly string CurrentVersion = "1.0";
+        public static readonly string CurrentVersion = "1.1";
         public string Version { get; set; }
         public int MainWindowX { get; set; }
         public int MainWindowY { get; set; }

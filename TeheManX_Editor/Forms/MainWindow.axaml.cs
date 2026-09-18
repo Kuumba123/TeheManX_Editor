@@ -4,6 +4,7 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Platform.Storage;
+using Avalonia.Threading;
 using Dock.Avalonia.Controls;
 using Dock.Model;
 using Dock.Model.Avalonia.Controls;
@@ -61,6 +62,8 @@ namespace TeheManX_Editor.Forms
         internal static LayoutWindow layoutWindow;
         internal static Settings settings = Settings.SetDefaultSettings();
         internal static Process emu;
+        private static int paletteFrameIndex;
+        private static int paletteFrameTimer;
         private static IRootDock loadedIdock;
         private static IDockSerializer serializer = new DockSerializer();
         private static IDockState dockState = new DockState();
@@ -78,6 +81,9 @@ namespace TeheManX_Editor.Forms
         public SpawnEditor spawnE;
         public CameraEditor camE;
         public TileEditor tileE;
+        public AnimeEditor animeE;
+
+        DispatcherTimer PaletteDispatchTimer = new DispatcherTimer();
         #endregion Properties
 
         #region Constructors
@@ -121,6 +127,10 @@ namespace TeheManX_Editor.Forms
             tileE = new TileEditor();
             tileE.IsVisible = false;
             vramDoc.Content = tileE;
+
+            animeE = new AnimeEditor();
+            animeE.IsVisible = false;
+            animeDoc.Content = animeE;
             dockState.Save(mainDockControl.Layout);
             ////////
 
@@ -196,6 +206,10 @@ namespace TeheManX_Editor.Forms
             }
 
             AddHandler(InputElement.KeyDownEvent, Window_KeyDown, RoutingStrategies.Tunnel);
+
+            PaletteDispatchTimer.Interval = TimeSpan.FromMilliseconds(1000 / 60);
+            PaletteDispatchTimer.Tick += PaletteTimer_Tick;
+            PaletteDispatchTimer.Start();
 
             DefineSizing();
 
@@ -826,6 +840,7 @@ namespace TeheManX_Editor.Forms
                 window.paletteE.CollectData();
                 window.spawnE.CollectData();
                 window.camE.CollectData();
+                window.animeE.CollectData();
                 window.enemyE.enemyListCanvas.InvalidateMeasure();
                 window.enemyE.enemyScroll.Offset = new Vector(0, 0);
                 Update();
@@ -957,6 +972,7 @@ namespace TeheManX_Editor.Forms
             spawnE.IsVisible = false;
             camE.IsVisible = false;
             tileE.IsVisible = false;
+            animeE.IsVisible = false;
         }
         private void UnlockWindows()
         {
@@ -969,6 +985,7 @@ namespace TeheManX_Editor.Forms
             spawnE.IsVisible = true;
             camE.IsVisible = true;
             tileE.IsVisible = true;
+            animeE.IsVisible = true;
         }
         internal void DefineSizing()
         {
@@ -1140,6 +1157,11 @@ namespace TeheManX_Editor.Forms
             float py = Snap(y * cellHeight);
 
             canvas.DrawRect(px, py, cellWidth * columnAmount, cellHeight * rowAmount, SelectPaint);
+        }
+        internal void ResetPaletteAnime()
+        {
+            paletteFrameIndex = -1;
+            paletteFrameTimer = 0;
         }
         #endregion Methods
 
@@ -1321,6 +1343,7 @@ namespace TeheManX_Editor.Forms
                 window.paletteE.CollectData();
                 window.spawnE.CollectData();
                 window.camE.CollectData();
+                window.animeE.CollectData();
                 window.enemyE.enemyListCanvas.InvalidateMeasure();
                 window.enemyE.enemyScroll.Offset = new Vector(0, 0);
                 Update();
@@ -1438,6 +1461,56 @@ Start-Process -FilePath $TargetExe
         {
             mainDockControl.Focus(); //This is to make text boxes and numeric up/downs lose focus
         }
+        private void PaletteTimer_Tick(object? sender, EventArgs e)
+        {
+            if (SNES.rom == null) return;
+
+            int id = animeE.animeInt.Value;
+
+            if (AnimeEditor.PaletteAnimes != null && id < AnimeEditor.PaletteAnimes.Count && animeE.enableAnimeCheck.IsChecked == true)
+            {
+                PaletteAnime anime = AnimeEditor.PaletteAnimes[id];
+
+                if (paletteFrameIndex < 0) // Init check
+                {
+                    paletteFrameIndex = 0;
+                    paletteFrameTimer = anime.Frames[0].Timer;
+                    // Apply frame 0 immediately so it's not blank for the first tick
+                    animeE.ApplyPaletteFrame(anime, anime.Frames[0]);
+                }
+
+                paletteFrameTimer--;
+
+                // We use a while loop to handle any "zero-length" frames or immediate jumps
+                while (paletteFrameTimer <= 0)
+                {
+                    paletteFrameIndex++;
+
+                    // Check for Loop
+                    if (paletteFrameIndex >= anime.Frames.Count)
+                        paletteFrameIndex = paletteFrameIndex + anime.LoopIndex;
+
+                    // Safety check
+                    if (paletteFrameIndex >= 0 && paletteFrameIndex < anime.Frames.Count)
+                    {
+                        var currentFrame = anime.Frames[paletteFrameIndex];
+                        paletteFrameTimer = currentFrame.Timer;
+
+                        // color update
+                        animeE.ApplyPaletteFrame(anime, currentFrame);
+                    }
+                    else break; // Fallback to prevent infinite loops
+
+                    // If the new timer we just loaded is > 0, we stop looping and wait for the next Tick
+                    if (paletteFrameTimer > 0) break;
+                }
+            }
+            else
+            {
+                paletteFrameIndex = -1;
+                paletteFrameTimer = 0;
+            }
+        }
         private async void Window_Closing(object? sender, WindowClosingEventArgs e)
         {
             /*Some Wird Logic to get around Async + Await*/
@@ -1457,6 +1530,7 @@ Start-Process -FilePath $TargetExe
 
                 await SaveLayout();
                 close = true;
+                PaletteDispatchTimer.Stop();
                 this.Close();
             }
             if (LayoutWindow.isOpen)

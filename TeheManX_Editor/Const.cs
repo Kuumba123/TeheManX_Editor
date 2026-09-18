@@ -48,6 +48,7 @@ namespace TeheManX_Editor
         public static int PaletteStageBase; //Base Id for Stage Palettes
 
         public static int SwapPaletteColorBank;
+        public static int PaletteAnimeColorBank;
 
         public static int BackgroundPaletteOffset;
         public static int BackgroundPaletteInfoLength;
@@ -94,8 +95,9 @@ namespace TeheManX_Editor
         public static int[] MegaManGreenChargeShotTilesOffset = new int[2]; //Offset to MegaMan X Pink Green Shot sprite tiles
 
         public static int PaletteAnimeInfoOffset; //list of 16-bit pointers to palette animes
-        public static int PaletteAnimeBoundsOffset; //Only does X position check
+        public static int PaletteAnimeBoundsOffset; //Only does X position check for X1
         public static int PaletteAnimeCount;
+        public static int PaletteAnimeLength;
 
         public static int[] LayoutPointersOffset = new int[2]; //Layout Pointers Offset to compressed data
         public static int[] ScreenDataPointersOffset = new int[2];
@@ -106,6 +108,7 @@ namespace TeheManX_Editor
         public static FrozenDictionary<int, ObjectIcon> EnemyIcons;
         public static FrozenDictionary<int, ObjectIcon> ItemIcons;
 
+        public static FrozenDictionary<int, string> MiscNames;
         public static FrozenDictionary<int, string> EffectNames;
 
         public static int[,] LayoutLength;
@@ -206,6 +209,7 @@ namespace TeheManX_Editor
 
             public const int PaletteAnimeInfoOffset = 0x28022; //list of 16-bit pointers to palette animes
             public const int PaletteAnimeCount = 0x1E;
+            public const int PaletteAnimeLength = 0x1D4; //size includes all pointers
 
             public static readonly int[] LayoutPointersOffset = { 0x30D24, 0x30F4F }; //Layout Pointers Offset to compressed data
             public static readonly int[] ScreenDataPointersOffset = { 0x30D93, 0x30FBE };
@@ -239,7 +243,7 @@ namespace TeheManX_Editor
 
                 public const int ObjectSpriteInfoOffset = 0x325E4;
 
-                public const int PaletteAnimeBoundsOffset = 0x36324; //Only does X position check
+                public const int PaletteAnimeBoundsOffset = 0x36324;
             }
             internal static class JP // Japanese Version
             {
@@ -336,6 +340,13 @@ namespace TeheManX_Editor
                     {0x63, new ObjectIcon(0x1D8) },
                     {0x65, new ObjectIcon(0x1DC) }
                 }.ToFrozenDictionary();
+
+            public static readonly FrozenDictionary<int, string> MiscNames =
+                new Dictionary<int, string>
+                {
+                    {0x33, "Palette Anime"},
+                }
+                .ToFrozenDictionary();
 
             public static readonly FrozenDictionary<int, string> EffectNames =
                 new Dictionary<int, string>
@@ -519,7 +530,8 @@ namespace TeheManX_Editor
             public const int MegaManTilesOffset = 0x168000; //Offset to MegaMan X sprite tiles
 
             public const int PaletteAnimeInfoOffset = 0x28000; //list of 16-bit pointers to palette animes
-            public const int PaletteAnimeCount = 0x48;
+            public const int PaletteAnimeCount = 0x4B;
+            public const int PaletteAnimeLength = 0x581; //size includes all pointers
 
             public static readonly int[] LayoutPointersOffset = { 0x030888, 0x30AB3 };
             public static readonly int[] ScreenDataPointersOffset = { 0x0308F7, 0x30B22 };
@@ -643,6 +655,13 @@ namespace TeheManX_Editor
                     {0x65, new ObjectIcon(0x16E) },
                 }.ToFrozenDictionary();
 
+            public static readonly FrozenDictionary<int, string> MiscNames =
+                new Dictionary<int, string>
+                {
+                    {0x33, "Palette Anime"},
+                }
+                .ToFrozenDictionary();
+
             public static readonly FrozenDictionary<int, string> EffectNames =
                 new Dictionary<int, string>
                 {
@@ -751,6 +770,7 @@ namespace TeheManX_Editor
 
             public const int PaletteAnimeInfoOffset = 0x28000; //list of 16-bit pointers to palette animes
             public const int PaletteAnimeCount = 0x68;
+            public const int PaletteAnimeLength = 0x76A; //size includes all pointers
 
             public static readonly int[] LayoutPointersOffset = { 0x309B3, 0x30BDE };
             public static readonly int[] ScreenDataPointersOffset = { 0x30A22, 0x30C4D };
@@ -842,6 +862,13 @@ namespace TeheManX_Editor
                     {0x62, new ObjectIcon(0x16C) },
                     {0x63, new ObjectIcon(0x1F0) }
                 }.ToFrozenDictionary();
+
+            public static readonly FrozenDictionary<int, string> MiscNames =
+                new Dictionary<int, string>
+                {
+                    {0x33, "Palette Anime"},
+                }
+                .ToFrozenDictionary();
 
             public static readonly FrozenDictionary<int, string> EffectNames =
                 new Dictionary<int, string>
@@ -1004,12 +1031,14 @@ namespace TeheManX_Editor
 
                 SpriteArrangmentPointersOffset = MegaManX.SpriteArrangmentPointersOffset;
 
-                PaletteAnimeInfoOffset = MegaManX.PaletteInfoOffset;
+                PaletteAnimeInfoOffset = MegaManX.PaletteAnimeInfoOffset;
                 PaletteAnimeCount = MegaManX.PaletteAnimeCount;
+                PaletteAnimeLength = MegaManX.PaletteAnimeLength;
 
                 ItemIcons = MegaManX.ItemIcons;
                 EnemyIcons = MegaManX.EnemyIcons;
 
+                MiscNames = MegaManX.MiscNames;
                 EffectNames = MegaManX.EffectNames;
 
                 if (gameVersion == GameVersion.NA)
@@ -1092,12 +1121,14 @@ namespace TeheManX_Editor
 
                 SpriteArrangmentPointersOffset = MegaManX2.SpriteArrangmentPointersOffset;
 
-                PaletteAnimeInfoOffset = MegaManX2.PaletteInfoOffset;
+                PaletteAnimeInfoOffset = MegaManX2.PaletteAnimeInfoOffset;
                 PaletteAnimeCount = MegaManX2.PaletteAnimeCount;
+                PaletteAnimeLength = MegaManX2.PaletteAnimeLength;
 
                 ItemIcons = MegaManX2.ItemIcons;
                 EnemyIcons = MegaManX2.EnemyIcons;
 
+                MiscNames = MegaManX2.MiscNames;
                 EffectNames = MegaManX2.EffectNames;
 
                 if (gameVersion == GameVersion.NA)
@@ -1176,12 +1207,14 @@ namespace TeheManX_Editor
 
                 SpriteArrangmentPointersOffset = MegaManX3.SpriteArrangmentPointersOffset;
 
-                PaletteAnimeInfoOffset = MegaManX3.PaletteInfoOffset;
+                PaletteAnimeInfoOffset = MegaManX3.PaletteAnimeInfoOffset;
                 PaletteAnimeCount = MegaManX3.PaletteAnimeCount;
+                PaletteAnimeLength = MegaManX3.PaletteAnimeLength;
 
                 ItemIcons = MegaManX3.ItemIcons;
                 EnemyIcons = MegaManX3.EnemyIcons;
 
+                MiscNames = MegaManX3.MiscNames;
                 EffectNames = MegaManX3.EffectNames;
 
                 if (gameVersion == GameVersion.NA)

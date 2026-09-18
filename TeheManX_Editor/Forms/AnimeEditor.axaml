@@ -1,0 +1,69 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="using:TeheManX_Editor.Forms"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="700" d:DesignHeight="800"
+             x:Class="TeheManX_Editor.Forms.AnimeEditor">
+    <Grid>
+		<Grid.ColumnDefinitions>
+            <ColumnDefinition Width="auto"/>
+            <ColumnDefinition Width="auto"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+
+        <StackPanel>
+            <StackPanel Orientation="Horizontal">
+				<TextBlock FontSize="25" Width="170">Palette Anime</TextBlock>
+                <local:NumInt x:Name="animeInt" Minimum="0" Width="70" FontSize="25" ValueChanged="animeInt_ValueChanged"/>
+            </StackPanel>
+		    <CheckBox x:Name="enableAnimeCheck" FontSize="25" Content="Enable"/>
+            <StackPanel Orientation="Horizontal">
+				<TextBlock FontSize="25" Width="170">Color Index:</TextBlock>
+                <local:NumInt x:Name="colorIndexInt" Minimum="0" Width="70" FontSize="25" ValueChanged="colorIndexInt_ValueChanged"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+				<TextBlock FontSize="25" Width="170">Color Count:</TextBlock>
+                <local:NumInt x:Name="colorCountInt" Minimum="0" Width="70" FontSize="25" ValueChanged="colorCountInt_ValueChanged"/>
+            </StackPanel>
+            <Separator Margin="0,0"/>
+            <StackPanel Orientation="Horizontal">
+				<TextBlock FontSize="25" Width="170">Frame Index:</TextBlock>
+                <local:NumInt x:Name="frameInt" Minimum="0" Width="70" FontSize="25" ValueChanged="frameInt_ValueChanged"/>
+            </StackPanel>
+            <Separator Margin="0,0"/>
+            <StackPanel Orientation="Horizontal">
+				<TextBlock FontSize="25" Width="170">Frame Timer:</TextBlock>
+                <local:NumInt x:Name="timerInt" Minimum="0" Width="70" FontSize="25"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <TextBlock FontSize="24" Width="155">Color Pointer:</TextBlock>
+                <local:NumInt x:Name="colorPointerInt" Minimum="0" Width="85" FontSize="25" ValueChanged="colorPointerInt_ValueChanged"/>
+            </StackPanel>
+            <Separator Margin="0,0"/>
+            <StackPanel Orientation="Horizontal">
+				<TextBlock FontSize="25" Width="170">Loop Index:</TextBlock>
+                <local:NumInt x:Name="loopInt" Width="70" FontSize="25" IsHex="False" ValueChanged="loopInt_ValueChanged"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <TextBlock FontSize="25" Width="155">Left Side:</TextBlock>
+                <local:NumInt x:Name="leftSideInt" Minimum="0" Width="85" FontSize="25" ValueChanged="leftSideInt_ValueChanged"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <TextBlock FontSize="25" Width="155">Right Side:</TextBlock>
+                <local:NumInt x:Name="rightSideInt" Minimum="0" Width="85" FontSize="25" ValueChanged="rightSideInt_ValueChanged"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <TextBlock FontSize="25" Width="155">Top Side:</TextBlock>
+                <local:NumInt x:Name="topSideInt" Minimum="0" Width="85" FontSize="25" ValueChanged="topSideInt_ValueChanged"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <TextBlock FontSize="25" Width="155">Bottom Side:</TextBlock>
+                <local:NumInt x:Name="bottomSideInt" Minimum="0" Width="85" FontSize="25" ValueChanged="bottomSideInt_ValueChanged"/>
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</UserControl>
