@@ -144,9 +144,9 @@ public partial class ExternalPaletteWindow : Window
                         return;
 
                     ushort color = BinaryPrimitives.ReadUInt16LittleEndian(rom.AsSpan(colorOffset + c * 2));
-                    byte R = (byte)(color % 32 * 8);
-                    byte G = (byte)(color / 32 % 32 * 8);
-                    byte B = (byte)(color / 1024 % 32 * 8);
+                    byte R = ColorTools.To24Bit(color % 32);
+                    byte G = ColorTools.To24Bit(color / 32 % 32);
+                    byte B = ColorTools.To24Bit(color / 1024 % 32);
 
                     Rectangle rect = colorGrid.Children[c] as Rectangle;
                     rect.Fill = new SolidColorBrush(Color.FromRgb(R, G, B));
@@ -240,7 +240,11 @@ public partial class ExternalPaletteWindow : Window
         for (int i = 0; i < colors.Count; i++)
         {
             if (i > (colorAmount - 1)) break;
-            ushort newC = (ushort)(colors[i].B / 8 * 1024 + colors[i].G / 8 * 32 + colors[i].R / 8);
+            ushort newC = (ushort)(
+				ColorTools.To15Bit(colors[i].B) * 1024 +
+				ColorTools.To15Bit(colors[i].G) * 32 +
+				ColorTools.To15Bit(colors[i].R) 
+			);
             BinaryPrimitives.WriteUInt16LittleEndian(rom.AsSpan(colorDataOffset + i * 2), newC);
         }
 
@@ -320,9 +324,9 @@ public partial class ExternalPaletteWindow : Window
                         for (int c = 0; c < colorCount; c++)
                         {
                             ushort color = BinaryPrimitives.ReadUInt16LittleEndian(rom.AsSpan(colorOffset + c * 2));
-                            byte R = (byte)(color % 32 * 8);
-                            byte G = (byte)(color / 32 % 32 * 8);
-                            byte B = (byte)(color / 1024 % 32 * 8);
+                            byte R = ColorTools.To24Bit(color % 32);
+                            byte G = ColorTools.To24Bit(color / 32 % 32);
+                            byte B = ColorTools.To24Bit(color / 1024 % 32);
                             bw.Write(R);
                             bw.Write(G);
                             bw.Write(B);
@@ -360,9 +364,9 @@ public partial class ExternalPaletteWindow : Window
                         for (int c = 0; c < colorCount; c++)
                         {
                             ushort color = BinaryPrimitives.ReadUInt16LittleEndian(rom.AsSpan(colorOffset + c * 2));
-                            byte R = (byte)(color % 32 * 8);
-                            byte G = (byte)(color / 32 % 32 * 8);
-                            byte B = (byte)(color / 1024 % 32 * 8);
+                            byte R = ColorTools.To24Bit(color % 32);
+                            byte G = ColorTools.To24Bit(color / 32 % 32);
+                            byte B = ColorTools.To24Bit(color / 1024 % 32);
                             lines.Add($"#{R:X2}{G:X2}{B:X2}");
                         }
                         infoOffset += 4;
@@ -408,13 +412,17 @@ public partial class ExternalPaletteWindow : Window
 
         if (colorDialog.confirm)
         {
-            ushort newC = (ushort)(colorDialog.view.Color.B / 8 * 1024 + colorDialog.view.Color.G / 8 * 32 + colorDialog.view.Color.R / 8);
+            ushort newC = (ushort)(
+				ColorTools.To15Bit(colorDialog.view.Color.B) * 1024 +
+				ColorTools.To15Bit(colorDialog.view.Color.G) * 32 +
+				ColorTools.To15Bit(colorDialog.view.Color.R)
+			);
             BinaryPrimitives.WriteUInt16LittleEndian(rom.AsSpan(offset), newC);
 
             //Convert & Change Clut in GUI
-            byte R = (byte)(newC % 32 * 8);
-            byte G = (byte)(newC / 32 % 32 * 8);
-            byte B = (byte)(newC / 1024 % 32 * 8);
+            byte R = ColorTools.To24Bit(newC % 32);
+            byte G = ColorTools.To24Bit(newC / 32 % 32);
+            byte B = ColorTools.To24Bit(newC / 1024 % 32);
             Color color = Color.FromRgb(R, G, B);
             rect.Fill = new SolidColorBrush(color);
         }

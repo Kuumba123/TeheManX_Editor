@@ -1177,9 +1177,9 @@ namespace TeheManX_Editor
                             return;
 
                         ushort color = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(colorOffset + c * 2));
-                        byte R = (byte)(color % 32 * 8);
-                        byte G = (byte)(color / 32 % 32 * 8);
-                        byte B = (byte)(color / 1024 % 32 * 8);
+                        byte R = ColorTools.To24Bit(color % 32);
+                        byte G = ColorTools.To24Bit(color / 32 % 32);
+                        byte B = ColorTools.To24Bit(color / 1024 % 32);
 
                         Palette[colorIndex + c] = (uint)(0xFF000000 | (R << 16) | (G << 8) | B);
                     }
@@ -1256,9 +1256,9 @@ namespace TeheManX_Editor
                                 return;
 
                             ushort color = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(colorOffset + c * 2));
-                            byte R = (byte)(color % 32 * 8);
-                            byte G = (byte)(color / 32 % 32 * 8);
-                            byte B = (byte)(color / 1024 % 32 * 8);
+                            byte R = ColorTools.To24Bit(color % 32);
+                            byte G = ColorTools.To24Bit(color / 32 % 32);
+                            byte B = ColorTools.To24Bit(color / 1024 % 32);
 
                             Palette[colorIndex + c] = (uint)(0xFF000000 | (R << 16) | (G << 8) | B);
                         }
@@ -1627,9 +1627,9 @@ namespace TeheManX_Editor
                             break;
 
                         ushort color = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(colorOffset + c * 2));
-                        byte R = (byte)(color % 32 * 8);
-                        byte G = (byte)(color / 32 % 32 * 8);
-                        byte B = (byte)(color / 1024 % 32 * 8);
+                        byte R = ColorTools.To24Bit(color % 32);
+                        byte G = ColorTools.To24Bit(color / 32 % 32);
+                        byte B = ColorTools.To24Bit(color / 1024 % 32);
 
                         palette[c + colorIndex - 0x80] = (uint)(0xFF000000 | (R << 16) | (G << 8) | B);
                     }

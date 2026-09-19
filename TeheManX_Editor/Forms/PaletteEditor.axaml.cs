@@ -149,9 +149,9 @@ public partial class PaletteEditor : UserControl
         for (int i = 0; i < 16; i++)
         {
             ushort color = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(offset + i * 2));
-            byte R = (byte)(color % 32 * 8);
-            byte G = (byte)(color / 32 % 32 * 8);
-            byte B = (byte)(color / 1024 % 32 * 8);
+            byte R = ColorTools.To24Bit(color % 32);
+            byte G = ColorTools.To24Bit(color / 32 % 32);
+            byte B = ColorTools.To24Bit(color / 1024 % 32);
 
             Rectangle rect = paletteGrid2.Children[i] as Rectangle;
 
@@ -485,15 +485,19 @@ public partial class PaletteEditor : UserControl
 
                 if (colorDialog.confirm)
                 {
-                    ushort newC = (ushort)(colorDialog.view.Color.B / 8 * 1024 + colorDialog.view.Color.G / 8 * 32 + colorDialog.view.Color.R / 8);
+                    ushort newC = (ushort)(
+						ColorTools.To15Bit(colorDialog.view.Color.B) * 1024 +
+						ColorTools.To15Bit(colorDialog.view.Color.G) * 32 +
+						ColorTools.To15Bit(colorDialog.view.Color.R)
+					);
                     BinaryPrimitives.WriteUInt16LittleEndian(SNES.rom.AsSpan(colorOffset), newC);
 
                     SNES.edit = true;
 
                     //Convert & Change Clut in GUI
-                    byte R = (byte)(newC % 32 * 8);
-                    byte G = (byte)(newC / 32 % 32 * 8);
-                    byte B = (byte)(newC / 1024 % 32 * 8);
+                    byte R = ColorTools.To24Bit(newC % 32);
+                    byte G = ColorTools.To24Bit(newC / 32 % 32);
+                    byte B = ColorTools.To24Bit(newC / 1024 % 32);
                     Color color = Color.FromRgb(R, G, B);
                     ((Rectangle)sender).Fill = new SolidColorBrush(color);
                     Level.Palette[r * 16 + c] = 0xFF000000 | (uint)((color.R << 16) | (color.G << 8) | color.B);
@@ -609,7 +613,11 @@ public partial class PaletteEditor : UserControl
                 for (int i = 0; i < colors.Count; i++)
                 {
                     if (i > (colorAmount - 1)) break;
-                    ushort newC = (ushort)(colors[i].B / 8 * 1024 + colors[i].G / 8 * 32 + colors[i].R / 8);
+                    ushort newC = (ushort)(
+						ColorTools.To15Bit(colors[i].B) * 1024 +
+						ColorTools.To15Bit(colors[i].G) * 32 +
+						ColorTools.To15Bit(colors[i].R)
+					);
                     BinaryPrimitives.WriteUInt16LittleEndian(SNES.rom.AsSpan(colorDataOffset + i * 2), newC);
                 }
                 SNES.edit = true;
@@ -760,9 +768,9 @@ public partial class PaletteEditor : UserControl
             for (int c = 0; c < 16; c++)
             {
                 ushort color = BinaryPrimitives.ReadUInt16LittleEndian(SNES.rom.AsSpan(colorOffset + c * 2));
-                byte R = (byte)(color % 32 * 8);
-                byte G = (byte)(color / 32 % 32 * 8);
-                byte B = (byte)(color / 1024 % 32 * 8);
+                byte R = ColorTools.To24Bit(color % 32);
+                byte G = ColorTools.To24Bit(color / 32 % 32);
+                byte B = ColorTools.To24Bit(color / 1024 % 32);
 
                 Level.Palette[colorIndex + c] = (uint)(0xFF000000 | (R << 16) | (G << 8) | B);
             }
@@ -915,8 +923,8 @@ public partial class PaletteEditor : UserControl
 
                 /*
                  * Draw 0x200 (512) tiles from VRAM
-                 * Layout: 16 tiles per row × 64 rows
-                 * Each tile is 8×8 pixels
+                 * Layout: 16 tiles per row ï¿½ 64 rows
+                 * Each tile is 8ï¿½8 pixels
                  */
                 for (int ty = 0; ty < 64; ty++)
                 {

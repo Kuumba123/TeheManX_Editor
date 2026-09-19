@@ -25,9 +25,9 @@ public partial class ColorDialog : Window
         InitializeComponent();
         if (!double.IsNaN(pickerLeft))
             Position = new PixelPoint((int)pickerLeft, (int)pickerTop);
-        byte R = (byte)(color % 32 * 8);
-        byte G = (byte)(color / 32 % 32 * 8);
-        byte B = (byte)(color / 1024 % 32 * 8);
+        byte R = ColorTools.To24Bit(color % 32);
+        byte G = ColorTools.To24Bit(color / 32 % 32);
+        byte B = ColorTools.To24Bit(color / 1024 % 32);
         view.Color = Color.FromRgb(R, G, B);
     }
     #endregion Constructors
@@ -40,7 +40,11 @@ public partial class ColorDialog : Window
     }
     private void ColorView_ColorChanged(object? sender, ColorChangedEventArgs e)
     {
-        ushort newC = (ushort)(view.Color.B / 8 * 1024 + view.Color.G / 8 * 32 + view.Color.R / 8);
+        ushort newC = (ushort)(
+			ColorTools.To15Bit(view.Color.B) * 1024 +
+			ColorTools.To15Bit(view.Color.G) * 32 +
+			ColorTools.To15Bit(view.Color.R)
+		);
         Title = $"Set: {row:X}  Color: {col:X}    15BPP RGB #{newC:X4}";
     }
     private void Window_Closing(object? sender, WindowClosingEventArgs e)
