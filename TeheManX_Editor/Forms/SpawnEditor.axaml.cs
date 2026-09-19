@@ -765,5 +765,12 @@ public partial class SpawnEditor : UserControl
         window.Content = grid;
         await window.ShowDialog(MainWindow.window);
     }
+    private void gateBtn_Click(object sender, RoutedEventArgs e)
+    {
+        if (BossGateWindow.isOpen)
+            return;
+        MainWindow.gateWindow = new BossGateWindow();
+        MainWindow.gateWindow.Show();
+    }
     #endregion Events
 }

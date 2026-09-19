@@ -59,7 +59,11 @@ public partial class HelpWindow : Window
             "This is because the data is controlled via 16 bit pointers rather than 24 bit pointers like in the earlier tabs. " +
             "You can set the location the data will dump the data that uses 16-bit pointers (ex: enemy tab) and use a JSON file to track " +
             "the data so you can still uses the editor. If you want to use the editor to track the data your self but you want to export it your self " +
-            "then you can specify an offset of 0."
+            "then you can specify an offset of 0.",
+            //8
+            "This is where you can edit what tiles get removed/added for the boss gates. " +
+            "The Left Side of the window is for the 16x16 added tiles and the right side is for the removed tiles. " +
+            "Just note that the left side is on per stage basis vs the right side is is for all stages."
     };
     public HelpWindow(int msgId)
     {

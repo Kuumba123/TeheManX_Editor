@@ -1,0 +1,103 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:local="using:TeheManX_Editor.Forms"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="440" d:DesignHeight="220"
+        x:Class="TeheManX_Editor.Forms.BossGateWindow"
+        Title="Boss Gate Editor" Opened="Window_Opened" Closing="Window_Closing" Topmost="True" Width="440" Height="500" CanResize="False">
+    <Window.Styles>
+        <Style Selector="local|NumInt">
+            <Setter Property="FontSize" Value="24"/>
+            <Setter Property="Width" Value="95"/>
+            <Setter Property="Height" Value="40"/>
+            <Setter Property="FontFamily" Value="Consolas"/>
+        </Style>
+    </Window.Styles>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+
+            <!--Boss Gate to be Added-->
+            <local:SkiaControl RenderEvent="bossGateImage_RenderEvent" MeasureEvent="bossGateImage_MeasureEvent" x:Name="bossGateImage" Width="32" Height="96"/>
+
+            <StackPanel Grid.Row="1" x:Name="bossGateIntsPannel">
+                <local:NumInt Minimum="0" Maximum="4096" ValueChanged="bossGateTileInt_ValueChanged">
+                    <local:NumInt.Tag>
+                        <x:Int32>0</x:Int32>
+                    </local:NumInt.Tag>
+                </local:NumInt>
+                <local:NumInt Minimum="0" Maximum="4096" ValueChanged="bossGateTileInt_ValueChanged">
+                    <local:NumInt.Tag>
+                        <x:Int32>1</x:Int32>
+                    </local:NumInt.Tag>
+                </local:NumInt>
+                <local:NumInt Minimum="0" Maximum="4096" ValueChanged="bossGateTileInt_ValueChanged">
+                    <local:NumInt.Tag>
+                        <x:Int32>2</x:Int32>
+                    </local:NumInt.Tag>
+                </local:NumInt>
+            </StackPanel>
+
+            <!--Removed Boss Gate Tiles-->
+            <local:SkiaControl Grid.Column="1" RenderEvent="removedBossGateImage_RenderEvent" MeasureEvent="removedBossGateImage_MeasureEvent" x:Name="removedBossGateImage" Width="64" Height="96"/>
+
+            <Grid Grid.Column="1" Grid.Row="1" >
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <local:NumInt Minimum="0" Maximum="4096" x:Name="removedBossGateInt" Grid.ColumnSpan="2" ValueChanged="removedBossGateInt_ValueChanged"/>
+
+                <!--Left Column-->
+                <StackPanel Grid.Row="1" x:Name="removedBossGateLeftColumn">
+                    <local:NumInt Minimum="0" Maximum="4096"  ValueChanged="removedBossGateTileInt_ValueChanged" HorizontalAlignment="Right">
+                        <local:NumInt.Tag>
+                            <x:Int32>0</x:Int32>
+                        </local:NumInt.Tag>
+                    </local:NumInt>
+                    <local:NumInt Minimum="0" Maximum="4096" ValueChanged="removedBossGateTileInt_ValueChanged" HorizontalAlignment="Right">
+                        <local:NumInt.Tag>
+                            <x:Int32>1</x:Int32>
+                        </local:NumInt.Tag>
+                    </local:NumInt>
+                    <local:NumInt Minimum="0" Maximum="4096" ValueChanged="removedBossGateTileInt_ValueChanged" HorizontalAlignment="Right">
+                        <local:NumInt.Tag>
+                            <x:Int32>2</x:Int32>
+                        </local:NumInt.Tag>
+                    </local:NumInt>
+                </StackPanel>
+
+                <!--Right Column-->
+                <StackPanel Grid.Column="1" Grid.Row="1" x:Name="removedBossGateRightColumn">
+                    <local:NumInt Minimum="0" Maximum="4096"  ValueChanged="removedBossGateTileInt_ValueChanged" HorizontalAlignment="Left">
+                        <local:NumInt.Tag>
+                            <x:Int32>3</x:Int32>
+                        </local:NumInt.Tag>
+                    </local:NumInt>
+                    <local:NumInt Minimum="0" Maximum="4096" ValueChanged="removedBossGateTileInt_ValueChanged" HorizontalAlignment="Left">
+                        <local:NumInt.Tag>
+                            <x:Int32>4</x:Int32>
+                        </local:NumInt.Tag>
+                    </local:NumInt>
+                    <local:NumInt Minimum="0" Maximum="4096" ValueChanged="removedBossGateTileInt_ValueChanged" HorizontalAlignment="Left">
+                        <local:NumInt.Tag>
+                            <x:Int32>5</x:Int32>
+                        </local:NumInt.Tag>
+                    </local:NumInt>
+                </StackPanel>
+            </Grid>
+
+            <Button Grid.Row="1" Click="HelpButton_Click" Margin="5" HorizontalAlignment="Left" VerticalAlignment="Bottom">?</Button>
+        </Grid>
+</Window>

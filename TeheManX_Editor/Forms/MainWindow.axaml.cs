@@ -60,6 +60,7 @@ namespace TeheManX_Editor.Forms
         #region Fields
         public static MainWindow window;
         internal static LayoutWindow layoutWindow;
+        internal static BossGateWindow gateWindow;
         internal static Settings settings = Settings.SetDefaultSettings();
         internal static Process emu;
         private static int paletteFrameIndex;
@@ -198,6 +199,10 @@ namespace TeheManX_Editor.Forms
                         tileE.romOffsetCheck.IsChecked = layout.UseRomOffset;
                         tileE.freshCheck.IsChecked = layout.RefreshBackground;
                         tileE.objectFreshCheck.IsChecked = layout.RefreshObject;
+
+                        BossGateWindow.layoutLeft = layout.BossGateLeft;
+                        BossGateWindow.layoutTop = layout.BossGateTop;
+                        BossGateWindow.layoutState = layout.BossGateState;
                     }
                 }
                 catch
@@ -261,6 +266,9 @@ namespace TeheManX_Editor.Forms
 
             if (LayoutWindow.isOpen)
                 layoutWindow.UpdateLayoutGrid();
+
+            if (BossGateWindow.isOpen)
+                gateWindow.UpdateBossGateUI();
         }
         public void UpdateWindowTitle()
         {
@@ -843,6 +851,8 @@ namespace TeheManX_Editor.Forms
                 window.animeE.CollectData();
                 window.enemyE.enemyListCanvas.InvalidateMeasure();
                 window.enemyE.enemyScroll.Offset = new Vector(0, 0);
+                if (BossGateWindow.isOpen)
+                    gateWindow.UpdateRemovedBossGateInts();
                 Update();
                 UnlockWindows();
             }
@@ -954,7 +964,11 @@ namespace TeheManX_Editor.Forms
 
                 UseRomOffset = tileE.romOffsetCheck.IsChecked == true,
                 RefreshBackground = tileE.freshCheck.IsChecked == true,
-                RefreshObject = tileE.objectFreshCheck.IsChecked == true
+                RefreshObject = tileE.objectFreshCheck.IsChecked == true,
+
+                BossGateLeft = BossGateWindow.layoutLeft,
+                BossGateTop = BossGateWindow.layoutTop,
+                BossGateState = BossGateWindow.layoutState
             };
 
             string json = JsonConvert.SerializeObject(layout);
@@ -1535,6 +1549,8 @@ Start-Process -FilePath $TargetExe
             }
             if (LayoutWindow.isOpen)
                 layoutWindow.Close();
+            if (BossGateWindow.isOpen)
+                gateWindow.Close();
         }
         private void Window_KeyDown(object? sender, KeyEventArgs e)
         {

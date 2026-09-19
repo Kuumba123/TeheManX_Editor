@@ -33,5 +33,9 @@
         public bool UseRomOffset { get; set; }
         public bool RefreshBackground { get; set; }
         public bool RefreshObject { get; set; }
+        //Boss Gate Window
+        public int? BossGateLeft { get; set; }
+        public int? BossGateTop { get; set; }
+        public int? BossGateState { get; set; }
     }
 }

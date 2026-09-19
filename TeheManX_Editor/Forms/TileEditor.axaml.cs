@@ -940,8 +940,8 @@ public partial class TileEditor : UserControl
         MainWindow.window.tile16E.Draw16xTiles();
         MainWindow.window.tile16E.DrawVramTiles();
 
-        //MainWindow.window.paletteE.DrawPalette();
-        //MainWindow.window.paletteE.DrawVramTiles();
+        if (BossGateWindow.isOpen)
+            MainWindow.gateWindow.DrawBossGate();
     }
     private void bgTileSetInt_ValueChanged(object sender, int newValue)
     {

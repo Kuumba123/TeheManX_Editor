@@ -70,6 +70,10 @@ namespace TeheManX_Editor
         public static int CheckpointOffset;
         public static int[] MaxCheckpoints = new int[MaxLevels];
 
+        public static int BossDoorTilesOffset;
+        public static int RemovedBossDoorTilesOffset;
+        public static int RemovedBossDoorCount;
+
         public static int CameraTriggersOffset;
         public static int CameraSettingsOffset;
         public static int CameraSettingsBank;
@@ -188,6 +192,8 @@ namespace TeheManX_Editor
 
             public const int MaxTotalCheckpoints = 44;
 
+            public const int RemovedBossDoorCount = 0x16;
+
             public const int MaxTotalCameraSettings = 0x46; //ID Used in Storm Eagle Stage
             public const int CameraSettingsBank = 0x86;
             public const int CameraTriggersLength = 0x7EE; //size includes all the pointers
@@ -228,6 +234,8 @@ namespace TeheManX_Editor
                 public const int LoadTileSetInfoOffset = 0x3756F;
                 public const int CompressedTileInfoOffset = 0x376F7;
                 public const int CheckpointOffset = 0x32780;
+                public const int BossDoorTilesOffset = 0x358CB;
+                public const int RemovedBossDoorTilesOffset = 0x35913;
                 public const int CameraTriggersOffset = 0x364E2;
                 public const int CameraSettingsOffset = 0x36CD0;
                 public const int BackgroundPaletteOffset = 0x32260;
@@ -250,6 +258,8 @@ namespace TeheManX_Editor
                 public const int LoadTileSetInfoOffset = 0x37572;
                 public const int CompressedTileInfoOffset = 0x376FA;
                 public const int CheckpointOffset = 0x32783;
+                public const int BossDoorTilesOffset = 0x358CE;
+                public const int RemovedBossDoorTilesOffset = 0x35916;
                 public const int CameraTriggersOffset = 0x364E5;
                 public const int CameraSettingsOffset = 0x36CD3;
                 public const int BackgroundPaletteOffset = 0x32263;
@@ -506,6 +516,8 @@ namespace TeheManX_Editor
 
             public const int MaxTotalCheckpoints = 64;
 
+            public const int RemovedBossDoorCount = 0x16;
+
             public const int MaxTotalCameraSettings = 0x7E;
             public const int CameraTriggersLength = 0xEFB; //size includes all the pointers
             public const int CameraSettingsBank = 0x2;
@@ -546,6 +558,8 @@ namespace TeheManX_Editor
                 public const int CompressedTileInfoOffset = 0x37A01;
                 public const int EnemyPointersOffset = 0x14D3D1;
                 public const int CheckpointOffset = 0x324C5;
+                public const int BossDoorTilesOffset = 0x36375;
+                public const int RemovedBossDoorTilesOffset = 0x36405;
                 public const int BackgroundTileInfoOffset = 0x31D6A;
                 public const int BackgroundPaletteOffset = 0x31DD1;
 
@@ -568,6 +582,8 @@ namespace TeheManX_Editor
                 public const int CompressedTileInfoOffset = 0x37A02;
                 public const int EnemyPointersOffset = 0x14D3D9;
                 public const int CheckpointOffset = 0x324C6;
+                public const int BossDoorTilesOffset = 0x36376;
+                public const int RemovedBossDoorTilesOffset = 0x36406;
                 public const int BackgroundTileInfoOffset = 0x31D6B;
                 public const int BackgroundPaletteOffset = 0x31DD2;
 
@@ -748,6 +764,8 @@ namespace TeheManX_Editor
             public const int LayoutDataOffset = 0x1AF800;
 
             public const int MaxTotalCheckpoints = 53;
+
+            public const int RemovedBossDoorCount = 0x12;
 
             public const int MaxTotalCameraSettings = 0x90;
             public const int CameraTriggersLength = 0x1489; //size includes all the pointers
@@ -949,6 +967,8 @@ namespace TeheManX_Editor
                 public const int LoadTileSetInfoOffset = 0x373C3;
                 public const int CompressedTileInfoOffset = 0x37732;
                 public const int CheckpointOffset = 0x328E4;
+                public const int BossDoorTilesOffset = 0x3559F;
+                public const int RemovedBossDoorTilesOffset = 0x35653;
                 public const int BackgroundTileInfoOffset = 0x32085;
                 public const int BackgroundPaletteOffset = 0x32172;
 
@@ -967,6 +987,8 @@ namespace TeheManX_Editor
                 public const int LoadTileSetInfoOffset = 0x373C4;
                 public const int CompressedTileInfoOffset = 0x37733;
                 public const int CheckpointOffset = 0x328E5;
+                public const int BossDoorTilesOffset = 0x355A0;
+                public const int RemovedBossDoorTilesOffset = 0x35654;
                 public const int BackgroundTileInfoOffset = 0x32086;
                 public const int BackgroundPaletteOffset = 0x32173;
 
@@ -1006,6 +1028,7 @@ namespace TeheManX_Editor
                 LayoutDataOffset = MegaManX.LayoutDataOffset;
 
                 MaxTotalCheckpoints = MegaManX.MaxTotalCheckpoints;
+                RemovedBossDoorCount = MegaManX.RemovedBossDoorCount;
                 CameraSettingsBank = MegaManX.CameraSettingsBank;
                 CameraTriggersLength = MegaManX.CameraTriggersLength;
                 MaxTotalCameraSettings = MegaManX.MaxTotalCameraSettings;
@@ -1046,6 +1069,8 @@ namespace TeheManX_Editor
                     LoadTileSetInfoOffset = MegaManX.NA.LoadTileSetInfoOffset;
                     CompressedTileInfoOffset = MegaManX.NA.CompressedTileInfoOffset;
                     CheckpointOffset = MegaManX.NA.CheckpointOffset;
+                    BossDoorTilesOffset = MegaManX.NA.BossDoorTilesOffset;
+                    RemovedBossDoorTilesOffset = MegaManX.NA.RemovedBossDoorTilesOffset;
                     BackgroundPaletteOffset = MegaManX.NA.BackgroundPaletteOffset;
                     BackgroundTileInfoOffset = MegaManX.NA.BackgroundTileInfoOffset;
                     CameraTriggersOffset = MegaManX.NA.CameraTriggersOffset;
@@ -1060,6 +1085,8 @@ namespace TeheManX_Editor
                     LoadTileSetInfoOffset = MegaManX.JP.LoadTileSetInfoOffset;
                     CompressedTileInfoOffset = MegaManX.JP.CompressedTileInfoOffset;
                     CheckpointOffset = MegaManX.JP.CheckpointOffset;
+                    BossDoorTilesOffset = MegaManX.JP.BossDoorTilesOffset;
+                    RemovedBossDoorTilesOffset = MegaManX.JP.RemovedBossDoorTilesOffset;
                     BackgroundPaletteOffset = MegaManX.JP.BackgroundPaletteOffset;
                     BackgroundTileInfoOffset = MegaManX.JP.BackgroundTileInfoOffset;
                     CameraTriggersOffset = MegaManX.JP.CameraTriggersOffset;
@@ -1090,6 +1117,7 @@ namespace TeheManX_Editor
                 LayoutDataOffset = MegaManX2.LayoutDataOffset;
 
                 MaxTotalCheckpoints = MegaManX2.MaxTotalCheckpoints;
+                RemovedBossDoorCount = MegaManX2.RemovedBossDoorCount;
                 CameraSettingsBank = MegaManX2.CameraSettingsBank;
                 CameraTriggersLength = MegaManX2.CameraTriggersLength;
                 MaxTotalCameraSettings = MegaManX2.MaxTotalCameraSettings;
@@ -1137,6 +1165,8 @@ namespace TeheManX_Editor
                     CompressedTileInfoOffset = MegaManX2.NA.CompressedTileInfoOffset;
                     EnemyPointersOffset = MegaManX2.NA.EnemyPointersOffset;
                     CheckpointOffset = MegaManX2.NA.CheckpointOffset;
+                    BossDoorTilesOffset = MegaManX2.NA.BossDoorTilesOffset;
+                    RemovedBossDoorTilesOffset = MegaManX2.NA.RemovedBossDoorTilesOffset;
                     BackgroundTileInfoOffset = MegaManX2.NA.BackgroundTileInfoOffset;
                     BackgroundPaletteOffset = MegaManX2.NA.BackgroundPaletteOffset;
                     ObjectSpriteInfoOffset = MegaManX2.NA.ObjectSpriteInfoOffset;
@@ -1148,6 +1178,8 @@ namespace TeheManX_Editor
                     CompressedTileInfoOffset = MegaManX2.JP.CompressedTileInfoOffset;
                     EnemyPointersOffset = MegaManX2.JP.EnemyPointersOffset;
                     CheckpointOffset = MegaManX2.JP.CheckpointOffset;
+                    BossDoorTilesOffset = MegaManX2.JP.BossDoorTilesOffset;
+                    RemovedBossDoorTilesOffset = MegaManX2.JP.RemovedBossDoorTilesOffset;
                     BackgroundTileInfoOffset = MegaManX2.JP.BackgroundTileInfoOffset;
                     BackgroundPaletteOffset = MegaManX2.JP.BackgroundPaletteOffset;
                     ObjectSpriteInfoOffset = MegaManX2.JP.ObjectSpriteInfoOffset;
@@ -1176,6 +1208,7 @@ namespace TeheManX_Editor
                 LayoutDataOffset = MegaManX3.LayoutDataOffset;
 
                 MaxTotalCheckpoints = MegaManX3.MaxTotalCheckpoints;
+                RemovedBossDoorCount = MegaManX3.RemovedBossDoorCount;
                 CameraSettingsBank = MegaManX3.CameraSettingsBank;
                 CameraTriggersLength = MegaManX3.CameraTriggersLength;
 
@@ -1222,6 +1255,8 @@ namespace TeheManX_Editor
                     LoadTileSetInfoOffset = MegaManX3.NA.LoadTileSetInfoOffset;
                     CompressedTileInfoOffset = MegaManX3.NA.CompressedTileInfoOffset;
                     CheckpointOffset = MegaManX3.NA.CheckpointOffset;
+                    BossDoorTilesOffset = MegaManX3.NA.BossDoorTilesOffset;
+                    RemovedBossDoorTilesOffset = MegaManX3.NA.RemovedBossDoorTilesOffset;
                     BackgroundTileInfoOffset = MegaManX3.NA.BackgroundTileInfoOffset;
                     BackgroundPaletteOffset = MegaManX3.NA.BackgroundPaletteOffset;
                     ObjectSpriteInfoOffset = MegaManX3.NA.ObjectSpriteInfoOffset;
@@ -1232,6 +1267,8 @@ namespace TeheManX_Editor
                     LoadTileSetInfoOffset = MegaManX3.JP.LoadTileSetInfoOffset;
                     CompressedTileInfoOffset = MegaManX3.JP.CompressedTileInfoOffset;
                     CheckpointOffset = MegaManX3.JP.CheckpointOffset;
+                    BossDoorTilesOffset = MegaManX3.JP.BossDoorTilesOffset;
+                    RemovedBossDoorTilesOffset = MegaManX3.JP.RemovedBossDoorTilesOffset;
                     BackgroundTileInfoOffset = MegaManX3.JP.BackgroundTileInfoOffset;
                     BackgroundPaletteOffset = MegaManX3.JP.BackgroundPaletteOffset;
                     ObjectSpriteInfoOffset = MegaManX3.JP.ObjectSpriteInfoOffset;
