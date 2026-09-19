@@ -1101,16 +1101,16 @@ namespace TeheManX_Editor
 
             if (Project.PaletteAnimes == null) //Using data in game
             {
-                List<PaletteAnime> sourceSettings = AnimeEditor.PaletteAnimes;
-
-                int[] shared = new int[sourceSettings.Count];
-                AnimeEditor.GetSharedAnimeInfo(sourceSettings, shared);
-
-                //Export Palette Animes
-                byte[] exportData = AnimeEditor.CreateAnimeInfoData(sourceSettings, shared, SNES.OffsetToCpu(Const.PaletteAnimeInfoOffset));
-                Array.Copy(exportData, 0, SNES.rom, Const.PaletteAnimeInfoOffset, exportData.Length);
-                exportData = AnimeEditor.CreateAnimeBoundsData(sourceSettings);
-                Array.Copy(exportData, 0, SNES.rom, Const.PaletteAnimeBoundsOffset, exportData.Length);
+                //List<PaletteAnime> sourceSettings = AnimeEditor.PaletteAnimes;
+                //
+                //int[] shared = new int[sourceSettings.Count];
+                //AnimeEditor.GetSharedAnimeInfo(sourceSettings, shared);
+                //
+                ////Export Palette Animes
+                //byte[] exportData = AnimeEditor.CreateAnimeInfoData(sourceSettings, shared, SNES.OffsetToCpu(Const.PaletteAnimeInfoOffset));
+                //Array.Copy(exportData, 0, SNES.rom, Const.PaletteAnimeInfoOffset, exportData.Length);
+                //exportData = AnimeEditor.CreateAnimeBoundsData(sourceSettings);
+                //Array.Copy(exportData, 0, SNES.rom, Const.PaletteAnimeBoundsOffset, exportData.Length);
             }
             else
             {

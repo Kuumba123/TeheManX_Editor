@@ -65,5 +65,7 @@
                 <local:NumInt x:Name="bottomSideInt" Minimum="0" Width="85" FontSize="25" ValueChanged="bottomSideInt_ValueChanged"/>
             </StackPanel>
         </StackPanel>
+
+        <Button Grid.Row="1" Margin="5" Click="HelpButton_Click" HorizontalAlignment="Left" VerticalAlignment="Bottom">WARNING</Button>
     </Grid>
 </UserControl>

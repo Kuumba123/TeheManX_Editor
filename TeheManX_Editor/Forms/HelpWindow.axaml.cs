@@ -63,7 +63,10 @@ public partial class HelpWindow : Window
             //8
             "This is where you can edit what tiles get removed/added for the boss gates. " +
             "The Left Side of the window is for the 16x16 added tiles and the right side is for the removed tiles. " +
-            "Just note that the left side is on per stage basis vs the right side is is for all stages."
+            "Just note that the left side is on per stage basis vs the right side is is for all stages.",
+            //9
+            "This tab is not complete and doesnt even save the data and will probably will stay like that for awhile given how horrible the format is for palette. " +
+            "There might be some sort of export/import function in the future but for now you can only play palette animes."
     };
     public HelpWindow(int msgId)
     {

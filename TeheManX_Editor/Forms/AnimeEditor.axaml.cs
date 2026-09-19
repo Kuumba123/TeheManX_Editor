@@ -150,7 +150,7 @@ public partial class AnimeEditor : UserControl
             }
         }
     }
-    public static byte[] CreateAnimeInfoData(List<PaletteAnime> sourceSettings,int[] shared, int baseCpu)
+    public static byte[] CreateAnimeInfoData(List<PaletteAnime> sourceSettings, int[] shared, int baseCpu)
     {
         baseCpu &= 0xFFFF;
         bool x1 = Const.Id == Const.GameId.MegaManX;
@@ -219,8 +219,8 @@ public partial class AnimeEditor : UserControl
             size = sourceSettings.Count * 2 * 2; // 2 sides, 2 bytes each.
         else
             size = sourceSettings.Count * 4 * 2; // 4 sides, 2 bytes each.
-        
-        byte [] data = new byte[size];
+
+        byte[] data = new byte[size];
 
         if (x1)
         {
@@ -367,6 +367,12 @@ public partial class AnimeEditor : UserControl
     {
         if (SNES.rom == null)
             return;
+    }
+
+    private void HelpButton_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        HelpWindow helpWindow = new HelpWindow(9);
+        helpWindow.ShowDialog(MainWindow.window);
     }
     #endregion Events
 }
