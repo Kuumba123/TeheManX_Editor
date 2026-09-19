@@ -18,6 +18,7 @@ for your respective operating system.
 * [ByteArrayComparer.cs](TeheManX_Editor/ByteArrayComparer.cs) a class needed for using byte arrays in a dictionary
 * [CameraTrigger.cs](TeheManX_Editor/CameraTrigger.cs) - a class represnting the Camera Triggers
 * [Checkpoint.cs](TeheManX_Editor/Checkpoint.cs) - a class represnting the Checkpoint
+* [ColorTools.cs](TeheManX_Editor/ColorTools.cs) - a class containing a few methods for converting colors to and from the SNES format
 * [Const.cs](TeheManX_Editor/Const.cs) - contains the class holding all the constants for all of the games
 * [Enemy.cs](TeheManX_Editor/Enemy.cs) - a class represnting the Enemies
 * [GameProject.cs](TeheManX_Editor/GameProject.cs) - the file containging the Game Project Settings
